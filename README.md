@@ -2,7 +2,7 @@
 
 **Universal Autonomous Codebase Health & Development Engine**
 
-25 commands | 28 flow recipes | Any project, any language, any platform
+26 commands | 28 flow recipes | Any project, any language, any platform
 
 ---
 
@@ -47,7 +47,7 @@ cp docs/healer-user-guide.html ~/.healer/
 /healer:flow feature       # Full feature pipeline
 ```
 
-## Commands (25)
+## Commands (26)
 
 ### Core
 | Command | Description |
@@ -101,6 +101,11 @@ cp docs/healer-user-guide.html ~/.healer/
 | `/healer:ship` | Full PR workflow with auto-reviewer loop |
 | `/healer:deploy` | Gate-checked deployment with smoke tests |
 | `/healer:docs` | Documentation generation (Divio framework) |
+
+### Help
+| Command | Description |
+|---------|-------------|
+| `/healer:help` | Interactive help — list commands, flows, recipes, gates, examples |
 
 ## Flow Orchestrator
 

@@ -47,6 +47,7 @@ Specialized modes for targeted work. Each auto-detects the stack using the same 
 /healer:ship [message]               # Full PR workflow — commit, PR, review loop, merge, deploy
 /healer:docs [scope]                 # Research-augmented documentation generation
 /healer:flow [preset|chain]          # Flow orchestrator — chain commands into pipelines
+/healer:help [topic|command]         # Interactive help — commands, flows, recipes, gates, examples
 ```
 
 ## Flow Orchestrator

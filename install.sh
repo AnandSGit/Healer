@@ -18,7 +18,7 @@ mkdir -p "$CLAUDE_COMMANDS"
 mkdir -p "$HEALER_CONFIG"
 
 # Copy commands
-echo "Installing 25 commands to $CLAUDE_COMMANDS..."
+echo "Installing 26 commands to $CLAUDE_COMMANDS..."
 cp "$SCRIPT_DIR/commands/"healer*.md "$CLAUDE_COMMANDS/"
 echo "  ✅ Commands installed"
 
@@ -36,7 +36,7 @@ echo ""
 echo "═══════════════════════════════════════════════════"
 echo "  Installation complete!"
 echo ""
-echo "  Commands:  $CLAUDE_COMMANDS/healer*.md (25 files)"
+echo "  Commands:  $CLAUDE_COMMANDS/healer*.md (26 files)"
 echo "  Recipes:   $HEALER_CONFIG/recipes.yaml"
 echo "  Guide:     $HEALER_CONFIG/healer-user-guide.html"
 echo ""
