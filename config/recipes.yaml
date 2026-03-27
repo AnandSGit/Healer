@@ -1,0 +1,335 @@
+# Healer Flow Recipes — Custom Pipelines
+# Usage: /healer:flow <recipe-name>
+# Gate types: auto (→), interactive (?→), must-pass (!→)
+#
+# These recipes supplement the built-in presets in healer:flow.
+# Built-in presets: feature, fix, deploy, audit, morning, refactor, tdd, research
+# Custom recipes here take precedence over built-ins with the same name.
+
+flows:
+
+  # ─────────────────────────────────────────────────
+  # DEVELOPMENT LIFECYCLE FLOWS
+  # ─────────────────────────────────────────────────
+
+  full-feature:
+    description: "Complete feature from idea to production"
+    steps:
+      - command: brainstorm
+        gate: interactive
+      - command: research
+        gate: auto
+      - command: design
+        gate: interactive
+      - command: spec
+        gate: interactive
+      - command: plan
+        gate: interactive
+      - command: tdd
+        gate: auto
+      - command: coverage
+        gate: auto
+      - command: review
+        gate: interactive
+      - command: docs
+        gate: auto
+      - command: ship
+        gate: must-pass
+
+  quick-feature:
+    description: "Fast feature — skip brainstorm, go straight to plan"
+    steps:
+      - command: plan
+        gate: interactive
+      - command: implement
+        gate: auto
+      - command: test
+        gate: must-pass
+      - command: push
+        gate: interactive
+
+  spike:
+    description: "Research spike — explore then prototype"
+    steps:
+      - command: research
+        gate: auto
+      - command: brainstorm
+        gate: interactive
+      - command: implement
+        gate: auto
+      - command: test
+        gate: auto
+
+  # ─────────────────────────────────────────────────
+  # BUG FIXING FLOWS
+  # ─────────────────────────────────────────────────
+
+  deep-fix:
+    description: "Thorough bug investigation and fix"
+    steps:
+      - command: diagnose
+        gate: auto
+      - command: research
+        gate: auto
+      - command: debug
+        gate: auto
+      - command: fix
+        gate: auto
+      - command: test
+        gate: must-pass
+      - command: review
+        gate: interactive
+      - command: push
+        gate: interactive
+
+  hotfix:
+    description: "Emergency fix — minimal steps to production"
+    steps:
+      - command: debug
+        gate: auto
+      - command: fix
+        gate: auto
+      - command: test
+        gate: must-pass
+      - command: ship
+        gate: must-pass
+
+  flaky-hunt:
+    description: "Find and fix flaky tests"
+    steps:
+      - command: diagnose
+        gate: auto
+      - command: coverage
+        gate: auto
+      - command: fix
+        args: "unit"
+        gate: auto
+      - command: fix
+        args: "e2e"
+        gate: auto
+      - command: report
+        gate: auto
+
+  # ─────────────────────────────────────────────────
+  # QUALITY & HEALTH FLOWS
+  # ─────────────────────────────────────────────────
+
+  full-audit:
+    description: "Complete quality, security, and coverage audit"
+    steps:
+      - command: analyze
+        gate: auto
+      - command: audit
+        gate: auto
+      - command: coverage
+        gate: auto
+      - command: optimize
+        gate: auto
+      - command: report
+        gate: auto
+
+  pre-release:
+    description: "Pre-release checklist — everything must pass"
+    steps:
+      - command: diagnose
+        gate: must-pass
+      - command: audit
+        gate: must-pass
+      - command: coverage
+        gate: auto
+      - command: review
+        gate: interactive
+      - command: docs
+        gate: auto
+      - command: ship
+        gate: must-pass
+
+  health-deep:
+    description: "Deep health analysis with recommendations"
+    steps:
+      - command: diagnose
+        gate: auto
+      - command: analyze
+        gate: auto
+      - command: coverage
+        gate: auto
+      - command: audit
+        gate: auto
+      - command: report
+        gate: auto
+
+  # ─────────────────────────────────────────────────
+  # ARCHITECTURE & DESIGN FLOWS
+  # ─────────────────────────────────────────────────
+
+  architect-feature:
+    description: "Architecture-first feature development"
+    steps:
+      - command: research
+        gate: auto
+      - command: brainstorm
+        gate: interactive
+      - command: architect
+        gate: interactive
+      - command: design
+        gate: interactive
+      - command: spec
+        gate: auto
+      - command: plan
+        gate: interactive
+
+  design-review:
+    description: "Design then validate with review"
+    steps:
+      - command: design
+        gate: interactive
+      - command: spec
+        gate: auto
+      - command: review
+        gate: interactive
+
+  # ─────────────────────────────────────────────────
+  # CODE IMPROVEMENT FLOWS
+  # ─────────────────────────────────────────────────
+
+  deep-refactor:
+    description: "Research-backed refactoring with full verification"
+    steps:
+      - command: analyze
+        gate: auto
+      - command: research
+        gate: auto
+      - command: plan
+        gate: interactive
+      - command: refactor
+        gate: auto
+      - command: test
+        gate: must-pass
+      - command: optimize
+        gate: auto
+      - command: review
+        gate: interactive
+      - command: push
+        gate: interactive
+
+  perf-deep:
+    description: "Deep performance investigation and optimization"
+    steps:
+      - command: analyze
+        gate: auto
+      - command: research
+        gate: auto
+      - command: optimize
+        gate: auto
+      - command: test
+        gate: must-pass
+      - command: report
+        gate: auto
+
+  tech-debt:
+    description: "Systematic tech debt reduction"
+    steps:
+      - command: analyze
+        gate: auto
+      - command: coverage
+        gate: auto
+      - command: refactor
+        gate: auto
+      - command: test
+        gate: must-pass
+      - command: docs
+        gate: auto
+      - command: push
+        gate: interactive
+
+  # ─────────────────────────────────────────────────
+  # DOCUMENTATION FLOWS
+  # ─────────────────────────────────────────────────
+
+  document-all:
+    description: "Full documentation generation"
+    steps:
+      - command: analyze
+        gate: auto
+      - command: docs
+        gate: auto
+      - command: review
+        gate: interactive
+      - command: push
+        gate: interactive
+
+  # ─────────────────────────────────────────────────
+  # SHIPPING FLOWS
+  # ─────────────────────────────────────────────────
+
+  safe-deploy:
+    description: "Maximum safety deployment pipeline"
+    steps:
+      - command: diagnose
+        gate: must-pass
+      - command: audit
+        gate: must-pass
+      - command: coverage
+        gate: auto
+      - command: review
+        gate: interactive
+      - command: ship
+        gate: must-pass
+
+  ci-fix:
+    description: "Fix CI failures and ship"
+    steps:
+      - command: fix
+        args: "types"
+        gate: auto
+      - command: fix
+        args: "lint"
+        gate: auto
+      - command: fix
+        args: "unit"
+        gate: auto
+      - command: fix
+        args: "build"
+        gate: auto
+      - command: report
+        gate: auto
+      - command: push
+        gate: interactive
+
+  # ─────────────────────────────────────────────────
+  # DAILY ROUTINES
+  # ─────────────────────────────────────────────────
+
+  morning:
+    description: "Morning health check"
+    steps:
+      - command: diagnose
+        gate: auto
+      - command: report
+        gate: auto
+
+  end-of-day:
+    description: "End of day — review, document, push"
+    steps:
+      - command: review
+        gate: auto
+      - command: docs
+        gate: auto
+      - command: push
+        gate: interactive
+
+  weekly-review:
+    description: "Weekly comprehensive review"
+    steps:
+      - command: analyze
+        gate: auto
+      - command: audit
+        gate: auto
+      - command: coverage
+        gate: auto
+      - command: optimize
+        gate: auto
+      - command: docs
+        gate: auto
+      - command: report
+        gate: auto

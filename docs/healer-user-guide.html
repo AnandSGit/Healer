@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Healer v3 — Universal Development Lifecycle Engine</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --yellow: #d29922;
+    --red: #f85149;
+    --purple: #bc8cff;
+    --orange: #f0883e;
+    --cyan: #39d2c0;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+  h1 span { color: var(--green); }
+  h2 { font-size: 1.8rem; margin: 2.5rem 0 1rem; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+  h3 { font-size: 1.3rem; margin: 1.5rem 0 0.75rem; color: var(--purple); }
+  p { margin-bottom: 1rem; color: var(--text-muted); }
+  .subtitle { font-size: 1.2rem; color: var(--text-muted); margin-bottom: 2rem; }
+  .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.75rem; font-weight: 600; margin-right: 0.5rem; }
+  .badge-green { background: rgba(63,185,80,0.15); color: var(--green); border: 1px solid rgba(63,185,80,0.3); }
+  .badge-blue { background: rgba(88,166,255,0.15); color: var(--accent); border: 1px solid rgba(88,166,255,0.3); }
+  .badge-yellow { background: rgba(210,153,34,0.15); color: var(--yellow); border: 1px solid rgba(210,153,34,0.3); }
+  .badge-red { background: rgba(248,81,73,0.15); color: var(--red); border: 1px solid rgba(248,81,73,0.3); }
+  .badge-purple { background: rgba(188,140,255,0.15); color: var(--purple); border: 1px solid rgba(188,140,255,0.3); }
+
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin: 2rem 0; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; text-align: center; }
+  .stat-number { font-size: 2.5rem; font-weight: 700; color: var(--green); }
+  .stat-label { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem; }
+
+  .command-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+  .command-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; transition: border-color 0.2s; }
+  .command-card:hover { border-color: var(--accent); }
+  .command-name { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 1rem; color: var(--green); font-weight: 600; }
+  .command-desc { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; }
+
+  .flow-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; margin-bottom: 0.75rem; }
+  .flow-name { font-family: monospace; color: var(--cyan); font-weight: 600; }
+  .flow-desc { font-size: 0.85rem; color: var(--text-muted); }
+  .flow-steps { font-family: monospace; font-size: 0.8rem; color: var(--accent); margin-top: 0.5rem; }
+
+  .gate-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+  .gate-table th, .gate-table td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid var(--border); }
+  .gate-table th { color: var(--accent); font-weight: 600; background: var(--surface); }
+  .gate-table td { color: var(--text-muted); }
+  .gate-table code { font-family: monospace; color: var(--green); background: rgba(63,185,80,0.1); padding: 0.15rem 0.4rem; border-radius: 4px; }
+
+  .next-map { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1rem 0; font-family: monospace; font-size: 0.85rem; line-height: 1.8; }
+  .next-map .from { color: var(--green); font-weight: 600; }
+  .next-map .arrow { color: var(--text-muted); }
+  .next-map .to { color: var(--accent); }
+
+  code { font-family: 'SF Mono', 'Fira Code', monospace; }
+  pre { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; overflow-x: auto; margin: 1rem 0; font-size: 0.85rem; line-height: 1.6; }
+
+  .toc { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem 2rem; margin: 2rem 0; }
+  .toc-title { font-size: 1rem; font-weight: 600; color: var(--accent); margin-bottom: 0.75rem; }
+  .toc a { color: var(--text-muted); text-decoration: none; display: block; padding: 0.2rem 0; }
+  .toc a:hover { color: var(--accent); }
+
+  .section-group { margin: 1rem 0; }
+  .section-group-title { font-size: 0.85rem; color: var(--orange); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin: 1.5rem 0 0.75rem; }
+
+  footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 0.85rem; text-align: center; }
+</style>
+</head>
+<body>
+
+<h1><span>/healer</span> v3</h1>
+<p class="subtitle">Universal Autonomous Codebase Health & Development Engine<br>25 commands &bull; 28 flow recipes &bull; Any project, any language, any platform</p>
+
+<div class="stats">
+  <div class="stat"><div class="stat-number">25</div><div class="stat-label">Commands</div></div>
+  <div class="stat"><div class="stat-number">28</div><div class="stat-label">Flow Recipes</div></div>
+  <div class="stat"><div class="stat-number">20+</div><div class="stat-label">Languages Supported</div></div>
+  <div class="stat"><div class="stat-number">3</div><div class="stat-label">Gate Operators</div></div>
+  <div class="stat"><div class="stat-number">&infin;</div><div class="stat-label">Custom Recipes</div></div>
+</div>
+
+<div class="toc">
+  <div class="toc-title">Table of Contents</div>
+  <a href="#quick-start">Quick Start</a>
+  <a href="#commands">All 25 Commands</a>
+  <a href="#flow">Flow Orchestrator & Pipelines</a>
+  <a href="#recipes">All 28 Flow Recipes</a>
+  <a href="#gates">Gate Operators</a>
+  <a href="#smart-suggest">Smart Next-Step Suggestions</a>
+  <a href="#custom">Custom Recipes (YAML)</a>
+  <a href="#stacks">Supported Stacks</a>
+</div>
+
+<!-- QUICK START -->
+<h2 id="quick-start">Quick Start</h2>
+<pre>
+# Heal everything autonomously
+/healer
+
+# Run a specific sub-command
+/healer:diagnose
+/healer:fix unit
+/healer:audit security
+
+# Chain commands into a flow
+/healer:flow feature
+/healer:flow brainstorm &rarr; plan &rarr; implement &rarr; test &rarr; ship
+
+# Smart suggest: after any command, run /healer with no args
+# &rarr; It proposes the natural next step
+</pre>
+
+<!-- ALL COMMANDS -->
+<h2 id="commands">All 25 Commands</h2>
+
+<div class="section-group-title">Core Engine</div>
+<div class="command-grid">
+  <div class="command-card">
+    <div class="command-name">/healer</div>
+    <span class="badge badge-green">autonomous</span>
+    <div class="command-desc">Full 7-phase autonomous heal: discover &rarr; understand &rarr; assess &rarr; research &rarr; plan &rarr; execute &rarr; report</div>
+  </div>
+  <div class="command-card">
+    <div class="command-name">/healer:flow</div>
+    <span class="badge badge-purple">orchestrator</span>
+    <div class="command-desc">Chain multiple sub-commands into pipelines with gate controls, built-in presets, custom YAML recipes, and smart next-step suggestions</div>
+  </div>
+</div>
+
+<div class="section-group-title">Ideation & Design</div>
+<div class="command-grid">
+  <div class="command-card">
+    <div class="command-name">/healer:brainstorm</div>
+    <span class="badge badge-blue">interactive</span>
+    <div class="command-desc">Socratic dialogue FIRST, then research. Combines interactive discovery with research-augmented proposals</div>
+  </div>
+  <div class="command-card">
+    <div class="command-name">/healer:research</div>
+    <span class="badge badge-blue">read-only</span>
+    <div class="command-desc">Deep multi-source research on any topic. Searches docs, repos, articles, community discussions</div>
+  </div>
+  <div class="command-card">
+    <div class="command-name">/healer:design</div>
+    <span class="badge badge-blue">document</span>
+    <div class="command-desc">Feature/API/UX design inspired by Stripe, GitHub, Linear. Produces design documents with trade-offs</div>
+  </div>
+  <div class="command-card">
+    <div class="command-name">/healer:architect</div>
+    <span class="badge badge-blue">document</span>
+    <div class="command-desc">System architecture informed by public postmortems and tech company engineering blogs</div>
+  </div>
+  <div class="command-card">
+    <div class="command-name">/healer:spec</div>
+    <span class="badge badge-blue">document</span>
+    <div class="command-desc">Technical specifications cross-referenced with public RFCs, ADRs, and spec templates</div>
+  </div>
+  <div class="command-card">
+    <div class="command-name">/healer:plan</div>
+    <span class="badge badge-purple">planning</span>
+    <div class="command-desc">Bite-sized task lists (2-5 min each) with dependency tracking, file mapping, native TaskCreate integration</div>
+  </div>
+</div>
+
+<div class="section-group-title">Implementation</div>
+<div class="command-grid">
+  <div class="command-card">
+    <div class="command-name">/healer:implement</div>
+    <span class="badge badge-green">code</span>
+    <div class="command-desc">Research-augmented feature building. Searches GitHub for reference implementations before writing code</div>
+  </div>
+  <div class="command-card">
+    <div class="command-name">/healer:tdd</div>
+    <span class="badge badge-green">code</span>
+    <div class="command-desc">Test-driven development: write failing test FIRST, implement minimum code, refactor. Red-Green-Refactor</div>
+  </div>
+  <div class="command-card">
+    <div class="command-name">/healer:refactor</div>
+    <span class="badge badge-green">code</span>
+    <div class="command-desc">Research-augmented refactoring with Martin Fowler pattern citations. Proposes plan before changing</div>
+  </div>
+  <div class="command-card">
+    <div class="command-name">/healer:optimize</div>
+    <span class="badge badge-red">10-phase</span>
+    <div class="command-desc">Structured performance investigation: baselines, profiling, hypothesis testing, controlled experiments, evidence-backed results</div>
+  </div>
+</div>
+
+<div class="section-group-title">Testing & Quality</div>
+<div class="command-grid">
+  <div class="command-card">
+    <div class="command-name">/healer:test</div>
+    <span class="badge badge-green">code</span>
+    <div class="command-desc">Research-augmented test writing. Searches for edge case strategies and framework-specific patterns</div>
+  </div>
+  <div class="command-card">
+    <div class="command-name">/healer:coverage</div>
+    <span class="badge badge-blue">analysis</span>
+    <div class="command-desc">Test coverage analysis with risk-based prioritization. Identifies untested critical paths</div>
+  </div>
+  <div class="command-card">
+    <div class="command-name">/healer:review</div>
+    <span class="badge badge-blue">analysis</span>
+    <div class="command-desc">Code review validated against online best practices. Checks correctness, security, performance, conventions</div>
+  </div>
+  <div class="command-card">
+    <div class="command-name">/healer:audit</div>
+    <span class="badge badge-red">security</span>
+    <div class="command-desc">OWASP top 10, CVE databases, accessibility (WCAG), dependency vulnerabilities, license compliance</div>
+  </div>
+</div>
+
+<div class="section-group-title">Debugging & Fixing</div>
+<div class="command-grid">
+  <div class="command-card">
+    <div class="command-name">/healer:debug</div>
+    <span class="badge badge-yellow">systematic</span>
+    <div class="command-desc">Hypothesis-driven debugging: reproduce, gather evidence, form hypotheses, test one at a time, verify fix</div>
+  </div>
+  <div class="command-card">
+    <div class="command-name">/healer:fix</div>
+    <span class="badge badge-green">code</span>
+    <div class="command-desc">Targeted test suite fix with online error research. Max 5 iterations. Searches for known framework bugs</div>
+  </div>
+</div>
+
+<div class="section-group-title">Health & Reporting</div>
+<div class="command-grid">
+  <div class="command-card">
+    <div class="command-name">/healer:diagnose</div>
+    <span class="badge badge-blue">read-only</span>
+    <div class="command-desc">Run all test suites, compare errors against known framework bugs, produce severity-classified health report</div>
+  </div>
+  <div class="command-card">
+    <div class="command-name">/healer:report</div>
+    <span class="badge badge-blue">read-only</span>
+    <div class="command-desc">Formal A-F health status report with pass/fail counts, error summaries, and grading</div>
+  </div>
+  <div class="command-card">
+    <div class="command-name">/healer:analyze</div>
+    <span class="badge badge-blue">read-only</span>
+    <div class="command-desc">Codebase health vs industry best practices. Tech debt inventory with severity and effort estimates</div>
+  </div>
+</div>
+
+<div class="section-group-title">Shipping</div>
+<div class="command-grid">
+  <div class="command-card">
+    <div class="command-name">/healer:push</div>
+    <span class="badge badge-yellow">git</span>
+    <div class="command-desc">Conventional commit with emoji prefix + push. Never force-pushes, never commits secrets</div>
+  </div>
+  <div class="command-card">
+    <div class="command-name">/healer:ship</div>
+    <span class="badge badge-red">end-to-end</span>
+    <div class="command-desc">Full PR workflow: quality gate &rarr; commit &rarr; PR &rarr; 180s auto-reviewer wait &rarr; comment resolution loop &rarr; merge &rarr; deploy</div>
+  </div>
+  <div class="command-card">
+    <div class="command-name">/healer:deploy</div>
+    <span class="badge badge-yellow">deploy</span>
+    <div class="command-desc">Gate-checked deployment with smoke tests. Auto-detects platform (Vercel, Netlify, AWS, Docker, etc.)</div>
+  </div>
+  <div class="command-card">
+    <div class="command-name">/healer:docs</div>
+    <span class="badge badge-blue">document</span>
+    <div class="command-desc">Documentation generation using Divio framework (tutorials, how-to, reference, explanation). Researches best-in-class docs first</div>
+  </div>
+</div>
+
+<!-- FLOW ORCHESTRATOR -->
+<h2 id="flow">Flow Orchestrator</h2>
+<p>The <code>/healer:flow</code> command chains multiple sub-commands into a pipeline. Use built-in presets, inline syntax, or custom YAML recipes.</p>
+
+<pre>
+# Built-in presets
+/healer:flow feature          # brainstorm ?&rarr; plan ?&rarr; implement &rarr; test !&rarr; review ?&rarr; ship !&rarr;
+/healer:flow fix              # diagnose &rarr; debug &rarr; fix &rarr; test !&rarr; push ?&rarr;
+
+# Inline custom chains
+/healer:flow diagnose &rarr; fix &rarr; test !&rarr; push
+/healer:flow brainstorm ?&rarr; plan ?&rarr; implement &rarr; test !&rarr; ship !&rarr;
+
+# Custom recipes
+/healer:flow pre-release      # from ~/.healer/recipes.yaml
+/healer:flow hotfix
+</pre>
+
+<!-- GATE OPERATORS -->
+<h2 id="gates">Gate Operators</h2>
+<table class="gate-table">
+  <tr><th>Operator</th><th>Name</th><th>On Success</th><th>On Failure</th></tr>
+  <tr><td><code>&rarr;</code></td><td>AUTO</td><td>Continue automatically</td><td>Log warning, continue anyway</td></tr>
+  <tr><td><code>?&rarr;</code></td><td>INTERACTIVE</td><td>Pause: "Continue to {next}? [Y/n]"</td><td>Pause: "Step failed. Continue? [Y/n/abort]"</td></tr>
+  <tr><td><code>!&rarr;</code></td><td>MUST-PASS</td><td>Continue automatically</td><td><strong>HALT flow.</strong> Suggest /healer:fix</td></tr>
+</table>
+
+<!-- ALL RECIPES -->
+<h2 id="recipes">All 28 Flow Recipes</h2>
+
+<div class="section-group-title">Built-in Presets (8)</div>
+
+<div class="flow-card">
+  <div class="flow-name">/healer:flow feature</div>
+  <div class="flow-desc">Full feature development lifecycle</div>
+  <div class="flow-steps">brainstorm ?&rarr; plan ?&rarr; implement &rarr; test !&rarr; review ?&rarr; ship !&rarr;</div>
+</div>
+<div class="flow-card">
+  <div class="flow-name">/healer:flow fix</div>
+  <div class="flow-desc">Diagnose and fix issues</div>
+  <div class="flow-steps">diagnose &rarr; debug &rarr; fix &rarr; test !&rarr; push ?&rarr;</div>
+</div>
+<div class="flow-card">
+  <div class="flow-name">/healer:flow deploy</div>
+  <div class="flow-desc">Safe deployment pipeline</div>
+  <div class="flow-steps">diagnose !&rarr; review ?&rarr; ship !&rarr;</div>
+</div>
+<div class="flow-card">
+  <div class="flow-name">/healer:flow audit</div>
+  <div class="flow-desc">Comprehensive health audit</div>
+  <div class="flow-steps">analyze &rarr; audit &rarr; coverage &rarr; report &rarr;</div>
+</div>
+<div class="flow-card">
+  <div class="flow-name">/healer:flow morning</div>
+  <div class="flow-desc">Quick morning health check</div>
+  <div class="flow-steps">diagnose &rarr; report &rarr;</div>
+</div>
+<div class="flow-card">
+  <div class="flow-name">/healer:flow refactor</div>
+  <div class="flow-desc">Research-backed code improvement</div>
+  <div class="flow-steps">analyze &rarr; plan ?&rarr; refactor &rarr; test !&rarr; review ?&rarr; push ?&rarr;</div>
+</div>
+<div class="flow-card">
+  <div class="flow-name">/healer:flow tdd</div>
+  <div class="flow-desc">Test-driven development flow</div>
+  <div class="flow-steps">plan ?&rarr; tdd &rarr; coverage &rarr; review ?&rarr; push ?&rarr;</div>
+</div>
+<div class="flow-card">
+  <div class="flow-name">/healer:flow research</div>
+  <div class="flow-desc">Deep research to specification</div>
+  <div class="flow-steps">research &rarr; brainstorm ?&rarr; design ?&rarr; spec &rarr;</div>
+</div>
+
+<div class="section-group-title">Custom Recipes (20) — from ~/.healer/recipes.yaml</div>
+
+<div class="flow-card">
+  <div class="flow-name">/healer:flow full-feature</div>
+  <div class="flow-desc">Complete feature from idea to production (10 steps)</div>
+  <div class="flow-steps">brainstorm ?&rarr; research &rarr; design ?&rarr; spec ?&rarr; plan ?&rarr; tdd &rarr; coverage &rarr; review ?&rarr; docs &rarr; ship !&rarr;</div>
+</div>
+<div class="flow-card">
+  <div class="flow-name">/healer:flow quick-feature</div>
+  <div class="flow-desc">Fast feature &mdash; skip brainstorm, go straight to plan</div>
+  <div class="flow-steps">plan ?&rarr; implement &rarr; test !&rarr; push ?&rarr;</div>
+</div>
+<div class="flow-card">
+  <div class="flow-name">/healer:flow spike</div>
+  <div class="flow-desc">Research spike &mdash; explore then prototype</div>
+  <div class="flow-steps">research &rarr; brainstorm ?&rarr; implement &rarr; test &rarr;</div>
+</div>
+<div class="flow-card">
+  <div class="flow-name">/healer:flow deep-fix</div>
+  <div class="flow-desc">Thorough bug investigation and fix</div>
+  <div class="flow-steps">diagnose &rarr; research &rarr; debug &rarr; fix &rarr; test !&rarr; review ?&rarr; push ?&rarr;</div>
+</div>
+<div class="flow-card">
+  <div class="flow-name">/healer:flow hotfix</div>
+  <div class="flow-desc">Emergency fix &mdash; minimal steps to production</div>
+  <div class="flow-steps">debug &rarr; fix &rarr; test !&rarr; ship !&rarr;</div>
+</div>
+<div class="flow-card">
+  <div class="flow-name">/healer:flow flaky-hunt</div>
+  <div class="flow-desc">Find and fix flaky tests</div>
+  <div class="flow-steps">diagnose &rarr; coverage &rarr; fix(unit) &rarr; fix(e2e) &rarr; report &rarr;</div>
+</div>
+<div class="flow-card">
+  <div class="flow-name">/healer:flow full-audit</div>
+  <div class="flow-desc">Complete quality, security, and coverage audit</div>
+  <div class="flow-steps">analyze &rarr; audit &rarr; coverage &rarr; optimize &rarr; report &rarr;</div>
+</div>
+<div class="flow-card">
+  <div class="flow-name">/healer:flow pre-release</div>
+  <div class="flow-desc">Pre-release checklist &mdash; everything must pass</div>
+  <div class="flow-steps">diagnose !&rarr; audit !&rarr; coverage &rarr; review ?&rarr; docs &rarr; ship !&rarr;</div>
+</div>
+<div class="flow-card">
+  <div class="flow-name">/healer:flow health-deep</div>
+  <div class="flow-desc">Deep health analysis with recommendations</div>
+  <div class="flow-steps">diagnose &rarr; analyze &rarr; coverage &rarr; audit &rarr; report &rarr;</div>
+</div>
+<div class="flow-card">
+  <div class="flow-name">/healer:flow architect-feature</div>
+  <div class="flow-desc">Architecture-first feature development</div>
+  <div class="flow-steps">research &rarr; brainstorm ?&rarr; architect ?&rarr; design ?&rarr; spec &rarr; plan ?&rarr;</div>
+</div>
+<div class="flow-card">
+  <div class="flow-name">/healer:flow design-review</div>
+  <div class="flow-desc">Design then validate with review</div>
+  <div class="flow-steps">design ?&rarr; spec &rarr; review ?&rarr;</div>
+</div>
+<div class="flow-card">
+  <div class="flow-name">/healer:flow deep-refactor</div>
+  <div class="flow-desc">Research-backed refactoring with full verification</div>
+  <div class="flow-steps">analyze &rarr; research &rarr; plan ?&rarr; refactor &rarr; test !&rarr; optimize &rarr; review ?&rarr; push ?&rarr;</div>
+</div>
+<div class="flow-card">
+  <div class="flow-name">/healer:flow perf-deep</div>
+  <div class="flow-desc">Deep performance investigation</div>
+  <div class="flow-steps">analyze &rarr; research &rarr; optimize &rarr; test !&rarr; report &rarr;</div>
+</div>
+<div class="flow-card">
+  <div class="flow-name">/healer:flow tech-debt</div>
+  <div class="flow-desc">Systematic tech debt reduction</div>
+  <div class="flow-steps">analyze &rarr; coverage &rarr; refactor &rarr; test !&rarr; docs &rarr; push ?&rarr;</div>
+</div>
+<div class="flow-card">
+  <div class="flow-name">/healer:flow document-all</div>
+  <div class="flow-desc">Full documentation generation</div>
+  <div class="flow-steps">analyze &rarr; docs &rarr; review ?&rarr; push ?&rarr;</div>
+</div>
+<div class="flow-card">
+  <div class="flow-name">/healer:flow safe-deploy</div>
+  <div class="flow-desc">Maximum safety deployment pipeline</div>
+  <div class="flow-steps">diagnose !&rarr; audit !&rarr; coverage &rarr; review ?&rarr; ship !&rarr;</div>
+</div>
+<div class="flow-card">
+  <div class="flow-name">/healer:flow ci-fix</div>
+  <div class="flow-desc">Fix CI failures and ship</div>
+  <div class="flow-steps">fix(types) &rarr; fix(lint) &rarr; fix(unit) &rarr; fix(build) &rarr; report &rarr; push ?&rarr;</div>
+</div>
+<div class="flow-card">
+  <div class="flow-name">/healer:flow end-of-day</div>
+  <div class="flow-desc">End of day &mdash; review, document, push</div>
+  <div class="flow-steps">review &rarr; docs &rarr; push ?&rarr;</div>
+</div>
+<div class="flow-card">
+  <div class="flow-name">/healer:flow weekly-review</div>
+  <div class="flow-desc">Weekly comprehensive review</div>
+  <div class="flow-steps">analyze &rarr; audit &rarr; coverage &rarr; optimize &rarr; docs &rarr; report &rarr;</div>
+</div>
+
+<!-- SMART SUGGEST -->
+<h2 id="smart-suggest">Smart Next-Step Suggestions</h2>
+<p>Every healer sub-command knows what naturally comes next. When you run <code>/healer</code> with no arguments after completing a sub-command, it reads <code>.healer/state.json</code> and proposes the logical next step.</p>
+
+<div class="next-map">
+  <span class="from">brainstorm</span> <span class="arrow">&rarr;</span> <span class="to">plan, design, architect, spec</span><br>
+  <span class="from">plan</span> <span class="arrow">&rarr;</span> <span class="to">implement, tdd</span><br>
+  <span class="from">design</span> <span class="arrow">&rarr;</span> <span class="to">spec, architect, implement</span><br>
+  <span class="from">architect</span> <span class="arrow">&rarr;</span> <span class="to">spec, design, plan</span><br>
+  <span class="from">spec</span> <span class="arrow">&rarr;</span> <span class="to">plan, implement</span><br>
+  <span class="from">implement</span> <span class="arrow">&rarr;</span> <span class="to">test, review, push</span><br>
+  <span class="from">tdd</span> <span class="arrow">&rarr;</span> <span class="to">coverage, review, push</span><br>
+  <span class="from">test</span> <span class="arrow">&rarr;</span> <span class="to">coverage, fix, push</span><br>
+  <span class="from">coverage</span> <span class="arrow">&rarr;</span> <span class="to">test, fix</span><br>
+  <span class="from">debug</span> <span class="arrow">&rarr;</span> <span class="to">fix, test</span><br>
+  <span class="from">fix</span> <span class="arrow">&rarr;</span> <span class="to">test, diagnose, push</span><br>
+  <span class="from">refactor</span> <span class="arrow">&rarr;</span> <span class="to">test, review, push</span><br>
+  <span class="from">optimize</span> <span class="arrow">&rarr;</span> <span class="to">test, review, push</span><br>
+  <span class="from">review</span> <span class="arrow">&rarr;</span> <span class="to">fix, push, ship</span><br>
+  <span class="from">analyze</span> <span class="arrow">&rarr;</span> <span class="to">refactor, audit, fix</span><br>
+  <span class="from">audit</span> <span class="arrow">&rarr;</span> <span class="to">fix, implement</span><br>
+  <span class="from">diagnose</span> <span class="arrow">&rarr;</span> <span class="to">fix, report, deploy</span><br>
+  <span class="from">report</span> <span class="arrow">&rarr;</span> <span class="to">fix, deploy</span><br>
+  <span class="from">research</span> <span class="arrow">&rarr;</span> <span class="to">brainstorm, design, implement</span><br>
+  <span class="from">push</span> <span class="arrow">&rarr;</span> <span class="to">ship, deploy</span><br>
+  <span class="from">docs</span> <span class="arrow">&rarr;</span> <span class="to">push</span><br>
+  <span class="from">ship</span> <span class="arrow">&rarr;</span> <span class="to">(done)</span><br>
+  <span class="from">deploy</span> <span class="arrow">&rarr;</span> <span class="to">(done)</span>
+</div>
+
+<!-- CUSTOM RECIPES -->
+<h2 id="custom">Custom Recipes</h2>
+<p>Define your own flows in <code>~/.healer/recipes.yaml</code>:</p>
+<pre>
+flows:
+  my-workflow:
+    description: "My custom pipeline"
+    steps:
+      - command: diagnose
+        gate: must-pass        # !&rarr;
+      - command: fix
+        args: "unit"
+        gate: auto             # &rarr;
+      - command: review
+        gate: interactive      # ?&rarr;
+      - command: push
+        gate: interactive      # ?&rarr;
+</pre>
+<p>Then run: <code>/healer:flow my-workflow</code></p>
+
+<!-- SUPPORTED STACKS -->
+<h2 id="stacks">Supported Stacks</h2>
+<p>Healer auto-detects the stack by scanning for manifest files. Every command adapts to the detected toolchain.</p>
+<div class="command-grid">
+  <div class="command-card"><div class="command-name">JavaScript / TypeScript</div><div class="command-desc">package.json, tsconfig.json &bull; pnpm/yarn/npm/bun &bull; Next.js, Vite, Angular &bull; Vitest, Jest, Playwright</div></div>
+  <div class="command-card"><div class="command-name">Python</div><div class="command-desc">pyproject.toml, requirements.txt &bull; pip/poetry/uv &bull; Django, FastAPI, Flask &bull; pytest, mypy, ruff</div></div>
+  <div class="command-card"><div class="command-name">Go</div><div class="command-desc">go.mod &bull; go test, golangci-lint &bull; go build</div></div>
+  <div class="command-card"><div class="command-name">Rust</div><div class="command-desc">Cargo.toml &bull; cargo test, cargo clippy &bull; cargo bench, cargo audit</div></div>
+  <div class="command-card"><div class="command-name">Swift / iOS / macOS</div><div class="command-desc">Package.swift, *.xcodeproj &bull; SPM, CocoaPods &bull; XCTest, XCUITest &bull; SwiftLint</div></div>
+  <div class="command-card"><div class="command-name">Kotlin / Android</div><div class="command-desc">build.gradle &bull; Gradle &bull; JUnit, Espresso, Compose Test &bull; ktlint, detekt</div></div>
+  <div class="command-card"><div class="command-name">.NET / C#</div><div class="command-desc">*.sln, *.csproj &bull; NuGet &bull; xUnit, NUnit &bull; dotnet format</div></div>
+  <div class="command-card"><div class="command-name">Flutter / Dart</div><div class="command-desc">pubspec.yaml &bull; flutter test &bull; dart analyze &bull; flutter build</div></div>
+  <div class="command-card"><div class="command-name">Ruby</div><div class="command-desc">Gemfile &bull; RSpec, Minitest &bull; RuboCop &bull; Rails</div></div>
+  <div class="command-card"><div class="command-name">Java</div><div class="command-desc">pom.xml, build.gradle &bull; Maven/Gradle &bull; JUnit &bull; Spring Boot</div></div>
+  <div class="command-card"><div class="command-name">C / C++</div><div class="command-desc">CMakeLists.txt, Makefile &bull; GTest, Catch2 &bull; clang-tidy</div></div>
+  <div class="command-card"><div class="command-name">Elixir, Haskell, OCaml, Julia</div><div class="command-desc">mix.exs, *.cabal, dune-project, Project.toml</div></div>
+</div>
+
+<footer>
+  <p><strong>Healer v3</strong> &mdash; 25 commands &bull; 28 flow recipes &bull; Universal across all projects</p>
+  <p>Global installation: <code>~/.claude/commands/healer*.md</code></p>
+  <p>Custom recipes: <code>~/.healer/recipes.yaml</code></p>
+  <p>Built by Anand S &bull; WeaverBird LLC &bull; 2026</p>
+</footer>
+
+</body>
+</html>
