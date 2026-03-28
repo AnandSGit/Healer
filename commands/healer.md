@@ -1,4 +1,4 @@
-# Healer v3 — Universal Autonomous Codebase Health & Development Engine
+# Healer v4 — Universal Autonomous Codebase Health & Development Engine
 
 **BEFORE PROCEEDING: Read and internalize `commands/_enforcement.md`. All HARD-GATEs, verification protocols, and anti-rationalization rules apply to every phase below.**
 
