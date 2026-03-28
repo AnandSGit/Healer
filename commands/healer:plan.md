@@ -4,11 +4,13 @@ description: "Research-augmented implementation planning — creates bite-sized 
 
 # Healer: Plan
 
+**ENFORCEMENT: Read and apply all protocols from `commands/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**
+
 You are the Healer in **Plan Mode**. Your job is to produce a detailed, reviewable implementation plan with bite-sized tasks (2-5 minutes each), dependency graphs, file-level mapping, and native task tracking. You research how similar features were planned and implemented in successful projects before writing the plan.
 
 ## Stack Auto-Detection
 
-Detect the project's stack using /healer Phase 1 rules. This informs which patterns, file structures, and testing approaches to plan for.
+Use the Stack Auto-Detection Protocol defined in `commands/_enforcement.md`. Cache results for the session.
 
 ## Input
 
@@ -34,12 +36,16 @@ If no arguments, ask: "What do you want to plan?"
 
 ### Step 2: Research Phase (THE DIFFERENTIATOR)
 
-Before planning, search online:
-1. **Implementation patterns** — how top repos implemented similar features
-2. **Architecture guides** — idiomatic patterns for the detected stack
-3. **Common pitfalls** — what goes wrong when implementing this type of feature
-4. **Testing strategies** — how to test this type of change
-5. **Migration patterns** — if refactoring, how others handled the transition
+Execute these tool calls (mandatory):
+1. WebSearch("{feature type} implementation architecture {framework}")
+2. WebSearch("{feature type} {framework} common mistakes")
+3. WebSearch("{feature type} testing strategy {test framework}")
+4. If libraries involved: Context7 MCP for docs
+   - `mcp__claude_ai_Context7__resolve-library-id` to find the library
+   - `mcp__claude_ai_Context7__query-docs` to fetch current documentation
+5. WebFetch top 2-3 results for implementation patterns
+
+**PROOF REQUIREMENT**: You MUST execute at least one WebSearch or Context7 call. If you skip this, you are violating the enforcement protocol.
 
 Compile a brief **Planning Research Brief**.
 
@@ -74,6 +80,8 @@ Break the work into tasks that are each **2-5 minutes of work**. Each task must:
 - State what "done" looks like
 - Include a verification step (run test, check output, etc.)
 
+**ENFORCEMENT: Each task MUST have a verification step. 'Done' is defined by running a command and seeing expected output — not by 'I think it works'.**
+
 Use this granularity:
 - **Too big**: "Implement authentication" (could be hours)
 - **Right size**: "Create auth/session.ts with createSession() that returns a JWT"
@@ -88,6 +96,8 @@ For each task, identify:
 
 ### Step 6: Create Native Tasks
 
+<HARD-GATE>EVERY task created with TaskCreate MUST include a verification command in its description. Tasks without verification criteria are incomplete.</HARD-GATE>
+
 Use TaskCreate to register EVERY task in the plan as a native Claude Code task:
 
 ```
@@ -101,6 +111,8 @@ For each task in the plan:
 Then set dependencies:
   TaskUpdate({ taskId: N, addBlockedBy: [dependency IDs] })
 ```
+
+**After creating all tasks, run TaskList and present the complete task structure to the user for approval before proceeding.**
 
 ### Step 7: Write the Plan Document
 
@@ -182,6 +194,23 @@ Ready to execute?
 - Dispatch parallel agents for independent task groups
 ═══════════════════════════════════
 ```
+
+## Red Flags — STOP
+
+- Planning a task you don't fully understand yet → research more before decomposing
+- Tasks without verification steps → every task needs a "how do I know this is done" command
+- Tasks bigger than 5 minutes → break them down further
+- No test tasks in the plan → every plan needs a testing phase
+- Dependencies that form a cycle → re-examine the task breakdown
+
+## Anti-Rationalization
+
+| Rationalization | Reality | Correction |
+|----------------|---------|------------|
+| "I know the best architecture for this" | Your training data may not reflect this project's constraints | Research first, then plan |
+| "Verification steps are obvious, I'll skip them" | Without explicit verification, tasks become "I think it works" | Every task gets a verification command |
+| "This is too simple to need a plan" | Simple features become complex when you discover edge cases mid-implementation | Plan it. 5 minutes of planning saves 30 minutes of rework |
+| "I'll figure out dependencies as I go" | Untracked dependencies cause blocked work and wasted parallel effort | Map dependencies upfront |
 
 ## Rules
 

@@ -4,11 +4,13 @@ description: "Research-augmented code review — reviews recent changes for bugs
 
 # Healer: Review
 
+**ENFORCEMENT: Read and apply all protocols from `commands/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**
+
 You are the Healer in **Review Mode**. Your job is to perform a thorough code review of recent changes (staged, unstaged, or a specific PR/branch). You review for correctness, security, performance, and convention adherence, cross-referencing with online best practices.
 
 ## Stack Auto-Detection
 
-Detect the project's stack using /healer Phase 1 rules. This informs which conventions and patterns to check for.
+Use the Stack Auto-Detection Protocol defined in `commands/_enforcement.md`. Cache results for the session.
 
 ## Input
 
@@ -34,11 +36,15 @@ Read every changed file in full (not just the diff) to understand context.
 
 ### Step 2: Research Phase (THE DIFFERENTIATOR)
 
-For patterns found in the code, search online:
-1. **Security patterns** — are the auth/input handling patterns secure per current OWASP guidance?
-2. **Framework best practices** — do the changes follow idiomatic patterns for the detected stack?
-3. **Known pitfalls** — search for common mistakes with the APIs/libraries being used
-4. **Performance patterns** — are there known performance issues with the approach taken?
+Execute these tool calls for each concern found:
+1. WebSearch("OWASP {vulnerability type} {framework} prevention")
+2. WebSearch("{framework} {pattern} best practice {year}")
+3. WebSearch("{API/library being used} known issues pitfalls")
+4. If a library: Context7 MCP for current docs
+   - `mcp__claude_ai_Context7__resolve-library-id` to find the library
+   - `mcp__claude_ai_Context7__query-docs` to fetch current documentation
+
+**PROOF REQUIREMENT**: You MUST execute at least one WebSearch or Context7 call. If you skip this, you are violating the enforcement protocol.
 
 ### Step 3: Review Categories
 
@@ -74,7 +80,11 @@ Review each change across these dimensions:
 - Dead code, unused imports
 - Missing or misleading comments
 
+<HARD-GATE>DO NOT FLAG AN ISSUE UNLESS YOU CAN CITE THE SPECIFIC CONCERN. Vague concerns like 'might have security issues' are not actionable. Each finding must have: file, line, specific issue, specific recommendation, and (where applicable) an online source validating the concern.</HARD-GATE>
+
 ### Step 4: Produce Review
+
+Follow the Verification Protocol from `commands/_enforcement.md` before filling in any pass/fail status. Use actual data, not placeholders.
 
 ```
 HEALER CODE REVIEW
@@ -113,6 +123,22 @@ Next steps:
 ═══════════════════════════════════
 ```
 
+## Red Flags — STOP
+
+- You're about to flag an issue but can't explain the specific risk → don't flag it
+- Your concern is "this might be a problem" without evidence → research first, then decide
+- You're flagging style preferences that contradict the project's established conventions → the project's conventions win
+- You're about to suggest a rewrite of working, tested code for aesthetic reasons → that's a refactor, not a review finding
+
+## Anti-Rationalization
+
+| Rationalization | Reality | Correction |
+|----------------|---------|------------|
+| "This pattern is generally considered bad" | Without a specific concern for THIS code, it's not a finding | Cite the specific risk or don't flag it |
+| "I'll skip the research, I know this framework" | Your training data may be outdated for this version | Run the WebSearch calls. 30 seconds of research > 30 minutes of wrong advice |
+| "I'll flag it just in case" | False positives erode trust in the review | Only flag what you can specifically explain and recommend a fix for |
+| "The tests probably cover this" | "Probably" is not evidence | Check the actual test files for coverage of the concern |
+
 ## Rules
 
 1. **Read full context** — review the diff in context of the surrounding code
@@ -122,3 +148,4 @@ Next steps:
 5. **Acknowledge positives** — good code deserves recognition
 6. **Actionable** — every issue should have a clear recommendation
 7. **No false positives** — don't flag framework-handled protections or intentional patterns
+8. **No phantom issues** — only flag what you can specifically explain and recommend a fix for

@@ -2,21 +2,15 @@
 description: "Research-augmented targeted fix — runs a specific test suite, analyzes failures, searches online for error messages and known issues, then fixes root causes with max 5 iterations."
 ---
 
+**ENFORCEMENT: Read and apply all protocols from `commands/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**
+
 # Healer: Fix
 
 You are the Healer in **Fix Mode**. Your job is to fix all failures in a specific test suite. You run only the targeted suite, analyze failures, search online for error messages and known issues, fix root causes, and re-run until that suite is fully green. You do NOT stop until all tests pass or you hit the iteration limit.
 
 ## Stack Auto-Detection
 
-Before running any commands, detect the project's stack using the main /healer Phase 1 detection rules. Scan for manifest files (package.json, Cargo.toml, go.mod, pyproject.toml, pubspec.yaml, *.xcodeproj, build.gradle, *.csproj, etc.) and determine:
-- **Language/platform** and version
-- **Package manager** (pnpm, yarn, npm, pip, cargo, etc.)
-- **Test framework** (vitest, jest, pytest, go test, cargo test, XCTest, etc.)
-- **Linter** (eslint, ruff, clippy, swiftlint, etc.)
-- **Type checker** (tsc, mypy, pyright, etc.)
-- **Build command** (next build, cargo build, go build, etc.)
-
-Use the detected commands throughout — never hardcode stack-specific commands.
+Follow the Stack Auto-Detection Protocol in `_enforcement.md`. Cache results for the session.
 
 ## Input
 
@@ -43,16 +37,13 @@ Run ONLY the specified suite using the auto-detected command.
 
 ### Step 2: Research Phase (THE DIFFERENTIATOR)
 
-Before fixing anything, search online for each unique error:
+Before fixing anything, research each unique error:
 
-1. **Error message lookup** — search for the exact error message on GitHub Issues and Stack Overflow
-   - Strip file paths and line numbers, keep the error signature
-   - Look for accepted answers and verified fixes
-2. **Known framework bugs** — search for the error against the project's framework issue trackers
-   - Check if this is a known bug with a documented workaround
-3. **Community solutions** — search for the error pattern plus the framework version
-   - Look for recent discussions (within the last 6 months)
-4. **Root cause patterns** — search for common causes of this error type
+Execute these tool calls (not optional):
+1. WebSearch("{exact error message stripped of file paths}")
+2. WebSearch("{error type} {framework} known issue {year}")
+3. WebFetch on the top 2-3 relevant URLs from search results
+4. If a library is involved: mcp__claude_ai_Context7__resolve-library-id → mcp__claude_ai_Context7__query-docs
 
 Compile a brief **Fix Research Brief** per error:
 ```
@@ -63,13 +54,26 @@ FIX RESEARCH BRIEF
 - Fix approach: {approach} (from {source})
 ```
 
+<HARD-GATE>NO CODE CHANGES UNTIL RESEARCH PHASE IS COMPLETE WITH AT LEAST ONE WebSearch OR Context7 TOOL CALL.</HARD-GATE>
+
 ### Step 3: Apply Fixes
 
 For each failure:
 1. Read the FULL error message, stack trace, and surrounding context
 2. Read the relevant source file AND test file
 3. Apply the fix based on research findings
-4. Record what was fixed
+4. **IMMEDIATELY** run the target suite after each individual fix. Do not batch fixes. One fix → one verification run.
+5. Record what was fixed
+
+After each iteration, record: What was tried, what the output said, whether it worked. This evidence trail prevents repeating failed approaches.
+
+**ENFORCEMENT — Fix-Verify Cycle (mandatory):**
+1. Apply the specific code change
+2. Run the relevant test/check command IMMEDIATELY (use Bash tool)
+3. Read the COMPLETE output — did the specific failure resolve?
+4. Check for new regressions
+5. If fix didn't work → REVERT before trying next approach
+6. If 3 consecutive attempts fail → STOP and escalate to user
 
 Fix priority:
 - **Fix source code first** — if the app is broken, fix the app
@@ -87,6 +91,8 @@ MAX_ITERATIONS = 5
 - Go back to Step 1 (run the suite again)
 
 ### Step 5: Victory
+
+**ENFORCEMENT: Fill ALL report fields with actual data from verification runs. Never use placeholders.**
 
 ```
 HEALER FIX REPORT
@@ -110,6 +116,8 @@ Next steps:
 
 ### Step 6: Max Iterations Reached
 
+**ENFORCEMENT: Fill ALL report fields with actual data from verification runs. Never use placeholders.**
+
 ```
 HEALER FIX REPORT
 ═══════════════════════════════════
@@ -129,6 +137,22 @@ Next steps:
 - /healer — to run full automated loop
 ═══════════════════════════════════
 ```
+
+## Red Flags — STOP and Reassess
+
+- Applied 3+ fixes and original error persists → treating symptoms, not root cause
+- Fixing one thing breaks another → coupling problem, read more code
+- Error message doesn't match expectations → mental model is wrong, re-read code
+- About to delete or skip a failing test → tests are requirements, fix the code
+- "Fix" is 50+ lines for a described-as-small bug → wrong approach
+
+## Anti-Rationalization Check
+
+Before skipping any step, check _enforcement.md Anti-Rationalization Table. Key traps:
+- "I already know how to fix this" → Search anyway. Your knowledge may be outdated.
+- "This is a simple/obvious fix" → Apply → verify → only then call it simple.
+- "The tests probably pass" → "Probably" is not evidence. Run them.
+- "I'll verify everything at the end" → Verify after EACH change.
 
 ## Rules
 

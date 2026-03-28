@@ -1,5 +1,5 @@
 #!/bin/bash
-# Healer v3 — Install Script
+# Healer v4 — Install Script
 # Copies commands to Claude Code global commands directory
 
 set -e
@@ -9,13 +9,19 @@ CLAUDE_COMMANDS="$HOME/.claude/commands"
 HEALER_CONFIG="$HOME/.healer"
 
 echo "═══════════════════════════════════════════════════"
-echo "  Healer v3 — Universal Development Lifecycle Engine"
+echo "  Healer v4 — Universal Development Lifecycle Engine"
+echo "  Now with Enforcement Protocol for real effectiveness"
 echo "═══════════════════════════════════════════════════"
 echo ""
 
 # Create directories
 mkdir -p "$CLAUDE_COMMANDS"
 mkdir -p "$HEALER_CONFIG"
+
+# Copy enforcement layer first
+echo "Installing enforcement protocol to $CLAUDE_COMMANDS..."
+cp "$SCRIPT_DIR/commands/_enforcement.md" "$CLAUDE_COMMANDS/"
+echo "  ✅ Enforcement protocol installed"
 
 # Copy commands
 echo "Installing 26 commands to $CLAUDE_COMMANDS..."
@@ -36,6 +42,7 @@ echo ""
 echo "═══════════════════════════════════════════════════"
 echo "  Installation complete!"
 echo ""
+echo "  Enforce:   $CLAUDE_COMMANDS/_enforcement.md"
 echo "  Commands:  $CLAUDE_COMMANDS/healer*.md (26 files)"
 echo "  Recipes:   $HEALER_CONFIG/recipes.yaml"
 echo "  Guide:     $HEALER_CONFIG/healer-user-guide.html"

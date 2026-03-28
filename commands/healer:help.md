@@ -2,6 +2,8 @@
 description: "Interactive help system — list commands, flows, recipes, gates, examples, and get detailed help for any healer sub-command"
 ---
 
+**ENFORCEMENT: Read and apply all protocols from `commands/_enforcement.md` before proceeding.**
+
 # Healer: Help
 
 You are the Healer in **Help Mode**. Your job is to provide clear, well-formatted, interactive help to the user about all available Healer commands, flows, recipes, and usage patterns.
@@ -41,7 +43,8 @@ Display:
 HEALER — Help
 ═══════════════════════════════════════════════════════════
 Universal Autonomous Codebase Health & Development Engine
-v3 — 26 commands | 8 flow presets | 20+ recipes
+v4 — 26 commands | 8 flow presets | 20+ recipes
+     Shared enforcement layer for research, verification & fixes
 
 CATEGORIES
 ──────────────────────────────────────────────────
@@ -137,6 +140,9 @@ HELP
 ─────────────────────────────────────────────────────────
   /healer:help             {description}
 
+All commands follow the shared enforcement protocol (_enforcement.md):
+  research is mandatory, verification is evidence-based, fixes are verified immediately.
+
 Tip: /healer:help <command> for detailed help on any command
 ═══════════════════════════════════════════════════════════
 ```
@@ -176,7 +182,12 @@ HEALER — Flow Presets (8)
 GATE OPERATORS
   →   AUTO          Continue automatically
   ?→  INTERACTIVE   Pause for user approval
-  !→  MUST-PASS     Halt if step fails
+  !→  MUST-PASS     Halt if step fails (enforced — no override, no "continue anyway?")
+
+ENFORCEMENT
+  Each sub-command in a flow runs its COMPLETE procedure including
+  all enforcement protocols (research, verification, fix-verify cycles).
+  Flows do not shortcut sub-commands.
 
 USAGE
   /healer:flow feature                    Run a preset
@@ -231,6 +242,15 @@ Gates control how flow steps chain together:
   →        AUTO          Continue to next step   Log warning, continue
   ?→       INTERACTIVE   Ask user to continue    Ask user: continue anyway?
   !→       MUST-PASS     Continue to next step   HALT — stop the flow
+
+ENFORCEMENT (v4)
+  !→ (must-pass) gates are absolute. When a step fails at a must-pass
+  gate, the flow HALTS immediately. There is no "continue anyway?" prompt.
+  The user must explicitly fix the issue and restart.
+
+  Gate checks are based on ACTUAL verification output from the sub-command,
+  not on guesses or assumptions. Each sub-command must complete its full
+  verification protocol before the gate evaluates its result.
 
 EXAMPLES
 
@@ -364,6 +384,8 @@ KEY CONCEPTS
   • Gates       — Control flow progression: → ?→ !→
   • State       — .healer/state.json tracks progress + suggests next steps
   • Research    — Every command searches online before acting
+  • Enforcement — Shared protocol ensuring research, verification & fixes
+                  are actually executed, not skipped (see below)
 
 GET MORE HELP
   /healer:help                           This overview
@@ -373,6 +395,20 @@ GET MORE HELP
   /healer:help <command>                 Any specific command
 ═══════════════════════════════════════════════════════════
 ```
+
+### Enforcement Layer (New in v4)
+
+All Healer commands now follow a shared enforcement protocol (`_enforcement.md`) that ensures:
+
+- **Research is mandatory** — every command that says "search online" now requires actual WebSearch/WebFetch/Context7 tool calls
+- **Verification is evidence-based** — "tests pass" means actual test output showing zero failures, not a guess
+- **Fixes are verified immediately** — apply one fix, run tests, verify, then move on
+- **Anti-rationalization** — common excuses for skipping steps are explicitly blocked
+- **Red-flag stop conditions** — automatic halt when approaches aren't working
+
+This enforcement layer is what makes Healer v4 actually effective at fixing issues, not just reporting them.
+
+When displaying help for any command in **detail** mode, mention that the command follows the enforcement protocol and link to `/healer:help gates` for gate enforcement details.
 
 ### Mode: all
 
@@ -431,6 +467,7 @@ When the user provides a command name (e.g., `brainstorm`, `flow`, `fix`):
    - **Arguments** — from the `## Arguments` or `## Input` section
    - **Procedure summary** — list the main steps (## Step headers)
    - **Category** — from the hardcoded mapping
+   - **Enforcement** — note that the command follows the shared enforcement protocol
    - **Suggested next** — from the next-step graph
    - **Related commands** — other commands in the same category
 
@@ -440,6 +477,7 @@ HEALER — /healer:{name}
 {description}
 
 Category: {category}
+Enforcement: Follows shared enforcement protocol (_enforcement.md)
 
 ARGUMENTS
   /healer:{name}                         {default behavior}
@@ -449,6 +487,11 @@ PROCEDURE
   1. {Step 1 title}
   2. {Step 2 title}
   ...
+
+ENFORCEMENT PROTOCOLS APPLIED
+  - Research: mandatory tool calls before code changes
+  - Verification: evidence-based status claims
+  - Fix-verify: immediate verification after each fix
 
 AFTER THIS COMMAND
   Suggested next: /healer:{suggested}
@@ -524,3 +567,4 @@ help: [help]
 6. **Keep it concise** — help should inform, not overwhelm
 7. **Show real examples** — use concrete, realistic arguments in examples
 8. **Update state** — write to `.healer/state.json` with `last_command: "help"` and `suggested_next: null`
+9. **Mention enforcement** — when showing detail for any command, note that it follows the shared enforcement protocol

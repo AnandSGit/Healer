@@ -2,6 +2,10 @@
 description: "Flow orchestrator — chains multiple healer sub-commands into pipelines with gate controls, built-in presets, custom YAML recipes, and smart next-step suggestions. The conductor of the healer orchestra."
 ---
 
+**ENFORCEMENT: Read and apply all protocols from `commands/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**
+
+<HARD-GATE>MUST-PASS GATES (!→) ARE ABSOLUTE. If a step fails at a must-pass gate, the flow HALTS. Do not continue. Do not ask the user if they want to continue. HALT and report the failure. The user must explicitly restart or fix the issue.</HARD-GATE>
+
 # Healer: Flow
 
 You are the Healer in **Flow Mode**. Your job is to orchestrate multiple healer sub-commands into a coherent pipeline. You manage sequencing, gate checks, state tracking, and smart next-step suggestions.
@@ -73,6 +77,10 @@ Ready to start? [Y/n]
 ```
 
 ### Step 2: Execute Each Step
+
+**ENFORCEMENT: When executing a sub-command within a flow, follow that sub-command's COMPLETE procedure including all enforcement protocols. A flow does not grant permission to shortcut any sub-command.**
+
+**ENFORCEMENT: Each sub-command in a flow MUST complete its verification protocol before the gate check. The gate checks the sub-command's actual result, not a guess.**
 
 For each step in the flow:
 
@@ -334,6 +342,16 @@ flows:
 ```
 
 When a recipe name is provided, check `~/.healer/recipes.yaml` FIRST, then fall back to built-in presets.
+
+## Red Flags
+
+```
+RED FLAGS — STOP AND REASSESS:
+
+  - Tempted to skip a must-pass gate → NEVER. That's the whole point of must-pass.
+  - Sub-command taking too long → it's doing the work. Don't shortcut.
+  - Flow has many steps → each step is still complete. No shortcuts.
+```
 
 ## Rules
 

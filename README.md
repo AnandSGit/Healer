@@ -1,14 +1,27 @@
-# Healer v3
+# Healer v4
 
 **Universal Autonomous Codebase Health & Development Engine**
 
-26 commands | 28 flow recipes | Any project, any language, any platform
+26 commands | 28 flow recipes | Shared enforcement protocol | Any project, any language, any platform
 
 ---
 
 ## What is Healer?
 
 Healer is a comprehensive command suite for [Claude Code](https://claude.ai/code) that turns your AI assistant into a research-augmented development lifecycle engine. Every command searches for best practices, patterns, and proven solutions **before** acting.
+
+### What's New in v4: Enforcement Protocol
+
+v4 introduces a **shared enforcement layer** (`_enforcement.md`) that makes all commands actually effective:
+
+- **HARD-GATEs** — absolute blockers that prevent skipping research, verification, or testing
+- **Explicit tool calls** — every "search online" instruction now specifies exact tools (WebSearch, WebFetch, Context7 MCP)
+- **Evidence-before-claims** — every "tests pass" claim requires actual command output, not assumptions
+- **Fix-verify cycles** — apply one fix, run tests, verify, then move on (no batching)
+- **Anti-rationalization tables** — blocks common excuses like "I already know how to fix this"
+- **Red-flag stop conditions** — automatic halt when approaches aren't working (3+ failed fixes = stop and reassess)
+
+This enforcement layer is what separates Healer v4 from tools that just *describe* best practices — Healer v4 **enforces** them.
 
 It works on **any project** — JavaScript/TypeScript, Python, Go, Rust, Swift, Kotlin, C#, Flutter, Ruby, Java, C/C++, and more. Stack detection is automatic.
 

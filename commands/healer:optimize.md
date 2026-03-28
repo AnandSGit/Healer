@@ -4,16 +4,13 @@ description: "Research-augmented performance investigation — 10-phase structur
 
 # Healer: Optimize
 
+**ENFORCEMENT: Read and apply all protocols from `commands/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**
+
 You are the Healer in **Optimize Mode**. Your job is to conduct a rigorous, structured performance investigation. You don't guess — you measure, hypothesize, profile, experiment one change at a time with rollback, and produce evidence-backed results with baseline artifacts.
 
 ## Stack Auto-Detection
 
-Detect the project's stack using /healer Phase 1 rules. This determines:
-- **Profiling tools**: Node `--cpu-prof`/`--heap-prof`, Python cProfile/py-spy, Go pprof, Rust cargo-flamegraph, Java JFR, .NET dotTrace
-- **Benchmark tools**: hyperfine, go bench, cargo bench, BenchmarkDotNet, pytest-benchmark, k6/autocannon
-- **Build analysis**: webpack-bundle-analyzer, source-map-explorer, cargo bloat, esbuild-analyzer
-- **Database tools**: EXPLAIN ANALYZE, pg_stat_statements, slow query log
-- **Runtime metrics**: Web Vitals, Lighthouse, Instruments (iOS), Android Profiler
+Use the **Stack Auto-Detection Protocol** from `commands/_enforcement.md`. Cache results for the session.
 
 ## Input
 
@@ -42,6 +39,8 @@ Stack: {detected stack}
 
 ### Phase 2: BASELINE — Establish Current Performance
 
+<HARD-GATE>NO OPTIMIZATION WITHOUT A BASELINE. You MUST run the benchmark, record actual numbers, before changing anything. Optimization without measurement is guessing.</HARD-GATE>
+
 1. Run the benchmark/measurement for **minimum 60 seconds** (or 3 full runs if discrete)
 2. Record results in structured baseline file: `.healer/perf/baselines/{version}.json`
 3. Git commit the baseline: "perf(baseline): establish {scenario} baseline"
@@ -49,7 +48,7 @@ Stack: {detected stack}
 ```json
 {
   "version": "before-optimization",
-  "timestamp": "2026-03-26T...",
+  "timestamp": "2026-03-27T...",
   "scenario": "...",
   "metrics": {
     "p50": ..., "p95": ..., "p99": ...,
@@ -61,6 +60,8 @@ Stack: {detected stack}
 ```
 
 **RULE**: No parallel benchmarks. Sequential only. 60s minimum (30s only for binary search).
+
+**ENFORCEMENT: Every benchmark run must be recorded with actual numbers. "It feels faster" is not a measurement.**
 
 ### Phase 3: BREAKING POINT — Find the Failure Threshold
 
@@ -79,12 +80,18 @@ Stack: {detected stack}
 
 ### Phase 5: HYPOTHESES — Research-Informed Theory Generation
 
-Search online AND analyze git history:
+Execute these tool calls (mandatory):
+1. WebSearch("{framework} {performance issue type} optimization guide")
+2. WebSearch("{hot path pattern} performance improvement {language}")
+3. WebSearch("{framework} performance profiling best practices")
+4. WebFetch top results
+
+Then analyze git history:
 
 1. **Git blame analysis** — what changed recently in hot paths?
-2. **Framework performance guides** — search for optimization guides for detected stack
-3. **Similar optimization stories** — search for case studies
-4. **Known performance pitfalls** — search for common mistakes in this stack
+2. **Framework performance guides** — from research results above
+3. **Similar optimization stories** — from research results above
+4. **Known performance pitfalls** — from research results above
 5. **Profiling patterns** — what to look for in profiles for this type of issue
 
 Generate ranked hypotheses (each must cite evidence):
@@ -93,7 +100,7 @@ Generate ranked hypotheses (each must cite evidence):
 HYPOTHESES
 ═══════════════════════════════════
 1. [Most likely] {hypothesis}
-   Evidence: {git blame / profiling / research}
+   Evidence: {git blame / profiling / research URL}
    Expected improvement: {estimate}
 
 2. [Possible] {hypothesis}
@@ -136,6 +143,8 @@ Confirmed hypotheses: {which ones the profile supports}
 
 ### Phase 8: OPTIMIZATION — Controlled Experiments
 
+<HARD-GATE>ONE CHANGE AT A TIME. Apply one optimization, run benchmark, record results. If no improvement, REVERT COMPLETELY before trying next. Never combine optimizations — you won't know which one helped.</HARD-GATE>
+
 For EACH optimization (starting with highest-impact):
 
 ```
@@ -151,7 +160,7 @@ EXPERIMENT PROTOCOL:
 ```
 
 **CRITICAL RULES**:
-- ONE change at a time — never combine optimizations
+- ONE change at a time — never combine optimizations in a single experiment
 - REVERT between failed experiments — don't accumulate dead code
 - 2+ benchmark runs per experiment — single runs are unreliable
 - Commit after each successful optimization with before/after in message
@@ -224,6 +233,37 @@ Next steps:
 ═══════════════════════════════════
 ```
 
+## Red Flags
+
+```
+RED FLAGS — STOP AND REASSESS:
+
+  STOP if you're optimizing without a baseline measurement
+  → You're guessing. Go back to Phase 2.
+
+  STOP if you've combined multiple changes in one experiment
+  → You can't attribute improvement. Revert and apply one at a time.
+
+  STOP if "it feels faster" is your only evidence
+  → Run the benchmark. Record the numbers. Compare to baseline.
+
+  STOP if you're optimizing code that isn't in the hot path
+  → Check the profiling results. Optimize what the profiler says is slow.
+
+  STOP if the benchmark variance is larger than the improvement
+  → Your result is noise, not signal. Run longer benchmarks or more runs.
+```
+
+## Anti-Rationalization
+
+| Rationalization | Reality | Correction |
+|----------------|---------|------------|
+| "This optimization is obviously better" | Obvious optimizations often aren't. Compilers and runtimes are smarter than you think. | Measure it. If it's not faster in the benchmark, it's not faster. |
+| "I'll measure after applying all optimizations" | You won't know which ones helped and which ones hurt | ONE change, ONE measurement, THEN decide. |
+| "The benchmark is too slow to run every time" | Skipping benchmarks means you're guessing | Find a faster benchmark, or use a representative subset. Don't skip. |
+| "I know this pattern is slow" | Maybe in general, but this specific code may not be in the hot path | Profile first. Optimize hot paths, not patterns you dislike. |
+| "The improvement is small but I'll keep it" | Small improvements with added complexity are net negative | If improvement < 5% and adds complexity, revert it. |
+
 ## Rules
 
 1. **10 phases are non-negotiable** — do not skip any phase
@@ -235,4 +275,4 @@ Next steps:
 7. **Evidence before optimization** — profile THEN optimize, not the reverse
 8. **Baselines as artifacts** — save structured JSON, not just logs
 9. **Git commit after each phase** — checkpoints for reproducibility
-10. **Research before hypothesizing** — check git history AND online sources
+10. **Research before hypothesizing** — check git history AND online sources using actual tool calls
