@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Healer v3 — Universal Development Lifecycle Engine</title>
+<title>Healer v4 — Universal Development Lifecycle Engine</title>
 <style>
   :root {
     --bg: #0d1117;
@@ -85,11 +85,11 @@
 </head>
 <body>
 
-<h1><span>/healer</span> v3</h1>
-<p class="subtitle">Universal Autonomous Codebase Health & Development Engine<br>25 commands &bull; 28 flow recipes &bull; Any project, any language, any platform</p>
+<h1><span>/healer</span> v4</h1>
+<p class="subtitle">Universal Autonomous Codebase Health & Development Engine<br>26 commands &bull; 28 flow recipes &bull; Shared enforcement protocol &bull; Any project, any language, any platform</p>
 
 <div class="stats">
-  <div class="stat"><div class="stat-number">25</div><div class="stat-label">Commands</div></div>
+  <div class="stat"><div class="stat-number">26</div><div class="stat-label">Commands</div></div>
   <div class="stat"><div class="stat-number">28</div><div class="stat-label">Flow Recipes</div></div>
   <div class="stat"><div class="stat-number">20+</div><div class="stat-label">Languages Supported</div></div>
   <div class="stat"><div class="stat-number">3</div><div class="stat-label">Gate Operators</div></div>
@@ -99,7 +99,8 @@
 <div class="toc">
   <div class="toc-title">Table of Contents</div>
   <a href="#quick-start">Quick Start</a>
-  <a href="#commands">All 25 Commands</a>
+  <a href="#enforcement">Enforcement Protocol (New in v4)</a>
+  <a href="#commands">All 26 Commands</a>
   <a href="#flow">Flow Orchestrator & Pipelines</a>
   <a href="#recipes">All 28 Flow Recipes</a>
   <a href="#gates">Gate Operators</a>
@@ -127,8 +128,45 @@
 # &rarr; It proposes the natural next step
 </pre>
 
+<!-- ENFORCEMENT PROTOCOL -->
+<h2 id="enforcement">Enforcement Protocol (New in v4)</h2>
+<p>v4 introduces a shared enforcement layer (<code>_enforcement.md</code>) that makes all commands <strong>actually effective</strong>. Every command references this protocol.</p>
+
+<div class="command-grid">
+  <div class="command-card">
+    <div class="command-name">HARD-GATEs</div>
+    <span class="badge badge-red">mandatory</span>
+    <div class="command-desc">Absolute blockers that prevent skipping research, verification, or testing. Cannot be rationalized away.</div>
+  </div>
+  <div class="command-card">
+    <div class="command-name">Explicit Tool Calls</div>
+    <span class="badge badge-blue">research</span>
+    <div class="command-desc">Every "search online" instruction specifies exact tools: WebSearch, WebFetch, Context7 MCP. No more relying on training data.</div>
+  </div>
+  <div class="command-card">
+    <div class="command-name">Evidence-Before-Claims</div>
+    <span class="badge badge-green">verification</span>
+    <div class="command-desc">Every "tests pass" claim requires actual command output. Run it, read it, count failures, then report.</div>
+  </div>
+  <div class="command-card">
+    <div class="command-name">Fix-Verify Cycles</div>
+    <span class="badge badge-yellow">iterative</span>
+    <div class="command-desc">Apply one fix, run tests, verify, move on. No batching. Revert if 3 consecutive attempts fail.</div>
+  </div>
+  <div class="command-card">
+    <div class="command-name">Anti-Rationalization</div>
+    <span class="badge badge-purple">discipline</span>
+    <div class="command-desc">12-entry table blocking common excuses: "I already know how to fix this", "tests probably pass", "I'll verify at the end".</div>
+  </div>
+  <div class="command-card">
+    <div class="command-name">Red-Flag Stops</div>
+    <span class="badge badge-red">safety</span>
+    <div class="command-desc">Automatic halt after 3+ failed fixes, when fixes cause regressions, or when changing code you don't understand.</div>
+  </div>
+</div>
+
 <!-- ALL COMMANDS -->
-<h2 id="commands">All 25 Commands</h2>
+<h2 id="commands">All 26 Commands</h2>
 
 <div class="section-group-title">Core Engine</div>
 <div class="command-grid">
@@ -523,7 +561,7 @@ flows:
 </div>
 
 <footer>
-  <p><strong>Healer v3</strong> &mdash; 25 commands &bull; 28 flow recipes &bull; Universal across all projects</p>
+  <p><strong>Healer v4</strong> &mdash; 26 commands &bull; 28 flow recipes &bull; Enforcement protocol &bull; Universal across all projects</p>
   <p>Global installation: <code>~/.claude/commands/healer*.md</code></p>
   <p>Custom recipes: <code>~/.healer/recipes.yaml</code></p>
   <p>Built by Anand S &bull; WeaverBird LLC &bull; 2026</p>
