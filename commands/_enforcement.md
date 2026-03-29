@@ -275,6 +275,90 @@ After completing ANY healer command, write state for flow continuity:
 
 ---
 
+## Requirements Traceability Protocol
+
+Every healer command that produces artifacts MUST maintain traceability:
+
+### Artifact Chain
+```
+validate → brainstorm → research → design → architect → spec → plan → implement → test → review
+```
+
+Each artifact MUST:
+1. **Reference upstream artifacts** — "This design traces to brainstorm: ~/.healer/brainstorms/{file}"
+2. **Include a REQUIREMENTS_TRACED section** mapping upstream requirements to this artifact's decisions
+3. **Include a VERIFICATION_CHECKLIST** that downstream commands use to verify implementation
+
+### Verification-Against-Requirements Protocol
+
+Before claiming ANY implementation is complete:
+
+1. **Find the requirements chain:**
+   ```bash
+   ls ~/.healer/validations/ ~/.healer/brainstorms/ ~/.healer/research/ docs/designs/ docs/specs/ docs/plans/ 2>/dev/null
+   ```
+
+2. **For each upstream artifact found:**
+   - Read its REQUIREMENTS section
+   - Check each requirement against the implementation
+   - Mark: ✅ Implemented, ⚠️ Partial, ❌ Missing
+
+3. **Generate Traceability Report:**
+   ```
+   REQUIREMENT TRACEABILITY
+   ═══════════════════════════════════
+   Source: {artifact file}
+
+   REQ-1: {requirement} → ✅ Implemented in {file:line}
+   REQ-2: {requirement} → ⚠️ Partial — missing {what}
+   REQ-3: {requirement} → ❌ Not implemented
+
+   Coverage: {X}/{Y} requirements ({%})
+   ═══════════════════════════════════
+   ```
+
+4. **HARD-GATE: If coverage < 80%, flag it.** Do NOT claim "done" without addressing gaps.
+
+---
+
+## Enhanced Research Protocol
+
+In addition to the base research protocol, ALL commands should:
+
+1. **Search from multiple angles:**
+   - "{topic} best practices" — the standard approach
+   - "{topic} problems failures" — what goes wrong
+   - "{topic} alternatives comparison" — what else exists
+   - "{topic} 2025 2026" — current state of the art
+
+2. **Source credibility scoring:**
+   - ★★★★★ Official docs (via Context7 or vendor sites)
+   - ★★★★ High-star GitHub repos (>1K stars)
+   - ★★★ Reputable tech blogs (Martin Fowler, Addy Osmani, etc.)
+   - ★★ Forum posts (Stack Overflow answers with 10+ votes)
+   - ★ Random blog posts (use with caution)
+
+3. **Contradiction detection:**
+   When two sources disagree, explicitly flag it:
+   "⚠️ CONTRADICTION: Source A says {X} while Source B says {Y}.
+    My assessment: {which is more credible and why}"
+
+4. **Negative research (mandatory for brainstorm/design/plan):**
+   - WebSearch("{topic} failed postmortem")
+   - WebSearch("{topic} common mistakes anti-patterns")
+   Learn from others' failures before proposing solutions.
+
+---
+
+## Memory Protocol
+
+Key decisions and constraints that affect future sessions should be flagged:
+- Save critical architectural decisions to project docs or CLAUDE.md
+- Note user's UI/UX preferences and recurring patterns
+- Flag recurring issues for future sessions to avoid
+
+---
+
 ## The Iron Law of Healer
 
 ```

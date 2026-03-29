@@ -24,6 +24,8 @@ The user provides: $ARGUMENTS
 /healer:flow refactor         # Clean code: analyze → plan → refactor → test → review → push
 /healer:flow tdd              # TDD cycle: plan → tdd → coverage → review → push
 /healer:flow research         # Deep dive: research → brainstorm → design → spec
+/healer:flow ideate           # Full ideation: validate → brainstorm → research → design → strategy → spec → plan
+/healer:flow visual           # Visual design: design-system → design → design-review
 ```
 
 ### Inline Custom Flow
@@ -339,6 +341,35 @@ flows:
         gate: auto
       - command: report
         gate: auto
+```
+
+ideate:
+  description: "Full ideation pipeline from validation to plan"
+  steps:
+    - command: validate
+      gate: interactive
+    - command: brainstorm
+      gate: interactive
+    - command: research
+      gate: auto
+    - command: design
+      gate: interactive
+    - command: strategy
+      gate: interactive
+    - command: spec
+      gate: interactive
+    - command: plan
+      gate: interactive
+
+visual:
+  description: "Visual design pipeline"
+  steps:
+    - command: design-system
+      gate: interactive
+    - command: design
+      gate: interactive
+    - command: design-review
+      gate: auto
 ```
 
 When a recipe name is provided, check `~/.healer/recipes.yaml` FIRST, then fall back to built-in presets.
