@@ -1,0 +1,12 @@
+{
+  "name": "healer",
+  "version": "6.0.0",
+  "description": "Universal Autonomous Codebase Health & Development Engine with Design Intelligence — 32 commands covering the full software lifecycle from brainstorming to deployment, with integrated UI/UX design databases.",
+  "author": {
+    "name": "WeaverBird LLC"
+  },
+  "license": "MIT",
+  "keywords": ["healer", "development", "testing", "design", "brand", "UI", "UX", "design-system", "code-review", "deployment"],
+  "commands": ["./commands/"],
+  "hooks": "./hooks/hooks.json"
+}

@@ -36,6 +36,36 @@ ls docs/brainstorms/ 2>/dev/null
 
 If a brainstorm artifact exists, read it and use it as the requirements source. You will trace every brainstorm requirement to a design decision in the final document.
 
+### Step 0.5: Design Intelligence Lookup (LOCAL DATABASE)
+
+Before proceeding to web research, query the local design database for curated recommendations:
+
+**For comprehensive style and product-type recommendations:**
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/search.py "<feature_type> <product_type>" --design-system
+```
+
+**For specific style lookups:**
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/search.py "<style_keywords>" --domain style
+```
+
+**For product-type design patterns:**
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/search.py "<product_type>" --domain product
+```
+
+**For UX reasoning rules:**
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/search.py "<query>" --domain ux
+```
+
+**DATA LOOKUP ORDER:**
+1. CSV database (instant, offline, curated) → baseline style and pattern recommendations
+2. Current state analysis (Step 1) → existing code and conventions
+3. Web research (HARD-GATE still enforced in Step 2) → current trends, competitor analysis
+4. Merge all three → final design decisions
+
 ### Step 1: Understand Current State
 
 1. Read relevant existing code

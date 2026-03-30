@@ -50,6 +50,14 @@ Specialized modes for targeted work. Each auto-detects the stack using the same 
 /healer:docs [scope]                 # Research-augmented documentation generation
 /healer:flow [preset|chain]          # Flow orchestrator — chain commands into pipelines
 /healer:help [topic|command]         # Interactive help — commands, flows, recipes, gates, examples
+
+# Design Intelligence commands (v6 — integrated from UI-UX-Pro-Max)
+/healer:brand [product]              # Brand voice, visual identity, messaging framework
+/healer:logo [brand]                 # Logo design brief — 55+ styles, color psychology, industry guides
+/healer:cip [scope]                  # Corporate Identity Program — 50+ deliverables checklist
+/healer:banner [campaign]            # Banner & social media design — 22 styles, 9+ platforms
+/healer:icon [system]                # Icon system design — 15 styles, SVG, accessibility
+/healer:slides [topic]               # HTML presentations — Chart.js, copywriting, slide strategies
 ```
 
 ## Flow Orchestrator
@@ -62,6 +70,9 @@ Chain multiple sub-commands into pipelines with gate controls:
 /healer:flow deploy                  # Built-in: diagnose → review → ship
 /healer:flow audit                   # Built-in: analyze → audit → coverage → report
 /healer:flow morning                 # Built-in: diagnose → report
+/healer:flow visual                  # Built-in: brand → design-system → design → design-review
+/healer:flow identity                # Built-in: brand → logo → cip → design-system
+/healer:flow brand-to-prod           # Built-in: brand → design-system → design → implement → test → review → ship
 
 # Inline custom chains with gate operators:
 /healer:flow brainstorm → plan → implement    # Auto-continue between steps

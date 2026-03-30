@@ -23,6 +23,25 @@ If no arguments, run a full audit. Focus areas: "security", "a11y", "dependencie
 
 ## Procedure
 
+### Step 0.5: UX & Accessibility Audit Dimensions (LOCAL DATABASE)
+
+In addition to security and dependency auditing, load UX audit rules from the local database to check for interaction, accessibility, and performance issues:
+
+**For comprehensive UX audit rules:**
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/search.py "accessibility touch animation navigation forms performance" --domain ux
+```
+
+**UX audit dimensions to include alongside security:**
+- **Accessibility (CRITICAL)**: color-contrast 4.5:1, focus-states, aria-labels, keyboard-nav, reduced-motion, dynamic-type
+- **Touch & Interaction (CRITICAL)**: touch-target-size min 44x44pt, touch-spacing 8px+, hover-vs-tap, loading-buttons
+- **Animation (MEDIUM)**: duration 150-300ms, motion conveys meaning, prefers-reduced-motion respected
+- **Navigation (HIGH)**: predictable back behavior, bottom nav ≤5 items, deep linking
+- **Forms & Feedback (MEDIUM)**: visible labels, error near field, progressive disclosure
+- **Performance (HIGH)**: lazy loading, CLS <0.1, WebP/AVIF images, reserve space for dynamic content
+
+These dimensions are added to the audit report alongside security findings, NOT as replacements.
+
 ### Step 1: Inventory the Attack Surface
 
 1. Map all API routes / endpoints / entry points

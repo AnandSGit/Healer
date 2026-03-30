@@ -1,8 +1,8 @@
-# Healer v4
+# Healer v6
 
-**Universal Autonomous Codebase Health & Development Engine**
+**Universal Autonomous Codebase Health & Development Engine with Design Intelligence**
 
-26 commands | 28 flow recipes | Shared enforcement protocol | Any project, any language, any platform
+32 commands | 32 flow recipes | Shared enforcement protocol | Integrated UI/UX design databases | Any project, any language, any platform
 
 ---
 
@@ -10,7 +10,20 @@
 
 Healer is a comprehensive command suite for [Claude Code](https://claude.ai/code) that turns your AI assistant into a research-augmented development lifecycle engine. Every command searches for best practices, patterns, and proven solutions **before** acting.
 
-### What's New in v4: Enforcement Protocol
+### What's New in v6: Design Intelligence Integration
+
+v6 integrates [UI-UX-Pro-Max](https://github.com/NextLevelBuilder/ui-ux-pro-max-skill) (MIT License) design intelligence into Healer, adding:
+
+- **6 new commands**: `brand`, `logo`, `cip`, `banner`, `icon`, `slides`
+- **5 enhanced commands**: `design`, `design-system`, `design-review`, `implement`, `audit` now query local design databases before web research
+- **Design data layer**: 161 color palettes, 57 font pairings, 99 UX guidelines, 50+ UI styles, 14 stack-specific guideline files
+- **BM25 search engine**: Python-based search across all design databases
+- **Auto-sync**: SessionStart hook keeps design data fresh from upstream
+- **New flow presets**: `identity`, `visual`, `brand-to-prod` + 4 new recipes
+
+Design intelligence is the DATA LAYER. Healer's enforcement protocol is the PROCESS LAYER. Together they produce research-backed design that avoids AI slop.
+
+### v4 Foundation: Enforcement Protocol
 
 v4 introduces a **shared enforcement layer** (`_enforcement.md`) that makes all commands actually effective:
 

@@ -56,7 +56,46 @@ ls .healer/state.json 2>/dev/null && cat .healer/state.json 2>/dev/null
 
 **If tailwind.config or theme files exist:** Read them. These represent implicit design decisions that need to be either formalized or intentionally replaced.
 
-**If nothing exists:** Proceed to Step 1. This is a greenfield design system.
+**If nothing exists:** Proceed to Step 0.5. This is a greenfield design system.
+
+### Step 0.5: Design Intelligence Lookup (LOCAL DATABASE)
+
+Before proceeding to interactive discovery, query the local design database for curated recommendations based on any context gathered in Step 0:
+
+**For comprehensive design system recommendations:**
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/search.py "<product_type> <brand_keywords>" --design-system
+```
+
+This searches across product types, styles, colors, typography, and landing patterns simultaneously, applying reasoning rules to select best matches.
+
+**For specific color palette options:**
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/search.py "<product_type> <mood>" --domain color
+```
+
+**For typography/font pairing options:**
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/search.py "<style_keywords>" --domain typography
+```
+
+**For stack-specific guidelines (if stack detected in Step 0):**
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/search.py "<query>" --stack {detected_stack}
+```
+
+Available stacks: react, nextjs, vue, svelte, astro, swiftui, react-native, flutter, nuxtjs, nuxt-ui, html-tailwind, shadcn, jetpack-compose, threejs
+
+**For design token architecture reference:**
+Read `${CLAUDE_PLUGIN_ROOT}/references/design-system/token-architecture.md` for the 3-layer token system (primitive → semantic → component).
+
+**DATA LOOKUP ORDER:**
+1. CSV database (instant, offline, curated) → baseline color palettes, font pairings, style recommendations
+2. Interactive discovery (Step 1) → user preferences and constraints
+3. Web research (HARD-GATE still enforced in existing Step 2) → current trends, validation
+4. Merge all three → final design system
+
+**Note:** The CSV data provides 161 curated color palettes and 57 font pairings — use these as HIGH-QUALITY starting points, not as the final answer. The user's interactive responses and web research refine and override.
 
 ### Step 1: Understand the Product (INTERACTIVE)
 

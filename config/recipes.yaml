@@ -333,3 +333,61 @@ flows:
         gate: auto
       - command: report
         gate: auto
+
+  # ─────────────────────────────────────────────────
+  # DESIGN & BRAND FLOWS (v6 — UI-UX-Pro-Max integration)
+  # ─────────────────────────────────────────────────
+
+  brand-identity:
+    description: "Complete brand identity from scratch"
+    steps:
+      - command: brainstorm
+        gate: interactive
+      - command: brand
+        gate: interactive
+      - command: logo
+        gate: interactive
+      - command: icon
+        gate: interactive
+      - command: cip
+        gate: interactive
+      - command: design-system
+        gate: interactive
+      - command: design-review
+        gate: auto
+
+  visual-full:
+    description: "Full visual design pipeline with brand and review"
+    steps:
+      - command: brand
+        gate: interactive
+      - command: design-system
+        gate: interactive
+      - command: design
+        gate: interactive
+      - command: slides
+        gate: interactive
+      - command: design-review
+        gate: auto
+
+  marketing-kit:
+    description: "Marketing materials — brand, banners, slides"
+    steps:
+      - command: brand
+        gate: interactive
+      - command: logo
+        gate: interactive
+      - command: banner
+        gate: interactive
+      - command: slides
+        gate: interactive
+
+  design-polish:
+    description: "Design review and iteration cycle"
+    steps:
+      - command: design-review
+        gate: auto
+      - command: design
+        gate: interactive
+      - command: design-review
+        gate: auto

@@ -43,13 +43,15 @@ Display:
 HEALER — Help
 ═══════════════════════════════════════════════════════════
 Universal Autonomous Codebase Health & Development Engine
-v4 — 26 commands | 8 flow presets | 20+ recipes
+v6 — 32 commands | 11 flow presets | 24+ recipes
      Shared enforcement layer for research, verification & fixes
+     Integrated design intelligence: 161 palettes, 57 fonts, 99 UX rules
 
 CATEGORIES
 ──────────────────────────────────────────────────
   Core (2)            /healer, /healer:flow
   Ideation (6)        brainstorm, research, design, architect, spec, plan
+  Design Intel (6)    brand, logo, cip, banner, icon, slides
   Implementation (4)  implement, tdd, refactor, optimize
   Quality (4)         test, coverage, review, audit
   Debug & Fix (2)     debug, fix
@@ -67,7 +69,7 @@ QUICK START
 
 MORE HELP
 ──────────────────────────────────────────────────
-  /healer:help commands            All 26 commands
+  /healer:help commands            All 32 commands
   /healer:help flows               Built-in flow presets
   /healer:help recipes             Custom recipe pipelines
   /healer:help gates               Gate operator reference
@@ -128,6 +130,19 @@ HEALTH & REPORTING
   /healer:diagnose         {description}
   /healer:report           {description}
   /healer:analyze          {description}
+
+DESIGN INTELLIGENCE (v6 — integrated from UI-UX-Pro-Max)
+─────────────────────────────────────────────────────────
+  /healer:brand            Brand voice, visual identity, messaging framework
+  /healer:logo             Logo design brief — 55+ styles, color psychology
+  /healer:cip              Corporate Identity Program — 50+ deliverables
+  /healer:banner           Banner & social media — 22 styles, 9+ platforms
+  /healer:icon             Icon system — 15 styles, SVG, accessibility
+  /healer:slides           HTML presentations — Chart.js, copywriting
+
+  Data: 161 color palettes, 57 font pairings, 99 UX guidelines,
+        50+ UI styles, 14 stack-specific guideline files
+  Sync: SessionStart hook auto-syncs from UI-UX-Pro-Max upstream
 
 SHIPPING
 ─────────────────────────────────────────────────────────

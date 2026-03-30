@@ -20,6 +20,35 @@ If no arguments, ask: "What do you want to implement?"
 
 ## Procedure
 
+### Step 0.5: Design Intelligence Lookup (LOCAL DATABASE)
+
+When the implementation involves UI/UX work, query the local design database for stack-specific guidelines BEFORE writing code:
+
+**For stack-specific implementation guidelines:**
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/search.py "<feature_type>" --stack {detected_stack}
+```
+
+Available stacks: react, nextjs, vue, svelte, astro, swiftui, react-native, flutter, nuxtjs, nuxt-ui, html-tailwind, shadcn, jetpack-compose, threejs
+
+**For UI component patterns:**
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/search.py "<component_type>" --domain ux
+```
+
+**For style implementation details:**
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/search.py "<style_name>" --domain style
+```
+
+**Skip this step if:** The implementation is purely backend, API, database, or infrastructure work with no UI components.
+
+**DATA LOOKUP ORDER:**
+1. Stack-specific CSV guidelines (instant) → framework-idiomatic patterns
+2. Understand the codebase (Step 1) → existing conventions
+3. Web research (Step 2, HARD-GATE enforced) → current best practices
+4. Merge all → implementation approach
+
 ### Step 1: Understand What to Build
 
 1. Parse request into concrete implementation requirements

@@ -25,7 +25,9 @@ The user provides: $ARGUMENTS
 /healer:flow tdd              # TDD cycle: plan → tdd → coverage → review → push
 /healer:flow research         # Deep dive: research → brainstorm → design → spec
 /healer:flow ideate           # Full ideation: validate → brainstorm → research → design → strategy → spec → plan
-/healer:flow visual           # Visual design: design-system → design → design-review
+/healer:flow visual           # Visual design: brand → design-system → design → design-review
+/healer:flow identity         # Brand identity: brand → logo → cip → design-system
+/healer:flow brand-to-prod    # Brand-aware feature: brand → design-system → design → implement → test → review → ship
 ```
 
 ### Inline Custom Flow
@@ -160,6 +162,12 @@ push          → ship, deploy
 ship          → (done)
 deploy        → (done)
 docs          → push
+brand         → logo, design-system, cip
+logo          → icon, cip, brand
+cip           → design-system, banner
+banner        → slides, push
+icon          → implement, push
+slides        → push, ship
 ```
 
 When `/healer` is called with NO arguments and state exists:
@@ -362,14 +370,46 @@ ideate:
       gate: interactive
 
 visual:
-  description: "Visual design pipeline"
+  description: "Visual design pipeline with brand awareness"
   steps:
+    - command: brand
+      gate: interactive
     - command: design-system
       gate: interactive
     - command: design
       gate: interactive
     - command: design-review
       gate: auto
+
+identity:
+  description: "Brand identity pipeline — from brand voice to design system"
+  steps:
+    - command: brand
+      gate: interactive
+    - command: logo
+      gate: interactive
+    - command: cip
+      gate: interactive
+    - command: design-system
+      gate: interactive
+
+brand-to-prod:
+  description: "Full brand-aware feature development"
+  steps:
+    - command: brand
+      gate: interactive
+    - command: design-system
+      gate: interactive
+    - command: design
+      gate: interactive
+    - command: implement
+      gate: auto
+    - command: test
+      gate: must-pass
+    - command: review
+      gate: interactive
+    - command: ship
+      gate: must-pass
 ```
 
 When a recipe name is provided, check `~/.healer/recipes.yaml` FIRST, then fall back to built-in presets.

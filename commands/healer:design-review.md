@@ -63,6 +63,31 @@ git diff main --name-only -- '*.tsx' '*.jsx' '*.vue' '*.svelte' '*.css' '*.scss'
 
 Record all findings. You will need them for every dimension.
 
+### Step 0.5: Design Intelligence Lookup (LOCAL DATABASE)
+
+Before applying the 7-dimension review, load UX guidelines from the local database to augment each dimension with curated, platform-specific rules:
+
+**For UX best practices across all dimensions:**
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/search.py "accessibility touch animation navigation forms performance" --domain ux
+```
+
+**For platform-specific guidelines (if stack detected):**
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/search.py "<query>" --stack {detected_stack}
+```
+
+**Reference: UX guideline categories to cross-check per dimension:**
+- Dimension 1 (Visual Hierarchy): typography, color, layout rules
+- Dimension 2 (Interaction States): touch-target-size, loading-buttons, error-feedback, hover-vs-tap
+- Dimension 3 (Consistency): design system alignment, spacing, component patterns
+- Dimension 4 (AI Slop): style selection rules, anti-patterns from styles.csv
+- Dimension 5 (Accessibility): color-contrast, focus-states, keyboard-nav, aria-labels, reduced-motion
+- Dimension 6 (Responsiveness): mobile-first, breakpoint-consistency, touch-spacing, safe-area-awareness
+- Dimension 7 (Performance): lazy loading, CLS prevention, image optimization
+
+Each dimension score MUST reference specific UX guideline IDs (e.g., "color-contrast", "touch-target-size") from the database when citing violations or compliance.
+
 ### Step 1: Research Phase (THE DIFFERENTIATOR)
 
 Execute these tool calls (mandatory):
