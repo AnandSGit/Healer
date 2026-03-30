@@ -3,569 +3,1518 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Healer v4 — Universal Development Lifecycle Engine</title>
+<title>Healer v6 — User Guide</title>
 <style>
-  :root {
-    --bg: #0d1117;
-    --surface: #161b22;
-    --border: #30363d;
-    --text: #e6edf3;
-    --text-muted: #8b949e;
-    --accent: #58a6ff;
-    --green: #3fb950;
-    --yellow: #d29922;
-    --red: #f85149;
-    --purple: #bc8cff;
-    --orange: #f0883e;
-    --cyan: #39d2c0;
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  background: #0d1117;
+  color: #e6edf3;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+a { color: #E07B3C; text-decoration: none; transition: color .2s; }
+a:hover { color: #f0a060; }
+code, pre {
+  font-family: 'SF Mono', 'Fira Code', 'Fira Mono', 'Roboto Mono', 'Consolas', monospace;
+}
+code {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: .875rem;
+}
+pre {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  padding: 16px;
+  overflow-x: auto;
+  font-size: .8125rem;
+  line-height: 1.5;
+  margin: 12px 0;
+}
+pre code { background: none; border: none; padding: 0; }
+h1, h2, h3, h4, h5 { color: #f0f6fc; font-weight: 600; }
+h1 { font-size: 2.25rem; }
+h2 { font-size: 1.625rem; margin-top: 2rem; margin-bottom: 1rem; border-bottom: 1px solid #21262d; padding-bottom: .5rem; }
+h3 { font-size: 1.25rem; margin-top: 1.5rem; margin-bottom: .75rem; }
+h4 { font-size: 1.0625rem; margin-top: 1rem; margin-bottom: .5rem; }
+p { margin-bottom: .75rem; }
+ul, ol { margin-left: 1.25rem; margin-bottom: .75rem; }
+li { margin-bottom: .25rem; }
+table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: .875rem; }
+th, td { padding: 8px 12px; border: 1px solid #30363d; text-align: left; }
+th { background: #161b22; color: #E07B3C; font-weight: 600; }
+tr:nth-child(even) { background: #0d1117; }
+tr:nth-child(odd) { background: #161b22; }
+hr { border: none; border-top: 1px solid #21262d; margin: 1.5rem 0; }
+
+/* ============================================================
+   BADGES
+   ============================================================ */
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: .6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  vertical-align: middle;
+  margin-left: 6px;
+}
+.badge-new { background: #E07B3C; color: #0d1117; }
+.badge-enhanced { background: #E07B3C; color: #0d1117; }
+.badge-core { background: #30363d; color: #8b949e; }
+.badge-gate { background: #da3633; color: #fff; }
+.badge-auto { background: #238636; color: #fff; }
+.badge-interactive { background: #1f6feb; color: #fff; }
+.badge-mustpass { background: #da3633; color: #fff; }
+
+/* ============================================================
+   LAYOUT -- SIDEBAR + MAIN
+   ============================================================ */
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+.sidebar {
+  width: 280px;
+  min-width: 280px;
+  background: #0d1117;
+  border-right: 1px solid #21262d;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  padding: 16px 0;
+  z-index: 100;
+  transition: transform .3s;
+}
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
+.sidebar-header {
+  padding: 8px 16px 16px;
+  border-bottom: 1px solid #21262d;
+  margin-bottom: 8px;
+}
+.sidebar-header h2 {
+  font-size: 1.125rem;
+  border: none;
+  padding: 0;
+  margin: 0;
+  color: #E07B3C;
+}
+.sidebar-header p {
+  font-size: .75rem;
+  color: #8b949e;
+  margin: 0;
+}
+.sidebar-search {
+  padding: 8px 16px;
+  margin-bottom: 4px;
+}
+.sidebar-search input {
+  width: 100%;
+  padding: 8px 12px;
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #e6edf3;
+  font-size: .8125rem;
+  outline: none;
+  transition: border-color .2s;
+}
+.sidebar-search input:focus { border-color: #E07B3C; }
+.sidebar-search input::placeholder { color: #484f58; }
+.nav-category {
+  margin-bottom: 4px;
+}
+.nav-category-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  font-size: .75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: #8b949e;
+  cursor: pointer;
+  user-select: none;
+  transition: color .2s;
+}
+.nav-category-title:hover { color: #E07B3C; }
+.nav-category-title .arrow {
+  display: inline-block;
+  transition: transform .2s;
+  font-size: .625rem;
+}
+.nav-category.collapsed .arrow { transform: rotate(-90deg); }
+.nav-category.collapsed .nav-items { display: none; }
+.nav-items { list-style: none; margin: 0; padding: 0; }
+.nav-items li a {
+  display: block;
+  padding: 4px 16px 4px 28px;
+  font-size: .8125rem;
+  color: #c9d1d9;
+  transition: all .2s;
+  border-left: 2px solid transparent;
+}
+.nav-items li a:hover {
+  color: #E07B3C;
+  background: rgba(224, 123, 60, .05);
+  border-left-color: #E07B3C;
+}
+.nav-items li a.active {
+  color: #E07B3C;
+  background: rgba(224, 123, 60, .08);
+  border-left-color: #E07B3C;
+}
+
+/* Main content */
+.main {
+  flex: 1;
+  min-width: 0;
+  padding: 32px 48px 80px;
+  max-width: 960px;
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero {
+  text-align: center;
+  padding: 48px 0 40px;
+  border-bottom: 1px solid #21262d;
+  margin-bottom: 32px;
+}
+.hero h1 {
+  font-size: 2.75rem;
+  margin-bottom: 8px;
+}
+.hero h1 span { color: #E07B3C; }
+.hero .tagline {
+  font-size: 1.125rem;
+  color: #8b949e;
+  margin-bottom: 24px;
+}
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+}
+.stat {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  padding: 12px 20px;
+  text-align: center;
+  min-width: 120px;
+}
+.stat .num { font-size: 1.75rem; font-weight: 700; color: #E07B3C; display: block; }
+.stat .label { font-size: .75rem; color: #8b949e; }
+
+/* ============================================================
+   SECTIONS & COMMAND CARDS
+   ============================================================ */
+.section { margin-bottom: 2.5rem; }
+.cmd-card {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin-bottom: 16px;
+  transition: border-color .2s;
+}
+.cmd-card:hover { border-color: #E07B3C; }
+.cmd-card h3 {
+  margin-top: 0;
+  font-size: 1.125rem;
+}
+.cmd-card h3 code {
+  background: #0d1117;
+  border: 1px solid #E07B3C;
+  color: #E07B3C;
+  font-size: 1rem;
+  padding: 2px 8px;
+}
+.cmd-card .desc {
+  color: #8b949e;
+  font-size: .875rem;
+  margin: 8px 0;
+}
+.cmd-card .details {
+  display: none;
+  margin-top: 12px;
+}
+.cmd-card.expanded .details { display: block; }
+.cmd-card .toggle-btn {
+  background: none;
+  border: 1px solid #30363d;
+  color: #8b949e;
+  padding: 4px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: .75rem;
+  margin-top: 8px;
+  transition: all .2s;
+}
+.cmd-card .toggle-btn:hover { border-color: #E07B3C; color: #E07B3C; }
+.procedure-list { list-style: none; padding: 0; margin: 8px 0; counter-reset: step; }
+.procedure-list li {
+  position: relative;
+  padding-left: 32px;
+  margin-bottom: 6px;
+  font-size: .875rem;
+}
+.procedure-list li::before {
+  counter-increment: step;
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #E07B3C;
+  color: #0d1117;
+  font-size: .6875rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.related { font-size: .8125rem; color: #8b949e; margin-top: 8px; }
+.related a { margin-right: 8px; }
+.hard-gate {
+  background: rgba(218, 54, 51, .08);
+  border-left: 3px solid #da3633;
+  padding: 8px 12px;
+  margin: 8px 0;
+  font-size: .8125rem;
+  border-radius: 0 6px 6px 0;
+}
+.success-box {
+  background: rgba(63, 185, 80, .08);
+  border-left: 3px solid #3fb950;
+  padding: 8px 12px;
+  margin: 8px 0;
+  font-size: .8125rem;
+  border-radius: 0 6px 6px 0;
+}
+.info-box {
+  background: rgba(31, 111, 235, .08);
+  border-left: 3px solid #1f6feb;
+  padding: 8px 12px;
+  margin: 8px 0;
+  font-size: .8125rem;
+  border-radius: 0 6px 6px 0;
+}
+
+/* ============================================================
+   FLOW VISUAL
+   ============================================================ */
+.flow-pipeline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin: 8px 0;
+}
+.flow-step {
+  background: #21262d;
+  border: 1px solid #30363d;
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-size: .75rem;
+  font-family: monospace;
+  white-space: nowrap;
+}
+.flow-gate {
+  font-size: .75rem;
+  font-weight: 700;
+  padding: 0 2px;
+}
+.flow-gate.auto { color: #3fb950; }
+.flow-gate.interactive { color: #1f6feb; }
+.flow-gate.mustpass { color: #da3633; }
+
+/* ============================================================
+   BACK TO TOP
+   ============================================================ */
+.back-to-top {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #E07B3C;
+  color: #0d1117;
+  border: none;
+  cursor: pointer;
+  font-size: 1.25rem;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  box-shadow: 0 2px 12px rgba(0,0,0,.4);
+  transition: opacity .2s;
+}
+.back-to-top.visible { display: flex; }
+
+/* ============================================================
+   MOBILE TOGGLE
+   ============================================================ */
+.mobile-toggle {
+  display: none;
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 300;
+  background: #161b22;
+  border: 1px solid #30363d;
+  color: #e6edf3;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.25rem;
+  align-items: center;
+  justify-content: center;
+}
+.overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.5);
+  z-index: 99;
+}
+
+/* ============================================================
+   SEARCH RESULTS
+   ============================================================ */
+.search-hidden { display: none !important; }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 900px) {
+  .main { padding: 24px 20px 80px; }
+  .hero h1 { font-size: 2rem; }
+  .stats { gap: 8px; }
+  .stat { min-width: 100px; padding: 8px 14px; }
+  .stat .num { font-size: 1.375rem; }
+}
+@media (max-width: 768px) {
+  .mobile-toggle { display: flex; }
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    transform: translateX(-100%);
+    z-index: 200;
+    width: 280px;
   }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    line-height: 1.6;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 2rem;
-  }
-  h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
-  h1 span { color: var(--green); }
-  h2 { font-size: 1.8rem; margin: 2.5rem 0 1rem; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
-  h3 { font-size: 1.3rem; margin: 1.5rem 0 0.75rem; color: var(--purple); }
-  p { margin-bottom: 1rem; color: var(--text-muted); }
-  .subtitle { font-size: 1.2rem; color: var(--text-muted); margin-bottom: 2rem; }
-  .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.75rem; font-weight: 600; margin-right: 0.5rem; }
-  .badge-green { background: rgba(63,185,80,0.15); color: var(--green); border: 1px solid rgba(63,185,80,0.3); }
-  .badge-blue { background: rgba(88,166,255,0.15); color: var(--accent); border: 1px solid rgba(88,166,255,0.3); }
-  .badge-yellow { background: rgba(210,153,34,0.15); color: var(--yellow); border: 1px solid rgba(210,153,34,0.3); }
-  .badge-red { background: rgba(248,81,73,0.15); color: var(--red); border: 1px solid rgba(248,81,73,0.3); }
-  .badge-purple { background: rgba(188,140,255,0.15); color: var(--purple); border: 1px solid rgba(188,140,255,0.3); }
-
-  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin: 2rem 0; }
-  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; text-align: center; }
-  .stat-number { font-size: 2.5rem; font-weight: 700; color: var(--green); }
-  .stat-label { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem; }
-
-  .command-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
-  .command-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; transition: border-color 0.2s; }
-  .command-card:hover { border-color: var(--accent); }
-  .command-name { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 1rem; color: var(--green); font-weight: 600; }
-  .command-desc { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; }
-
-  .flow-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; margin-bottom: 0.75rem; }
-  .flow-name { font-family: monospace; color: var(--cyan); font-weight: 600; }
-  .flow-desc { font-size: 0.85rem; color: var(--text-muted); }
-  .flow-steps { font-family: monospace; font-size: 0.8rem; color: var(--accent); margin-top: 0.5rem; }
-
-  .gate-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
-  .gate-table th, .gate-table td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid var(--border); }
-  .gate-table th { color: var(--accent); font-weight: 600; background: var(--surface); }
-  .gate-table td { color: var(--text-muted); }
-  .gate-table code { font-family: monospace; color: var(--green); background: rgba(63,185,80,0.1); padding: 0.15rem 0.4rem; border-radius: 4px; }
-
-  .next-map { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1rem 0; font-family: monospace; font-size: 0.85rem; line-height: 1.8; }
-  .next-map .from { color: var(--green); font-weight: 600; }
-  .next-map .arrow { color: var(--text-muted); }
-  .next-map .to { color: var(--accent); }
-
-  code { font-family: 'SF Mono', 'Fira Code', monospace; }
-  pre { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; overflow-x: auto; margin: 1rem 0; font-size: 0.85rem; line-height: 1.6; }
-
-  .toc { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem 2rem; margin: 2rem 0; }
-  .toc-title { font-size: 1rem; font-weight: 600; color: var(--accent); margin-bottom: 0.75rem; }
-  .toc a { color: var(--text-muted); text-decoration: none; display: block; padding: 0.2rem 0; }
-  .toc a:hover { color: var(--accent); }
-
-  .section-group { margin: 1rem 0; }
-  .section-group-title { font-size: 0.85rem; color: var(--orange); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin: 1.5rem 0 0.75rem; }
-
-  footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 0.85rem; text-align: center; }
+  .sidebar.open { transform: translateX(0); }
+  .overlay.open { display: block; }
+  .main { padding: 60px 16px 80px; }
+  .hero { padding: 24px 0 24px; }
+  .hero h1 { font-size: 1.75rem; }
+  .cmd-card { padding: 16px; }
+  table { font-size: .75rem; }
+  th, td { padding: 6px 8px; }
+}
 </style>
 </head>
 <body>
 
-<h1><span>/healer</span> v4</h1>
-<p class="subtitle">Universal Autonomous Codebase Health & Development Engine<br>26 commands &bull; 28 flow recipes &bull; Shared enforcement protocol &bull; Any project, any language, any platform</p>
+<!-- Mobile toggle -->
+<button class="mobile-toggle" onclick="toggleSidebar()" aria-label="Toggle navigation">&#9776;</button>
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
 
-<div class="stats">
-  <div class="stat"><div class="stat-number">26</div><div class="stat-label">Commands</div></div>
-  <div class="stat"><div class="stat-number">28</div><div class="stat-label">Flow Recipes</div></div>
-  <div class="stat"><div class="stat-number">20+</div><div class="stat-label">Languages Supported</div></div>
-  <div class="stat"><div class="stat-number">3</div><div class="stat-label">Gate Operators</div></div>
-  <div class="stat"><div class="stat-number">&infin;</div><div class="stat-label">Custom Recipes</div></div>
-</div>
+<div class="layout">
 
-<div class="toc">
-  <div class="toc-title">Table of Contents</div>
-  <a href="#quick-start">Quick Start</a>
-  <a href="#enforcement">Enforcement Protocol (New in v4)</a>
-  <a href="#commands">All 26 Commands</a>
-  <a href="#flow">Flow Orchestrator & Pipelines</a>
-  <a href="#recipes">All 28 Flow Recipes</a>
-  <a href="#gates">Gate Operators</a>
-  <a href="#smart-suggest">Smart Next-Step Suggestions</a>
-  <a href="#custom">Custom Recipes (YAML)</a>
-  <a href="#stacks">Supported Stacks</a>
-</div>
+<!-- ============================================================
+     SIDEBAR
+     ============================================================ -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <h2>Healer v6</h2>
+    <p>User Guide &amp; Reference</p>
+  </div>
+  <div class="sidebar-search">
+    <input type="text" id="searchInput" placeholder="Search commands, flows..." oninput="handleSearch(this.value)">
+  </div>
+
+  <div class="nav-category">
+    <div class="nav-category-title" onclick="toggleCategory(this)">Getting Started <span class="arrow">&#9660;</span></div>
+    <ul class="nav-items">
+      <li><a href="#hero">Overview</a></li>
+      <li><a href="#quickstart">Quick Start</a></li>
+      <li><a href="#installation">Installation</a></li>
+    </ul>
+  </div>
+
+  <div class="nav-category">
+    <div class="nav-category-title" onclick="toggleCategory(this)">Core (2) <span class="arrow">&#9660;</span></div>
+    <ul class="nav-items">
+      <li><a href="#cmd-healer">healer</a></li>
+      <li><a href="#cmd-flow">healer:flow</a></li>
+    </ul>
+  </div>
+
+  <div class="nav-category">
+    <div class="nav-category-title" onclick="toggleCategory(this)">Ideation (8) <span class="arrow">&#9660;</span></div>
+    <ul class="nav-items">
+      <li><a href="#cmd-validate">validate</a></li>
+      <li><a href="#cmd-brainstorm">brainstorm</a></li>
+      <li><a href="#cmd-research">research</a></li>
+      <li><a href="#cmd-design">design</a></li>
+      <li><a href="#cmd-architect">architect</a></li>
+      <li><a href="#cmd-spec">spec</a></li>
+      <li><a href="#cmd-plan">plan</a></li>
+      <li><a href="#cmd-strategy">strategy</a></li>
+    </ul>
+  </div>
+
+  <div class="nav-category">
+    <div class="nav-category-title" onclick="toggleCategory(this)">Design Intelligence (8) <span class="arrow">&#9660;</span></div>
+    <ul class="nav-items">
+      <li><a href="#cmd-brand">brand <span class="badge badge-new">NEW</span></a></li>
+      <li><a href="#cmd-logo">logo <span class="badge badge-new">NEW</span></a></li>
+      <li><a href="#cmd-cip">cip <span class="badge badge-new">NEW</span></a></li>
+      <li><a href="#cmd-banner">banner <span class="badge badge-new">NEW</span></a></li>
+      <li><a href="#cmd-icon">icon <span class="badge badge-new">NEW</span></a></li>
+      <li><a href="#cmd-slides">slides <span class="badge badge-new">NEW</span></a></li>
+      <li><a href="#cmd-design-system">design-system</a></li>
+      <li><a href="#cmd-design-review">design-review</a></li>
+    </ul>
+  </div>
+
+  <div class="nav-category">
+    <div class="nav-category-title" onclick="toggleCategory(this)">Implementation (4) <span class="arrow">&#9660;</span></div>
+    <ul class="nav-items">
+      <li><a href="#cmd-implement">implement</a></li>
+      <li><a href="#cmd-tdd">tdd</a></li>
+      <li><a href="#cmd-refactor">refactor</a></li>
+      <li><a href="#cmd-optimize">optimize</a></li>
+    </ul>
+  </div>
+
+  <div class="nav-category">
+    <div class="nav-category-title" onclick="toggleCategory(this)">Quality (4) <span class="arrow">&#9660;</span></div>
+    <ul class="nav-items">
+      <li><a href="#cmd-test">test</a></li>
+      <li><a href="#cmd-coverage">coverage</a></li>
+      <li><a href="#cmd-review">review</a></li>
+      <li><a href="#cmd-audit">audit</a></li>
+    </ul>
+  </div>
+
+  <div class="nav-category">
+    <div class="nav-category-title" onclick="toggleCategory(this)">Debug &amp; Fix (2) <span class="arrow">&#9660;</span></div>
+    <ul class="nav-items">
+      <li><a href="#cmd-debug">debug</a></li>
+      <li><a href="#cmd-fix">fix</a></li>
+    </ul>
+  </div>
+
+  <div class="nav-category">
+    <div class="nav-category-title" onclick="toggleCategory(this)">Health (3) <span class="arrow">&#9660;</span></div>
+    <ul class="nav-items">
+      <li><a href="#cmd-diagnose">diagnose</a></li>
+      <li><a href="#cmd-report">report</a></li>
+      <li><a href="#cmd-analyze">analyze</a></li>
+    </ul>
+  </div>
+
+  <div class="nav-category">
+    <div class="nav-category-title" onclick="toggleCategory(this)">Shipping (4) <span class="arrow">&#9660;</span></div>
+    <ul class="nav-items">
+      <li><a href="#cmd-push">push</a></li>
+      <li><a href="#cmd-ship">ship</a></li>
+      <li><a href="#cmd-deploy">deploy</a></li>
+      <li><a href="#cmd-docs">docs</a></li>
+    </ul>
+  </div>
+
+  <div class="nav-category">
+    <div class="nav-category-title" onclick="toggleCategory(this)">Help (1) <span class="arrow">&#9660;</span></div>
+    <ul class="nav-items">
+      <li><a href="#cmd-help">help</a></li>
+    </ul>
+  </div>
+
+  <div class="nav-category">
+    <div class="nav-category-title" onclick="toggleCategory(this)">Reference <span class="arrow">&#9660;</span></div>
+    <ul class="nav-items">
+      <li><a href="#flows">Flow Orchestrator</a></li>
+      <li><a href="#recipes">Recipes</a></li>
+      <li><a href="#enforcement">Enforcement Protocol</a></li>
+      <li><a href="#design-intel">Design Intelligence</a></li>
+      <li><a href="#workflows">Workflows &amp; Examples</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ============================================================
+     MAIN CONTENT
+     ============================================================ -->
+<main class="main">
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <h1><span>Healer</span> v6</h1>
+  <p class="tagline">Universal Autonomous Codebase Health &amp; Development Engine for Claude Code</p>
+  <div class="stats">
+    <div class="stat"><span class="num">32</span><span class="label">Commands</span></div>
+    <div class="stat"><span class="num">11</span><span class="label">Flow Presets</span></div>
+    <div class="stat"><span class="num">24+</span><span class="label">Recipes</span></div>
+    <div class="stat"><span class="num">161</span><span class="label">Palettes</span></div>
+    <div class="stat"><span class="num">57</span><span class="label">Fonts</span></div>
+    <div class="stat"><span class="num">99</span><span class="label">UX Guidelines</span></div>
+  </div>
+</section>
 
 <!-- QUICK START -->
-<h2 id="quick-start">Quick Start</h2>
-<pre>
-# Heal everything autonomously
-/healer
+<section class="section" id="quickstart">
+  <h2>Quick Start</h2>
+  <p>Healer is a 32-command plugin for Claude Code that turns your AI assistant into a research-augmented development engine. Every command searches the web and official docs <em>before</em> acting, then verifies its work with real tool output.</p>
 
-# Run a specific sub-command
-/healer:diagnose
-/healer:fix unit
+  <h3 id="installation">Installation</h3>
+  <pre><code>git clone https://github.com/AnandSGit/Healer.git
+cd Healer &amp;&amp; ./install.sh</code></pre>
+  <p>The installer symlinks all commands into <code>~/.claude/commands/</code> and sets up the recipe configuration.</p>
+
+  <h3>First Commands</h3>
+  <pre><code>/healer:diagnose                 # Quick health check (read-only)
+/healer:report                   # Formal health grade
+/healer:flow morning             # Daily health routine
+/healer:help                     # Interactive help</code></pre>
+
+  <h3>Build a Feature</h3>
+  <pre><code>/healer:brainstorm my-feature    # Explore the idea (interactive)
+/healer:plan my-feature          # Create task plan
+/healer:implement my-feature     # Build it with research
+/healer:test my-feature          # Write comprehensive tests
+/healer:review                   # Code review
+/healer:ship                     # PR + merge + deploy
+
+# Or use the flow shortcut:
+/healer:flow feature</code></pre>
+
+  <h3>Supported Stacks</h3>
+  <p>Healer auto-detects and works with: JavaScript/TypeScript, Python, Go, Rust, Swift/iOS, Kotlin/Android, C#/.NET, Flutter/Dart, Ruby, Java, C/C++, Elixir, and more. Detection is based on manifest files (<code>package.json</code>, <code>Cargo.toml</code>, <code>go.mod</code>, etc.) and runs once per session.</p>
+</section>
+
+<!-- ============================================================
+     COMMAND REFERENCE
+     ============================================================ -->
+<section class="section" id="commands">
+  <h2>Command Reference</h2>
+  <p>Each command follows the shared <a href="#enforcement">Enforcement Protocol</a>: research is mandatory, verification is evidence-based, and fixes are verified immediately.</p>
+
+  <!-- CORE -->
+  <h3 style="color:#E07B3C; margin-top: 2rem;">Core</h3>
+
+  <div class="cmd-card" id="cmd-healer" data-search="healer autonomous heal full check fix plan learn implement upgrade reference">
+    <h3><code>/healer</code> <span class="badge badge-core">CORE</span></h3>
+    <p class="desc">Universal Autonomous Codebase Health &amp; Development Engine. The master command that discovers, understands, assesses, researches, plans, executes, and reports across any stack.</p>
+    <button class="toggle-btn" onclick="toggleCard(this)">Show details</button>
+    <div class="details">
+      <h4>What it does</h4>
+      <p>Runs a full 7-phase autonomous healing cycle: Discover (auto-detect stack), Understand (read docs and code), Assess (run all tests), Research (search the web), Plan (create implementation plan), Execute (fix and build), Victory (report results).</p>
+      <h4>Arguments</h4>
+      <pre><code>/healer                              # Full autonomous heal
+/healer [description]                # Focused heal on specific area
+/healer --check                      # Assessment only (no changes)
+/healer --fix                        # Classic test-fix loop only
+/healer --plan                       # Generate plan only
+/healer --learn [topic]              # Research mode
+/healer --implement [feature/spec]   # Full feature implementation
+/healer --upgrade                    # Upgrade dependencies
+/healer --ref [url/image/figma]      # Use reference as inspiration</code></pre>
+      <h4>Procedure</h4>
+      <ol class="procedure-list">
+        <li>DISCOVER -- Auto-detect the full technology stack, platform, and toolchain</li>
+        <li>UNDERSTAND -- Read docs, schemas, APIs, UI, business logic, test files, git history</li>
+        <li>ASSESS -- Run all test suites, linters, builds; categorize every failure</li>
+        <li>RESEARCH -- WebSearch and WebFetch for best practices, fixes, patterns</li>
+        <li>PLAN -- Create ordered, dependency-aware implementation plan</li>
+        <li>EXECUTE -- Implement at expert quality with continuous verification (max 10 iterations)</li>
+        <li>VICTORY -- Present formal report with all metrics from actual runs</li>
+      </ol>
+      <div class="hard-gate">HARD-GATE: Do not start Phase 6 (Execute) without completing Phase 4 (Research). If Phase 4 produced zero WebSearch/WebFetch/Context7 tool calls, research is NOT complete.</div>
+      <h4>Examples</h4>
+      <pre><code>/healer                                    # Heal everything
+/healer auth system with Google + Apple    # Focus on OAuth
+/healer --learn "Core Data migration"      # Research and adapt
+/healer --implement user onboarding flow   # Build from scratch
+/healer --ref https://example.com/feature  # Reference a live site</code></pre>
+      <p class="related">Related: <a href="#cmd-flow">flow</a>, <a href="#cmd-diagnose">diagnose</a>, <a href="#cmd-fix">fix</a></p>
+    </div>
+  </div>
+
+  <div class="cmd-card" id="cmd-flow" data-search="flow orchestrator pipeline chain preset recipe gate auto interactive must-pass">
+    <h3><code>/healer:flow</code> <span class="badge badge-core">CORE</span></h3>
+    <p class="desc">Flow orchestrator -- chains multiple healer sub-commands into pipelines with gate controls, built-in presets, custom YAML recipes, and smart next-step suggestions.</p>
+    <button class="toggle-btn" onclick="toggleCard(this)">Show details</button>
+    <div class="details">
+      <h4>What it does</h4>
+      <p>Orchestrates multi-command pipelines with three gate types: auto-continue, interactive pause, and must-pass halt. Manages state tracking, resumption, and smart next-step suggestions. Includes 11 built-in presets and supports custom YAML recipes.</p>
+      <h4>Gate Operators</h4>
+      <table>
+        <tr><th>Symbol</th><th>Name</th><th>On Success</th><th>On Failure</th></tr>
+        <tr><td><code>&#8594;</code></td><td><span class="badge badge-auto">AUTO</span></td><td>Continue automatically</td><td>Log warning, continue</td></tr>
+        <tr><td><code>?&#8594;</code></td><td><span class="badge badge-interactive">INTERACTIVE</span></td><td>Ask user to continue</td><td>Ask user: continue anyway?</td></tr>
+        <tr><td><code>!&#8594;</code></td><td><span class="badge badge-mustpass">MUST-PASS</span></td><td>Continue to next step</td><td>HALT -- no override</td></tr>
+      </table>
+      <div class="hard-gate">HARD-GATE: Must-pass gates (!&#8594;) are absolute. If a step fails at a must-pass gate, the flow HALTS. Do not continue. The user must explicitly fix and restart.</div>
+      <h4>Examples</h4>
+      <pre><code>/healer:flow feature                    # Full feature lifecycle
+/healer:flow fix                        # Diagnose > fix > test > push
+/healer:flow brainstorm &#8594; plan &#8594; test  # Inline custom chain
+/healer:flow diagnose !&#8594; deploy         # Must-pass gate
+/healer:flow pre-release                # Custom recipe from YAML</code></pre>
+      <p class="related">Related: <a href="#flows">All presets</a>, <a href="#recipes">Recipes</a>, <a href="#cmd-help">help</a></p>
+    </div>
+  </div>
+
+  <!-- IDEATION -->
+  <h3 style="color:#E07B3C; margin-top: 2rem;">Ideation &amp; Design</h3>
+
+  <div class="cmd-card" id="cmd-validate" data-search="validate demand YC startup mom test forcing questions lean">
+    <h3><code>/healer:validate</code></h3>
+    <p class="desc">Demand validation diagnostic -- challenges whether an idea is worth building using YC-style forcing questions, The Mom Test principles, lean startup validation, and anti-sycophancy rules.</p>
+    <button class="toggle-btn" onclick="toggleCard(this)">Show details</button>
+    <div class="details">
+      <h4>What it does</h4>
+      <p>Acts as a YC partner conducting office hours. Features 6 forcing questions (Demand Reality, Status Quo, Desperate Specificity, Narrowest Wedge, Observation, Future-Fit), failure pattern detection, anti-sycophancy rules, and mode-appropriate intensity (Founder, Demo, Community, Builder).</p>
+      <div class="hard-gate">HARD-GATE: This is a diagnostic, not a pep talk. Never encourage without evidence. Never validate without proof of demand.</div>
+      <h4>Examples</h4>
+      <pre><code>/healer:validate AI code review tool
+/healer:validate marketplace for handmade goods
+/healer:validate internal workflow automation</code></pre>
+      <p class="related">Related: <a href="#cmd-brainstorm">brainstorm</a>, <a href="#cmd-strategy">strategy</a>, <a href="#cmd-research">research</a></p>
+    </div>
+  </div>
+
+  <div class="cmd-card" id="cmd-brainstorm" data-search="brainstorm socratic discovery ideas requirements interactive research dialogue">
+    <h3><code>/healer:brainstorm</code></h3>
+    <p class="desc">Interactive Socratic brainstorming -- explores requirements through structured dialogue FIRST, then researches online for inspiration, competing approaches, and real-world lessons. Persists decisions for cross-session continuity.</p>
+    <button class="toggle-btn" onclick="toggleCard(this)">Show details</button>
+    <div class="details">
+      <h4>Procedure</h4>
+      <ol class="procedure-list">
+        <li>Mode Detection -- Startup, Builder, Learning, or Hackathon intensity</li>
+        <li>Demand Validation Gate (Startup only)</li>
+        <li>Understand Local Context -- codebase, git history, patterns</li>
+        <li>Socratic Discovery (5 rounds) -- Purpose, Scope, Narrowest Wedge, Trade-offs, Success Criteria</li>
+        <li>Research Phase -- implementation patterns, competitive landscape, Context7</li>
+        <li>Propose 2-3 Approaches with effort estimates</li>
+        <li>Challenge Round (Devil's Advocate)</li>
+        <li>Synthesize and Save to ~/.healer/brainstorms/</li>
+      </ol>
+      <div class="hard-gate">HARD-GATE: Do NOT write any code during brainstorming. Brainstorming produces IDEAS and DECISIONS, not implementations.</div>
+      <h4>Examples</h4>
+      <pre><code>/healer:brainstorm user authentication with OAuth
+/healer:brainstorm real-time collaboration feature
+/healer:brainstorm mobile payment integration</code></pre>
+      <p class="related">Related: <a href="#cmd-validate">validate</a>, <a href="#cmd-plan">plan</a>, <a href="#cmd-design">design</a>, <a href="#cmd-architect">architect</a></p>
+    </div>
+  </div>
+
+  <div class="cmd-card" id="cmd-research" data-search="research deep dive technical product market sources credibility contradiction">
+    <h3><code>/healer:research</code></h3>
+    <p class="desc">Deep research -- fetches docs, repos, articles, competitor intel, and community insights. Source credibility scoring (1-5 stars), contradiction detection, negative research. Modes: --technical, --product, --deep, --quick.</p>
+    <button class="toggle-btn" onclick="toggleCard(this)">Show details</button>
+    <div class="details">
+      <h4>Research Modes</h4>
+      <table>
+        <tr><th>Mode</th><th>Focus</th><th>Min Searches</th><th>Depth</th></tr>
+        <tr><td><code>--technical</code></td><td>Architecture, best practices, pitfalls</td><td>5</td><td>Standard</td></tr>
+        <tr><td><code>--product</code></td><td>Market, competitors, pricing, complaints</td><td>5</td><td>Standard</td></tr>
+        <tr><td><code>--deep</code></td><td>All angles: technical + product + negative</td><td>8</td><td>Exhaustive</td></tr>
+        <tr><td><code>--quick</code></td><td>Fast 3-search summary</td><td>3</td><td>Surface</td></tr>
+      </table>
+      <h4>Examples</h4>
+      <pre><code>/healer:research WebSocket scaling --technical
+/healer:research headless CMS comparison --product
+/healer:research Redis vs Dragonfly --deep</code></pre>
+      <p class="related">Related: <a href="#cmd-brainstorm">brainstorm</a>, <a href="#cmd-design">design</a>, <a href="#cmd-implement">implement</a></p>
+    </div>
+  </div>
+
+  <div class="cmd-card" id="cmd-design" data-search="design feature API data model UX flow visual tokens preview HTML">
+    <h3><code>/healer:design</code></h3>
+    <p class="desc">Research-augmented feature design -- APIs, data models, UX flows, visual design systems, and HTML previews inspired by public design systems and real-world examples.</p>
+    <button class="toggle-btn" onclick="toggleCard(this)">Show details</button>
+    <div class="details">
+      <h4>What it does</h4>
+      <p>Designs features with complete visual design system (CSS custom properties, design tokens), competitor visual research, 7-dimension self-review checklist, and self-contained HTML preview files.</p>
+      <div class="hard-gate">HARD-GATE: Do not write code during design. The HTML preview is the one exception.</div>
+      <h4>Examples</h4>
+      <pre><code>/healer:design REST API for user management
+/healer:design dashboard with real-time charts
+/healer:design checkout flow with Apple Pay</code></pre>
+      <p class="related">Related: <a href="#cmd-architect">architect</a>, <a href="#cmd-spec">spec</a>, <a href="#cmd-implement">implement</a></p>
+    </div>
+  </div>
+
+  <div class="cmd-card" id="cmd-architect" data-search="architect architecture service boundaries ADR diagrams cost failure security">
+    <h3><code>/healer:architect</code></h3>
+    <p class="desc">System architecture -- service boundaries, infrastructure, scalability, cost estimation, failure mode analysis, and security architecture informed by public postmortems.</p>
+    <button class="toggle-btn" onclick="toggleCard(this)">Show details</button>
+    <div class="details">
+      <h4>Key Outputs</h4>
+      <ul>
+        <li>System Component Map and Data Flow Diagram (ASCII + Mermaid)</li>
+        <li>Sequence Diagrams for key flows</li>
+        <li>Architecture Decision Records (ADR format with cost impact)</li>
+        <li>Cost Estimation table (monthly/annual)</li>
+        <li>Breaking Points and scaling milestones (10 to 1M users)</li>
+        <li>Failure Mode Analysis with blast radius and recovery strategies</li>
+        <li>Security Architecture with auth boundaries and data protection</li>
+      </ul>
+      <div class="hard-gate">HARD-GATE: Architecture is design, NOT implementation. Mandatory diagrams: component map, data flow, and at least one sequence diagram.</div>
+      <h4>Examples</h4>
+      <pre><code>/healer:architect microservices for e-commerce
+/healer:architect real-time notification system
+/healer:architect multi-tenant SaaS platform</code></pre>
+      <p class="related">Related: <a href="#cmd-spec">spec</a>, <a href="#cmd-design">design</a>, <a href="#cmd-plan">plan</a></p>
+    </div>
+  </div>
+
+  <div class="cmd-card" id="cmd-spec" data-search="spec specification acceptance criteria API contract OpenAPI error catalog NFR traceability">
+    <h3><code>/healer:spec</code></h3>
+    <p class="desc">Technical specifications -- acceptance tests (Given/When/Then), API contracts (OpenAPI/JSON Schema), error catalogs, traceability matrices, and non-functional requirements with numeric targets.</p>
+    <button class="toggle-btn" onclick="toggleCard(this)">Show details</button>
+    <div class="details">
+      <h4>Key Sections</h4>
+      <ul>
+        <li>Artifact Lineage tracing back to brainstorm/design/architecture</li>
+        <li>Functional Requirements with Given/When/Then acceptance criteria</li>
+        <li>NFRs: Performance (P50/P95/P99), Scalability, Security, Accessibility, Reliability</li>
+        <li>API Design with OpenAPI/JSON Schema snippets</li>
+        <li>Error Catalog with codes, HTTP status, user/internal messages, recovery actions</li>
+        <li>Data Migration Plan with rollback procedure</li>
+        <li>Requirements Traceability Matrix</li>
+        <li>Rollout Plan with measurable rollback criteria</li>
+      </ul>
+      <div class="hard-gate">HARD-GATE: A requirement without acceptance criteria is just a wish. Every FR MUST have Given/When/Then. Every API MUST have OpenAPI/JSON Schema.</div>
+      <h4>Examples</h4>
+      <pre><code>/healer:spec OAuth2 login system
+/healer:spec GraphQL subscriptions
+/healer:spec payment processing with Stripe</code></pre>
+      <p class="related">Related: <a href="#cmd-plan">plan</a>, <a href="#cmd-implement">implement</a>, <a href="#cmd-test">test</a></p>
+    </div>
+  </div>
+
+  <div class="cmd-card" id="cmd-plan" data-search="plan task list dependencies file map effort estimation traceability bite-sized compression">
+    <h3><code>/healer:plan</code></h3>
+    <p class="desc">Implementation planning -- bite-sized tasks (2-5 min each) with dependency tracking, file mapping, requirement traceability, effort estimation with compression ratios, and native task integration.</p>
+    <button class="toggle-btn" onclick="toggleCard(this)">Show details</button>
+    <div class="details">
+      <h4>Procedure</h4>
+      <ol class="procedure-list">
+        <li>Understand scope, extract numbered REQ-N requirements</li>
+        <li>Research -- Context7 for current APIs, WebSearch for patterns</li>
+        <li>Strategic Review Checkpoint (scope, direction, alignment, constraints)</li>
+        <li>Design Review Checkpoint (UI: interaction states, responsive, a11y)</li>
+        <li>File Structure Map (every file to create, modify, test)</li>
+        <li>Decompose into 2-5 min bite-sized tasks</li>
+        <li>Effort Estimation (boilerplate ~100x, tests ~50x, features ~30x compression)</li>
+        <li>Create native Claude Code tasks with dependencies</li>
+        <li>Save plan document and cross-session memory</li>
+      </ol>
+      <h4>Examples</h4>
+      <pre><code>/healer:plan add OAuth login with Google
+/healer:plan migrate from REST to tRPC
+/healer:plan implement docs/specs/user-auth.md</code></pre>
+      <p class="related">Related: <a href="#cmd-implement">implement</a>, <a href="#cmd-tdd">tdd</a>, <a href="#cmd-spec">spec</a></p>
+    </div>
+  </div>
+
+  <div class="cmd-card" id="cmd-strategy" data-search="strategy CEO review scope assumptions competitive moat 10x thinking vitamin painkiller">
+    <h3><code>/healer:strategy</code></h3>
+    <p class="desc">CEO-level strategic review -- 10 scored dimensions including scope fitness, dangerous assumptions, competitive moat, 10x thinking, time-to-value, and future-fit analysis.</p>
+    <button class="toggle-btn" onclick="toggleCard(this)">Show details</button>
+    <div class="details">
+      <h4>10 Strategic Dimensions (0-10 each)</h4>
+      <p>Problem-Solution Fit, Scope Fitness, Dangerous Assumptions, Competitive Moat, User Clarity, 10x Thinking, Technical Risk, Time-to-Value, Measurement, Future-Fit. Verdict: STRONG GO / CONDITIONAL GO / NEEDS WORK / RETHINK.</p>
+      <div class="hard-gate">HARD-GATE: Strategy review MUST include market research. WebSearch for competitors, failures, and trends before scoring.</div>
+      <h4>Examples</h4>
+      <pre><code>/healer:strategy
+/healer:strategy mobile-first CRM
+/healer:strategy AI-powered analytics</code></pre>
+      <p class="related">Related: <a href="#cmd-validate">validate</a>, <a href="#cmd-brainstorm">brainstorm</a>, <a href="#cmd-plan">plan</a></p>
+    </div>
+  </div>
+
+  <!-- DESIGN INTELLIGENCE -->
+  <h3 style="color:#E07B3C; margin-top: 2rem;">Design Intelligence <span class="badge badge-new">NEW v6</span></h3>
+  <p style="color:#8b949e; font-size:.875rem; margin-bottom:1rem;">Integrated from UI-UX-Pro-Max. 161 palettes, 57 font pairings, 99 UX guidelines, 50+ UI styles, 14 stack-specific guideline files.</p>
+
+  <div class="cmd-card" id="cmd-brand" data-search="brand voice visual identity messaging framework guidelines personality tone">
+    <h3><code>/healer:brand</code> <span class="badge badge-new">NEW v6</span></h3>
+    <p class="desc">Brand framework generator -- brand voice (personality, tone spectrum, We Say/We Don't Say), visual identity direction (color families, typography character), messaging framework (elevator pitch, taglines, positioning).</p>
+    <button class="toggle-btn" onclick="toggleCard(this)">Show details</button>
+    <div class="details">
+      <h4>Key Outputs</h4>
+      <ul>
+        <li><strong>Brand Voice</strong>: Personality traits, tone spectrum by context, voice principles, We Say/We Don't Say</li>
+        <li><strong>Visual Identity Direction</strong>: Color families, typography character, imagery style</li>
+        <li><strong>Messaging Framework</strong>: Elevator pitch, 3+ taglines, value propositions, positioning statement</li>
+      </ul>
+      <div class="hard-gate">HARD-GATE: Do NOT invent brand attributes from training data. Complete research before proposing any brand direction. No code -- documents only.</div>
+      <h4>Examples</h4>
+      <pre><code>/healer:brand developer productivity tool
+/healer:brand healthcare SaaS platform
+/healer:brand eco-friendly consumer brand</code></pre>
+      <p class="related">Related: <a href="#cmd-design-system">design-system</a>, <a href="#cmd-logo">logo</a>, <a href="#cmd-cip">cip</a></p>
+    </div>
+  </div>
+
+  <div class="cmd-card" id="cmd-logo" data-search="logo design brief 55 styles color psychology typography AI prompts variations">
+    <h3><code>/healer:logo</code> <span class="badge badge-new">NEW v6</span></h3>
+    <p class="desc">Logo design guidance -- 55+ styles, color psychology, industry conventions, AI generation prompts, do/don't rules, and 7 required logo variations. Produces a brief, not the logo itself.</p>
+    <button class="toggle-btn" onclick="toggleCard(this)">Show details</button>
+    <div class="details">
+      <h4>55+ Logo Styles</h4>
+      <p>Wordmark (9 variants), Lettermark (6), Symbol (10), Combination Mark (5), Emblem (6), Specialty (12 including Mascot, Animated, Responsive, Dynamic, Brutalist).</p>
+      <div class="hard-gate">HARD-GATE: This produces a LOGO BRIEF, not an actual logo. Do NOT generate images.</div>
+      <h4>Examples</h4>
+      <pre><code>/healer:logo fintech startup
+/healer:logo artisan coffee brand
+/healer:logo developer tools company</code></pre>
+      <p class="related">Related: <a href="#cmd-brand">brand</a>, <a href="#cmd-icon">icon</a>, <a href="#cmd-cip">cip</a></p>
+    </div>
+  </div>
+
+  <div class="cmd-card" id="cmd-cip" data-search="cip corporate identity program 50 deliverables checklist specifications mockup prompts">
+    <h3><code>/healer:cip</code> <span class="badge badge-new">NEW v6</span></h3>
+    <p class="desc">Corporate Identity Program -- 50+ deliverables checklist across 7 categories (Core Identity, Print, Digital, Signage, Packaging, Uniforms, Documentation) with specs, AI mockup prompts, and usage rules.</p>
+    <button class="toggle-btn" onclick="toggleCard(this)">Show details</button>
+    <div class="details">
+      <h4>Each Deliverable Includes</h4>
+      <p>Exact dimensions (mm and px), bleed, color mode (CMYK/RGB), file formats, resolution, key elements, layout notes, brand rules, and priority (P0/P1/P2). P0 and P1 items also get AI generation prompts for Midjourney/DALL-E.</p>
+      <div class="hard-gate">HARD-GATE: CIP produces specifications, NOT actual mockups. Do NOT generate images.</div>
+      <h4>Examples</h4>
+      <pre><code>/healer:cip
+/healer:cip digital-only
+/healer:cip restaurant branding</code></pre>
+      <p class="related">Related: <a href="#cmd-brand">brand</a>, <a href="#cmd-logo">logo</a>, <a href="#cmd-design-system">design-system</a></p>
+    </div>
+  </div>
+
+  <div class="cmd-card" id="cmd-banner" data-search="banner social media 22 styles 9 platforms sizes safe zones HTML CSS CTA">
+    <h3><code>/healer:banner</code> <span class="badge badge-new">NEW v6</span></h3>
+    <p class="desc">Banner and social media design -- 22 styles, 9+ platforms, research-verified dimensions, safe zones, copy guidelines, and self-contained HTML/CSS web banner templates.</p>
+    <button class="toggle-btn" onclick="toggleCard(this)">Show details</button>
+    <div class="details">
+      <div class="hard-gate">HARD-GATE: Research current platform dimensions BEFORE designing. Social media platforms change sizes frequently.</div>
+      <h4>Examples</h4>
+      <pre><code>/healer:banner product launch campaign
+/healer:banner LinkedIn + Twitter social kit
+/healer:banner Google Display Network ads</code></pre>
+      <p class="related">Related: <a href="#cmd-brand">brand</a>, <a href="#cmd-slides">slides</a></p>
+    </div>
+  </div>
+
+  <div class="cmd-card" id="cmd-icon" data-search="icon system 15 styles SVG accessibility library grid currentColor touch targets">
+    <h3><code>/healer:icon</code> <span class="badge badge-new">NEW v6</span></h3>
+    <p class="desc">Icon system design -- 15 styles, library recommendations with bundle size analysis, size grid, color rules (currentColor), accessibility (aria-label), SVG standards, and stack-native code examples.</p>
+    <button class="toggle-btn" onclick="toggleCard(this)">Show details</button>
+    <div class="details">
+      <div class="hard-gate">HARD-GATE: Query the icon database BEFORE recommending libraries. No emoji as icons (rendering varies by OS). Minimum 44x44px touch targets.</div>
+      <h4>Examples</h4>
+      <pre><code>/healer:icon React dashboard application
+/healer:icon mobile-first consumer app
+/healer:icon data-dense enterprise tool</code></pre>
+      <p class="related">Related: <a href="#cmd-logo">logo</a>, <a href="#cmd-design-system">design-system</a></p>
+    </div>
+  </div>
+
+  <div class="cmd-card" id="cmd-slides" data-search="slides presentation HTML Chart.js copywriting narrative self-contained single-file">
+    <h3><code>/healer:slides</code> <span class="badge badge-new">NEW v6</span></h3>
+    <p class="desc">HTML presentations -- Chart.js data visualization, copywriting formulas (PAS, AIDA), slide strategies, layout patterns, keyboard/click/swipe navigation, and print-friendly output.</p>
+    <button class="toggle-btn" onclick="toggleCard(this)">Show details</button>
+    <div class="details">
+      <h4>Presentation Types</h4>
+      <p>Pitch decks, conference talks, quarterly reviews, product demos, internal training. Narrative arc: opening hook, problem, solution, evidence, call-to-action.</p>
+      <h4>Examples</h4>
+      <pre><code>/healer:slides investor pitch deck
+/healer:slides quarterly engineering review
+/healer:slides conference talk on microservices</code></pre>
+      <p class="related">Related: <a href="#cmd-brand">brand</a>, <a href="#cmd-banner">banner</a></p>
+    </div>
+  </div>
+
+  <div class="cmd-card" id="cmd-design-system" data-search="design-system tokens colors typography spacing DESIGN.md preview palette dark light mode">
+    <h3><code>/healer:design-system</code></h3>
+    <p class="desc">Design system generator -- complete visual identity: color palettes, typography scales, spacing systems, component patterns, dark/light mode, and interactive HTML previews. Produces DESIGN.md.</p>
+    <button class="toggle-btn" onclick="toggleCard(this)">Show details</button>
+    <div class="details">
+      <div class="hard-gate">HARD-GATE: Do NOT guess colors or fonts from training data. Complete research using actual tool calls before generating any design values.</div>
+      <h4>Examples</h4>
+      <pre><code>/healer:design-system SaaS analytics dashboard
+/healer:design-system mobile-first consumer app
+/healer:design-system developer documentation site</code></pre>
+      <p class="related">Related: <a href="#cmd-brand">brand</a>, <a href="#cmd-design">design</a>, <a href="#cmd-design-review">design-review</a></p>
+    </div>
+  </div>
+
+  <div class="cmd-card" id="cmd-design-review" data-search="design-review 7 dimensions AI slop accessibility responsive interaction states score verdict">
+    <h3><code>/healer:design-review</code></h3>
+    <p class="desc">Visual and UX quality review -- rates 7 dimensions (0-10 each): Information Architecture, Interaction States, User Journey, AI Slop Detection, Design System Alignment, Responsive, Accessibility. Verdict: APPROVE / NEEDS CHANGES / MAJOR REWORK.</p>
+    <button class="toggle-btn" onclick="toggleCard(this)">Show details</button>
+    <div class="details">
+      <h4>7 Dimensions</h4>
+      <table>
+        <tr><th>#</th><th>Dimension</th><th>Key Checks</th></tr>
+        <tr><td>1</td><td>Information Architecture</td><td>Hierarchy, grouping, navigation, scanability</td></tr>
+        <tr><td>2</td><td>Interaction States</td><td>Default, hover, active, focus, disabled, loading, empty, error, success</td></tr>
+        <tr><td>3</td><td>User Journey</td><td>Happy path, first-time, power user, error recovery, edge cases</td></tr>
+        <tr><td>4</td><td>AI Slop Detection</td><td>Generic gradients, card monotony, hero cliches, template layouts</td></tr>
+        <tr><td>5</td><td>Design System Alignment</td><td>Token usage, spacing grid, component reuse</td></tr>
+        <tr><td>6</td><td>Responsive &amp; Layout</td><td>375/768/1280/1920px, touch targets, overflow</td></tr>
+        <tr><td>7</td><td>Accessibility</td><td>Contrast 4.5:1, alt text, focus, keyboard, ARIA, headings</td></tr>
+      </table>
+      <h4>Examples</h4>
+      <pre><code>/healer:design-review
+/healer:design-review http://localhost:3000
+/healer:design-review src/components/Dashboard.tsx</code></pre>
+      <p class="related">Related: <a href="#cmd-design">design</a>, <a href="#cmd-audit">audit</a></p>
+    </div>
+  </div>
+
+  <!-- IMPLEMENTATION -->
+  <h3 style="color:#E07B3C; margin-top: 2rem;">Implementation</h3>
+
+  <div class="cmd-card" id="cmd-implement" data-search="implement build feature research-augmented code GitHub patterns">
+    <h3><code>/healer:implement</code></h3>
+    <p class="desc">Research-augmented implementation -- searches GitHub for reference implementations, idiomatic patterns, and library best practices before writing code. Implement-then-test cadence.</p>
+    <button class="toggle-btn" onclick="toggleCard(this)">Show details</button>
+    <div class="details">
+      <div class="hard-gate">HARD-GATE: No code changes without completing research. Never implement more than one file without testing.</div>
+      <h4>Examples</h4>
+      <pre><code>/healer:implement payment processing with Stripe
+/healer:implement real-time WebSocket notifications
+/healer:implement dark mode toggle</code></pre>
+      <p class="related">Related: <a href="#cmd-tdd">tdd</a>, <a href="#cmd-test">test</a>, <a href="#cmd-review">review</a>, <a href="#cmd-push">push</a></p>
+    </div>
+  </div>
+
+  <div class="cmd-card" id="cmd-tdd" data-search="tdd test-driven development red green refactor cycle failing test minimum code">
+    <h3><code>/healer:tdd</code></h3>
+    <p class="desc">Test-driven development -- strict Red-Green-Refactor cycle. Write failing test, implement minimum code, refactor while green.</p>
+    <button class="toggle-btn" onclick="toggleCard(this)">Show details</button>
+    <div class="details">
+      <p><strong style="color:#da3633;">RED</strong> -- Write ONE failing test, confirm it fails. <strong style="color:#3fb950;">GREEN</strong> -- MINIMUM code to pass. <strong style="color:#1f6feb;">REFACTOR</strong> -- Clean up, tests stay green.</p>
+      <div class="hard-gate">HARD-GATE: In RED, MUST run the test and confirm it fails. In GREEN, write ONLY minimum code. If refactoring breaks tests, REVERT immediately.</div>
+      <h4>Examples</h4>
+      <pre><code>/healer:tdd email validation for signup
+/healer:tdd calculateShippingCost()
+/healer:tdd shopping cart total with tax</code></pre>
+      <p class="related">Related: <a href="#cmd-test">test</a>, <a href="#cmd-coverage">coverage</a>, <a href="#cmd-plan">plan</a></p>
+    </div>
+  </div>
+
+  <div class="cmd-card" id="cmd-refactor" data-search="refactor clean code patterns maintainability green baseline no behavior change">
+    <h3><code>/healer:refactor</code></h3>
+    <p class="desc">Research-augmented refactoring -- improves structure and readability using clean code patterns. No behavior changes. Green baseline enforced.</p>
+    <button class="toggle-btn" onclick="toggleCard(this)">Show details</button>
+    <div class="details">
+      <div class="hard-gate">HARD-GATE: Establish GREEN BASELINE before refactoring. After EACH change, run tests. If a previously passing test fails, REVERT immediately.</div>
+      <h4>Examples</h4>
+      <pre><code>/healer:refactor src/lib/auth
+/healer:refactor extract shared utilities
+/healer:refactor reduce nesting in checkout flow</code></pre>
+      <p class="related">Related: <a href="#cmd-test">test</a>, <a href="#cmd-review">review</a>, <a href="#cmd-push">push</a></p>
+    </div>
+  </div>
+
+  <div class="cmd-card" id="cmd-optimize" data-search="optimize performance profiling baseline benchmark hypothesis 10 phases controlled experiments">
+    <h3><code>/healer:optimize</code></h3>
+    <p class="desc">Performance investigation -- 10 non-negotiable phases: setup, baseline (60s min), breaking point, constraints, hypotheses, code paths, profiling, optimization (one change at a time), decision, consolidation.</p>
+    <button class="toggle-btn" onclick="toggleCard(this)">Show details</button>
+    <div class="details">
+      <div class="hard-gate">HARD-GATE: No optimization without a baseline. ONE change at a time. If no improvement, REVERT COMPLETELY. 60s minimum benchmarks, 2+ runs per experiment.</div>
+      <h4>Examples</h4>
+      <pre><code>/healer:optimize database queries
+/healer:optimize React re-render performance
+/healer:optimize API response time</code></pre>
+      <p class="related">Related: <a href="#cmd-test">test</a>, <a href="#cmd-analyze">analyze</a>, <a href="#cmd-push">push</a></p>
+    </div>
+  </div>
+
+  <!-- QUALITY -->
+  <h3 style="color:#E07B3C; margin-top: 2rem;">Quality</h3>
+
+  <div class="cmd-card" id="cmd-test" data-search="test writing unit integration e2e edge cases patterns research arrange act assert">
+    <h3><code>/healer:test</code></h3>
+    <p class="desc">Research-augmented test writing -- searches for testing patterns, edge case strategies, and framework-specific examples before writing comprehensive tests. Run-after-each-file cadence.</p>
+    <button class="toggle-btn" onclick="toggleCard(this)">Show details</button>
+    <div class="details">
+      <div class="hard-gate">HARD-GATE: Every test you write MUST be run and pass. No test.skip, no test.todo. Run after each file, not at the end.</div>
+      <h4>Examples</h4>
+      <pre><code>/healer:test src/lib/auth
+/healer:test checkout flow
+/healer:test API endpoints</code></pre>
+      <p class="related">Related: <a href="#cmd-tdd">tdd</a>, <a href="#cmd-coverage">coverage</a>, <a href="#cmd-fix">fix</a></p>
+    </div>
+  </div>
+
+  <div class="cmd-card" id="cmd-coverage" data-search="coverage analysis risk prioritization untested critical paths auth payments">
+    <h3><code>/healer:coverage</code></h3>
+    <p class="desc">Test coverage analysis -- identifies untested critical paths (auth, payments, data mutations), prioritizes by risk, recommends exactly what to test next.</p>
+    <button class="toggle-btn" onclick="toggleCard(this)">Show details</button>
+    <div class="details">
+      <div class="hard-gate">HARD-GATE: Coverage MUST be based on actual coverage tool output. Do not estimate by reading code.</div>
+      <h4>Examples</h4>
+      <pre><code>/healer:coverage
+/healer:coverage auth
+/healer:coverage --threshold 80%</code></pre>
+      <p class="related">Related: <a href="#cmd-test">test</a>, <a href="#cmd-fix">fix</a></p>
+    </div>
+  </div>
+
+  <div class="cmd-card" id="cmd-review" data-search="review code correctness security performance conventions maintainability">
+    <h3><code>/healer:review</code></h3>
+    <p class="desc">Code review -- correctness, security, performance, conventions, and maintainability. Research-validated findings with file:line specificity. Verdict: APPROVE / REQUEST CHANGES / COMMENT.</p>
+    <button class="toggle-btn" onclick="toggleCard(this)">Show details</button>
+    <div class="details">
+      <div class="hard-gate">HARD-GATE: Do not flag an issue unless you can cite the specific concern with file, line, issue, and recommendation.</div>
+      <h4>Examples</h4>
+      <pre><code>/healer:review                   # Uncommitted changes
+/healer:review #42               # PR #42
+/healer:review feature/auth      # Branch</code></pre>
+      <p class="related">Related: <a href="#cmd-fix">fix</a>, <a href="#cmd-push">push</a>, <a href="#cmd-ship">ship</a></p>
+    </div>
+  </div>
+
+  <div class="cmd-card" id="cmd-audit" data-search="audit security OWASP CVE dependencies accessibility license a11y">
+    <h3><code>/healer:audit</code></h3>
+    <p class="desc">Security and quality audit -- OWASP top 10, CVE databases, dependency vulnerabilities (actual audit command output), accessibility (WCAG AA), license conflicts, and UX audit dimensions.</p>
+    <button class="toggle-btn" onclick="toggleCard(this)">Show details</button>
+    <div class="details">
+      <div class="hard-gate">HARD-GATE: Every finding MUST include: (1) specific file:line, (2) vulnerability type with CWE, (3) evidence, (4) specific remediation. Run the actual dependency audit command.</div>
+      <h4>Examples</h4>
+      <pre><code>/healer:audit
 /healer:audit security
+/healer:audit a11y</code></pre>
+      <p class="related">Related: <a href="#cmd-fix">fix</a>, <a href="#cmd-implement">implement</a></p>
+    </div>
+  </div>
 
-# Chain commands into a flow
-/healer:flow feature
-/healer:flow brainstorm &rarr; plan &rarr; implement &rarr; test &rarr; ship
+  <!-- DEBUG & FIX -->
+  <h3 style="color:#E07B3C; margin-top: 2rem;">Debug &amp; Fix</h3>
 
-# Smart suggest: after any command, run /healer with no args
-# &rarr; It proposes the natural next step
-</pre>
+  <div class="cmd-card" id="cmd-debug" data-search="debug systematic hypothesis testing root cause isolation reproduce revert">
+    <h3><code>/healer:debug</code></h3>
+    <p class="desc">Systematic debugging -- reproduce, gather evidence, form hypotheses, test one at a time, verify fix. Never guesses, always verifies.</p>
+    <button class="toggle-btn" onclick="toggleCard(this)">Show details</button>
+    <div class="details">
+      <div class="hard-gate">HARD-GATE: ONE hypothesis at a time. Apply ONE change, verify. REVERT if no fix before trying next.</div>
+      <h4>Examples</h4>
+      <pre><code>/healer:debug TypeError: Cannot read property 'id' of undefined
+/healer:debug login fails silently on mobile
+/healer:debug auth.test.ts line 42</code></pre>
+      <p class="related">Related: <a href="#cmd-fix">fix</a>, <a href="#cmd-test">test</a>, <a href="#cmd-diagnose">diagnose</a></p>
+    </div>
+  </div>
 
-<!-- ENFORCEMENT PROTOCOL -->
-<h2 id="enforcement">Enforcement Protocol (New in v4)</h2>
-<p>v4 introduces a shared enforcement layer (<code>_enforcement.md</code>) that makes all commands <strong>actually effective</strong>. Every command references this protocol.</p>
+  <div class="cmd-card" id="cmd-fix" data-search="fix test suite failures max 5 iterations research root cause source first">
+    <h3><code>/healer:fix</code></h3>
+    <p class="desc">Targeted fix -- runs a specific test suite, researches each error online, fixes root causes with max 5 iterations. Fix source code first, test code second.</p>
+    <button class="toggle-btn" onclick="toggleCard(this)">Show details</button>
+    <div class="details">
+      <div class="hard-gate">HARD-GATE: No code changes until research is complete. One fix at a time, verify immediately. If 3 consecutive attempts fail, STOP and escalate.</div>
+      <h4>Examples</h4>
+      <pre><code>/healer:fix unit
+/healer:fix e2e
+/healer:fix lint
+/healer:fix types</code></pre>
+      <p class="related">Related: <a href="#cmd-debug">debug</a>, <a href="#cmd-test">test</a>, <a href="#cmd-diagnose">diagnose</a></p>
+    </div>
+  </div>
 
-<div class="command-grid">
-  <div class="command-card">
-    <div class="command-name">HARD-GATEs</div>
-    <span class="badge badge-red">mandatory</span>
-    <div class="command-desc">Absolute blockers that prevent skipping research, verification, or testing. Cannot be rationalized away.</div>
-  </div>
-  <div class="command-card">
-    <div class="command-name">Explicit Tool Calls</div>
-    <span class="badge badge-blue">research</span>
-    <div class="command-desc">Every "search online" instruction specifies exact tools: WebSearch, WebFetch, Context7 MCP. No more relying on training data.</div>
-  </div>
-  <div class="command-card">
-    <div class="command-name">Evidence-Before-Claims</div>
-    <span class="badge badge-green">verification</span>
-    <div class="command-desc">Every "tests pass" claim requires actual command output. Run it, read it, count failures, then report.</div>
-  </div>
-  <div class="command-card">
-    <div class="command-name">Fix-Verify Cycles</div>
-    <span class="badge badge-yellow">iterative</span>
-    <div class="command-desc">Apply one fix, run tests, verify, move on. No batching. Revert if 3 consecutive attempts fail.</div>
-  </div>
-  <div class="command-card">
-    <div class="command-name">Anti-Rationalization</div>
-    <span class="badge badge-purple">discipline</span>
-    <div class="command-desc">12-entry table blocking common excuses: "I already know how to fix this", "tests probably pass", "I'll verify at the end".</div>
-  </div>
-  <div class="command-card">
-    <div class="command-name">Red-Flag Stops</div>
-    <span class="badge badge-red">safety</span>
-    <div class="command-desc">Automatic halt after 3+ failed fixes, when fixes cause regressions, or when changing code you don't understand.</div>
-  </div>
-</div>
+  <!-- HEALTH -->
+  <h3 style="color:#E07B3C; margin-top: 2rem;">Health &amp; Reporting</h3>
 
-<!-- ALL COMMANDS -->
-<h2 id="commands">All 26 Commands</h2>
+  <div class="cmd-card" id="cmd-diagnose" data-search="diagnose health check read-only suites severity classification regression flaky">
+    <h3><code>/healer:diagnose</code></h3>
+    <p class="desc">Read-only health check -- runs all test suites, classifies errors (Regression, Missing implementation, Configuration, Dependency, Flaky), researches each against known framework bugs. Never modifies files.</p>
+    <button class="toggle-btn" onclick="toggleCard(this)">Show details</button>
+    <div class="details">
+      <div class="hard-gate">HARD-GATE: Diagnose is READ-ONLY. If about to Write or Edit a file, STOP.</div>
+      <h4>Examples</h4>
+      <pre><code>/healer:diagnose
+/healer:diagnose auth module</code></pre>
+      <p class="related">Related: <a href="#cmd-fix">fix</a>, <a href="#cmd-report">report</a>, <a href="#cmd-deploy">deploy</a></p>
+    </div>
+  </div>
 
-<div class="section-group-title">Core Engine</div>
-<div class="command-grid">
-  <div class="command-card">
-    <div class="command-name">/healer</div>
-    <span class="badge badge-green">autonomous</span>
-    <div class="command-desc">Full 7-phase autonomous heal: discover &rarr; understand &rarr; assess &rarr; research &rarr; plan &rarr; execute &rarr; report</div>
+  <div class="cmd-card" id="cmd-report" data-search="report status grade A B C D F suite results formal health score">
+    <h3><code>/healer:report</code></h3>
+    <p class="desc">Formal health report -- runs all suites, produces pass/fail counts, error summaries, and overall grade (A-F). Every number from actual command output.</p>
+    <button class="toggle-btn" onclick="toggleCard(this)">Show details</button>
+    <div class="details">
+      <div class="hard-gate">HARD-GATE: Every number MUST come from an actual command run. No placeholders, no estimates.</div>
+      <h4>Examples</h4>
+      <pre><code>/healer:report
+/healer:report unit integration</code></pre>
+      <p class="related">Related: <a href="#cmd-diagnose">diagnose</a>, <a href="#cmd-fix">fix</a></p>
+    </div>
   </div>
-  <div class="command-card">
-    <div class="command-name">/healer:flow</div>
-    <span class="badge badge-purple">orchestrator</span>
-    <div class="command-desc">Chain multiple sub-commands into pipelines with gate controls, built-in presets, custom YAML recipes, and smart next-step suggestions</div>
-  </div>
-</div>
 
-<div class="section-group-title">Ideation & Design</div>
-<div class="command-grid">
-  <div class="command-card">
-    <div class="command-name">/healer:brainstorm</div>
-    <span class="badge badge-blue">interactive</span>
-    <div class="command-desc">Socratic dialogue FIRST, then research. Combines interactive discovery with research-augmented proposals</div>
+  <div class="cmd-card" id="cmd-analyze" data-search="analyze codebase health patterns tech debt dependencies quality metrics benchmarks">
+    <h3><code>/healer:analyze</code></h3>
+    <p class="desc">Codebase health analysis -- patterns, tech debt, dependencies, quality metrics compared against researched industry benchmarks. Evidence-based with actual file counts and line measurements.</p>
+    <button class="toggle-btn" onclick="toggleCard(this)">Show details</button>
+    <div class="details">
+      <div class="hard-gate">HARD-GATE: Every claim MUST cite specific files, line counts, or tool output. "The code seems messy" is not analysis.</div>
+      <h4>Examples</h4>
+      <pre><code>/healer:analyze
+/healer:analyze src/lib/auth
+/healer:analyze dependencies</code></pre>
+      <p class="related">Related: <a href="#cmd-refactor">refactor</a>, <a href="#cmd-audit">audit</a></p>
+    </div>
   </div>
-  <div class="command-card">
-    <div class="command-name">/healer:research</div>
-    <span class="badge badge-blue">read-only</span>
-    <div class="command-desc">Deep multi-source research on any topic. Searches docs, repos, articles, community discussions</div>
-  </div>
-  <div class="command-card">
-    <div class="command-name">/healer:design</div>
-    <span class="badge badge-blue">document</span>
-    <div class="command-desc">Feature/API/UX design inspired by Stripe, GitHub, Linear. Produces design documents with trade-offs</div>
-  </div>
-  <div class="command-card">
-    <div class="command-name">/healer:architect</div>
-    <span class="badge badge-blue">document</span>
-    <div class="command-desc">System architecture informed by public postmortems and tech company engineering blogs</div>
-  </div>
-  <div class="command-card">
-    <div class="command-name">/healer:spec</div>
-    <span class="badge badge-blue">document</span>
-    <div class="command-desc">Technical specifications cross-referenced with public RFCs, ADRs, and spec templates</div>
-  </div>
-  <div class="command-card">
-    <div class="command-name">/healer:plan</div>
-    <span class="badge badge-purple">planning</span>
-    <div class="command-desc">Bite-sized task lists (2-5 min each) with dependency tracking, file mapping, native TaskCreate integration</div>
-  </div>
-</div>
 
-<div class="section-group-title">Implementation</div>
-<div class="command-grid">
-  <div class="command-card">
-    <div class="command-name">/healer:implement</div>
-    <span class="badge badge-green">code</span>
-    <div class="command-desc">Research-augmented feature building. Searches GitHub for reference implementations before writing code</div>
-  </div>
-  <div class="command-card">
-    <div class="command-name">/healer:tdd</div>
-    <span class="badge badge-green">code</span>
-    <div class="command-desc">Test-driven development: write failing test FIRST, implement minimum code, refactor. Red-Green-Refactor</div>
-  </div>
-  <div class="command-card">
-    <div class="command-name">/healer:refactor</div>
-    <span class="badge badge-green">code</span>
-    <div class="command-desc">Research-augmented refactoring with Martin Fowler pattern citations. Proposes plan before changing</div>
-  </div>
-  <div class="command-card">
-    <div class="command-name">/healer:optimize</div>
-    <span class="badge badge-red">10-phase</span>
-    <div class="command-desc">Structured performance investigation: baselines, profiling, hypothesis testing, controlled experiments, evidence-backed results</div>
-  </div>
-</div>
+  <!-- SHIPPING -->
+  <h3 style="color:#E07B3C; margin-top: 2rem;">Shipping</h3>
 
-<div class="section-group-title">Testing & Quality</div>
-<div class="command-grid">
-  <div class="command-card">
-    <div class="command-name">/healer:test</div>
-    <span class="badge badge-green">code</span>
-    <div class="command-desc">Research-augmented test writing. Searches for edge case strategies and framework-specific patterns</div>
+  <div class="cmd-card" id="cmd-push" data-search="push commit conventional emoji stage git no force push no secrets">
+    <h3><code>/healer:push</code></h3>
+    <p class="desc">Conventional commit with emoji prefix + push. Scans for secrets, stages explicitly (never git add -A), generates message from actual diff. Never force pushes.</p>
+    <button class="toggle-btn" onclick="toggleCard(this)">Show details</button>
+    <div class="details">
+      <div class="hard-gate">HARD-GATE: Review git diff --staged for secrets and debug code. Run test suite. NEVER force push. NEVER push to main without confirmation.</div>
+      <h4>Examples</h4>
+      <pre><code>/healer:push
+/healer:push "add OAuth login support"</code></pre>
+      <p class="related">Related: <a href="#cmd-ship">ship</a>, <a href="#cmd-deploy">deploy</a></p>
+    </div>
   </div>
-  <div class="command-card">
-    <div class="command-name">/healer:coverage</div>
-    <span class="badge badge-blue">analysis</span>
-    <div class="command-desc">Test coverage analysis with risk-based prioritization. Identifies untested critical paths</div>
+
+  <div class="cmd-card" id="cmd-ship" data-search="ship PR workflow commit push auto-reviewer review loop merge deploy rollback 180 seconds">
+    <h3><code>/healer:ship</code></h3>
+    <p class="desc">Full PR workflow -- 9 phases: pre-flight, quality gate, commit, create PR, mandatory 180s auto-reviewer wait + comment resolution loop, merge, deploy, smoke test, report.</p>
+    <button class="toggle-btn" onclick="toggleCard(this)">Show details</button>
+    <div class="details">
+      <div class="hard-gate">HARD-GATE: ALL suites must pass. 180-second auto-reviewer wait is MANDATORY. Never merge with failing CI or unresolved threads.</div>
+      <h4>Examples</h4>
+      <pre><code>/healer:ship
+/healer:ship "add OAuth login"
+/healer:ship skip-deploy</code></pre>
+      <p class="related">Related: <a href="#cmd-push">push</a>, <a href="#cmd-deploy">deploy</a>, <a href="#cmd-review">review</a></p>
+    </div>
   </div>
-  <div class="command-card">
-    <div class="command-name">/healer:review</div>
-    <span class="badge badge-blue">analysis</span>
-    <div class="command-desc">Code review validated against online best practices. Checks correctness, security, performance, conventions</div>
+
+  <div class="cmd-card" id="cmd-deploy" data-search="deploy production staging gate smoke test Vercel Netlify AWS Docker Firebase">
+    <h3><code>/healer:deploy</code></h3>
+    <p class="desc">Production deployment -- all suites as gate check, deploy to detected platform (Vercel, Netlify, AWS, Docker, Heroku, Firebase, Fly.io, App Store, Google Play), post-deploy smoke test.</p>
+    <button class="toggle-btn" onclick="toggleCard(this)">Show details</button>
+    <div class="details">
+      <div class="hard-gate">HARD-GATE: Do NOT deploy without passing ALL test suites. Post-deploy smoke test is mandatory.</div>
+      <h4>Examples</h4>
+      <pre><code>/healer:deploy
+/healer:deploy staging</code></pre>
+      <p class="related">Related: <a href="#cmd-ship">ship</a>, <a href="#cmd-diagnose">diagnose</a></p>
+    </div>
   </div>
-  <div class="command-card">
-    <div class="command-name">/healer:audit</div>
-    <span class="badge badge-red">security</span>
-    <div class="command-desc">OWASP top 10, CVE databases, accessibility (WCAG), dependency vulnerabilities, license compliance</div>
+
+  <div class="cmd-card" id="cmd-docs" data-search="docs documentation README API architecture Divio tutorials how-to reference explanation">
+    <h3><code>/healer:docs</code></h3>
+    <p class="desc">Documentation generation -- README, API docs, architecture docs, component docs using the Divio system (Tutorials, How-to, Reference, Explanation). Every code example verified against actual source.</p>
+    <button class="toggle-btn" onclick="toggleCard(this)">Show details</button>
+    <div class="details">
+      <div class="hard-gate">HARD-GATE: Every code example must be verified by reading actual source code. All file paths must be confirmed to exist.</div>
+      <h4>Examples</h4>
+      <pre><code>/healer:docs
+/healer:docs auth system
+/healer:docs API</code></pre>
+      <p class="related">Related: <a href="#cmd-push">push</a></p>
+    </div>
   </div>
-</div>
 
-<div class="section-group-title">Debugging & Fixing</div>
-<div class="command-grid">
-  <div class="command-card">
-    <div class="command-name">/healer:debug</div>
-    <span class="badge badge-yellow">systematic</span>
-    <div class="command-desc">Hypothesis-driven debugging: reproduce, gather evidence, form hypotheses, test one at a time, verify fix</div>
+  <!-- HELP -->
+  <h3 style="color:#E07B3C; margin-top: 2rem;">Help</h3>
+
+  <div class="cmd-card" id="cmd-help" data-search="help commands flows recipes gates examples quickstart search interactive">
+    <h3><code>/healer:help</code></h3>
+    <p class="desc">Interactive help system -- 10 modes: overview, commands, flows, recipes, gates, examples, quickstart, all, search, and per-command detail.</p>
+    <button class="toggle-btn" onclick="toggleCard(this)">Show details</button>
+    <div class="details">
+      <h4>Modes</h4>
+      <pre><code>/healer:help                  # Welcome + categories
+/healer:help commands         # All 32 commands
+/healer:help flows            # 11 flow presets
+/healer:help recipes          # Custom recipes
+/healer:help gates            # Gate operator reference
+/healer:help examples         # Usage patterns
+/healer:help quickstart       # Getting started
+/healer:help all              # Complete reference
+/healer:help search &lt;term&gt;   # Search everything
+/healer:help brainstorm       # Detail for any command</code></pre>
+    </div>
   </div>
-  <div class="command-card">
-    <div class="command-name">/healer:fix</div>
-    <span class="badge badge-green">code</span>
-    <div class="command-desc">Targeted test suite fix with online error research. Max 5 iterations. Searches for known framework bugs</div>
+
+</section>
+
+<!-- ============================================================
+     FLOW ORCHESTRATOR
+     ============================================================ -->
+<section class="section" id="flows">
+  <h2>Flow Orchestrator</h2>
+  <p>The flow orchestrator chains commands with gate controls. It manages state persistence (<code>.healer/state.json</code>), resumption, and smart next-step suggestions.</p>
+
+  <h3>Built-in Presets (11)</h3>
+
+  <div class="cmd-card"><h4><code>feature</code> -- Full feature development lifecycle</h4>
+    <div class="flow-pipeline"><span class="flow-step">brainstorm</span><span class="flow-gate interactive">?&#8594;</span><span class="flow-step">plan</span><span class="flow-gate interactive">?&#8594;</span><span class="flow-step">implement</span><span class="flow-gate auto">&#8594;</span><span class="flow-step">test</span><span class="flow-gate mustpass">!&#8594;</span><span class="flow-step">review</span><span class="flow-gate interactive">?&#8594;</span><span class="flow-step">ship</span><span class="flow-gate mustpass">!&#8594;</span></div>
   </div>
-</div>
 
-<div class="section-group-title">Health & Reporting</div>
-<div class="command-grid">
-  <div class="command-card">
-    <div class="command-name">/healer:diagnose</div>
-    <span class="badge badge-blue">read-only</span>
-    <div class="command-desc">Run all test suites, compare errors against known framework bugs, produce severity-classified health report</div>
+  <div class="cmd-card"><h4><code>fix</code> -- Diagnose and fix issues</h4>
+    <div class="flow-pipeline"><span class="flow-step">diagnose</span><span class="flow-gate auto">&#8594;</span><span class="flow-step">debug</span><span class="flow-gate auto">&#8594;</span><span class="flow-step">fix</span><span class="flow-gate auto">&#8594;</span><span class="flow-step">test</span><span class="flow-gate mustpass">!&#8594;</span><span class="flow-step">push</span><span class="flow-gate interactive">?&#8594;</span></div>
   </div>
-  <div class="command-card">
-    <div class="command-name">/healer:report</div>
-    <span class="badge badge-blue">read-only</span>
-    <div class="command-desc">Formal A-F health status report with pass/fail counts, error summaries, and grading</div>
+
+  <div class="cmd-card"><h4><code>deploy</code> -- Safe deployment pipeline</h4>
+    <div class="flow-pipeline"><span class="flow-step">diagnose</span><span class="flow-gate mustpass">!&#8594;</span><span class="flow-step">review</span><span class="flow-gate interactive">?&#8594;</span><span class="flow-step">ship</span><span class="flow-gate mustpass">!&#8594;</span></div>
   </div>
-  <div class="command-card">
-    <div class="command-name">/healer:analyze</div>
-    <span class="badge badge-blue">read-only</span>
-    <div class="command-desc">Codebase health vs industry best practices. Tech debt inventory with severity and effort estimates</div>
+
+  <div class="cmd-card"><h4><code>audit</code> -- Comprehensive health audit</h4>
+    <div class="flow-pipeline"><span class="flow-step">analyze</span><span class="flow-gate auto">&#8594;</span><span class="flow-step">audit</span><span class="flow-gate auto">&#8594;</span><span class="flow-step">coverage</span><span class="flow-gate auto">&#8594;</span><span class="flow-step">report</span></div>
   </div>
-</div>
 
-<div class="section-group-title">Shipping</div>
-<div class="command-grid">
-  <div class="command-card">
-    <div class="command-name">/healer:push</div>
-    <span class="badge badge-yellow">git</span>
-    <div class="command-desc">Conventional commit with emoji prefix + push. Never force-pushes, never commits secrets</div>
+  <div class="cmd-card"><h4><code>morning</code> -- Quick morning health check</h4>
+    <div class="flow-pipeline"><span class="flow-step">diagnose</span><span class="flow-gate auto">&#8594;</span><span class="flow-step">report</span></div>
   </div>
-  <div class="command-card">
-    <div class="command-name">/healer:ship</div>
-    <span class="badge badge-red">end-to-end</span>
-    <div class="command-desc">Full PR workflow: quality gate &rarr; commit &rarr; PR &rarr; 180s auto-reviewer wait &rarr; comment resolution loop &rarr; merge &rarr; deploy</div>
+
+  <div class="cmd-card"><h4><code>refactor</code> -- Research-backed code improvement</h4>
+    <div class="flow-pipeline"><span class="flow-step">analyze</span><span class="flow-gate auto">&#8594;</span><span class="flow-step">plan</span><span class="flow-gate interactive">?&#8594;</span><span class="flow-step">refactor</span><span class="flow-gate auto">&#8594;</span><span class="flow-step">test</span><span class="flow-gate mustpass">!&#8594;</span><span class="flow-step">review</span><span class="flow-gate interactive">?&#8594;</span><span class="flow-step">push</span><span class="flow-gate interactive">?&#8594;</span></div>
   </div>
-  <div class="command-card">
-    <div class="command-name">/healer:deploy</div>
-    <span class="badge badge-yellow">deploy</span>
-    <div class="command-desc">Gate-checked deployment with smoke tests. Auto-detects platform (Vercel, Netlify, AWS, Docker, etc.)</div>
+
+  <div class="cmd-card"><h4><code>tdd</code> -- Test-driven development flow</h4>
+    <div class="flow-pipeline"><span class="flow-step">plan</span><span class="flow-gate interactive">?&#8594;</span><span class="flow-step">tdd</span><span class="flow-gate auto">&#8594;</span><span class="flow-step">coverage</span><span class="flow-gate auto">&#8594;</span><span class="flow-step">review</span><span class="flow-gate interactive">?&#8594;</span><span class="flow-step">push</span><span class="flow-gate interactive">?&#8594;</span></div>
   </div>
-  <div class="command-card">
-    <div class="command-name">/healer:docs</div>
-    <span class="badge badge-blue">document</span>
-    <div class="command-desc">Documentation generation using Divio framework (tutorials, how-to, reference, explanation). Researches best-in-class docs first</div>
+
+  <div class="cmd-card"><h4><code>research</code> -- Deep research to specification</h4>
+    <div class="flow-pipeline"><span class="flow-step">research</span><span class="flow-gate auto">&#8594;</span><span class="flow-step">brainstorm</span><span class="flow-gate interactive">?&#8594;</span><span class="flow-step">design</span><span class="flow-gate interactive">?&#8594;</span><span class="flow-step">spec</span></div>
   </div>
-</div>
 
-<!-- FLOW ORCHESTRATOR -->
-<h2 id="flow">Flow Orchestrator</h2>
-<p>The <code>/healer:flow</code> command chains multiple sub-commands into a pipeline. Use built-in presets, inline syntax, or custom YAML recipes.</p>
+  <div class="cmd-card"><h4><code>ideate</code> -- Full ideation pipeline <span class="badge badge-new">NEW v6</span></h4>
+    <div class="flow-pipeline"><span class="flow-step">validate</span><span class="flow-gate interactive">?&#8594;</span><span class="flow-step">brainstorm</span><span class="flow-gate interactive">?&#8594;</span><span class="flow-step">research</span><span class="flow-gate auto">&#8594;</span><span class="flow-step">design</span><span class="flow-gate interactive">?&#8594;</span><span class="flow-step">strategy</span><span class="flow-gate interactive">?&#8594;</span><span class="flow-step">spec</span><span class="flow-gate interactive">?&#8594;</span><span class="flow-step">plan</span><span class="flow-gate interactive">?&#8594;</span></div>
+  </div>
 
-<pre>
-# Built-in presets
-/healer:flow feature          # brainstorm ?&rarr; plan ?&rarr; implement &rarr; test !&rarr; review ?&rarr; ship !&rarr;
-/healer:flow fix              # diagnose &rarr; debug &rarr; fix &rarr; test !&rarr; push ?&rarr;
+  <div class="cmd-card"><h4><code>visual</code> -- Visual design pipeline <span class="badge badge-new">NEW v6</span></h4>
+    <div class="flow-pipeline"><span class="flow-step">brand</span><span class="flow-gate interactive">?&#8594;</span><span class="flow-step">design-system</span><span class="flow-gate interactive">?&#8594;</span><span class="flow-step">design</span><span class="flow-gate interactive">?&#8594;</span><span class="flow-step">design-review</span></div>
+  </div>
 
-# Inline custom chains
-/healer:flow diagnose &rarr; fix &rarr; test !&rarr; push
-/healer:flow brainstorm ?&rarr; plan ?&rarr; implement &rarr; test !&rarr; ship !&rarr;
+  <div class="cmd-card"><h4><code>identity</code> -- Brand identity pipeline <span class="badge badge-new">NEW v6</span></h4>
+    <div class="flow-pipeline"><span class="flow-step">brand</span><span class="flow-gate interactive">?&#8594;</span><span class="flow-step">logo</span><span class="flow-gate interactive">?&#8594;</span><span class="flow-step">cip</span><span class="flow-gate interactive">?&#8594;</span><span class="flow-step">design-system</span><span class="flow-gate interactive">?&#8594;</span></div>
+  </div>
 
-# Custom recipes
-/healer:flow pre-release      # from ~/.healer/recipes.yaml
-/healer:flow hotfix
-</pre>
+  <h3>Suggested-Next Graph</h3>
+  <p>After any command, run <code>/healer</code> with no arguments to get the natural next step from <code>.healer/state.json</code>.</p>
+  <pre><code>brainstorm  &#8594; plan, design, architect, spec
+plan        &#8594; implement, tdd
+design      &#8594; spec, architect, implement
+architect   &#8594; spec, design, plan
+implement   &#8594; test, review, push
+tdd         &#8594; coverage, review, push
+test        &#8594; coverage, fix, push
+debug       &#8594; fix, test
+fix         &#8594; test, diagnose, push
+review      &#8594; fix, push, ship
+analyze     &#8594; refactor, audit, fix
+diagnose    &#8594; fix, report, deploy
+brand       &#8594; logo, design-system, cip
+logo        &#8594; icon, cip, brand
+cip         &#8594; design-system, banner
+banner      &#8594; slides, push
+slides      &#8594; push, ship</code></pre>
+</section>
 
-<!-- GATE OPERATORS -->
-<h2 id="gates">Gate Operators</h2>
-<table class="gate-table">
-  <tr><th>Operator</th><th>Name</th><th>On Success</th><th>On Failure</th></tr>
-  <tr><td><code>&rarr;</code></td><td>AUTO</td><td>Continue automatically</td><td>Log warning, continue anyway</td></tr>
-  <tr><td><code>?&rarr;</code></td><td>INTERACTIVE</td><td>Pause: "Continue to {next}? [Y/n]"</td><td>Pause: "Step failed. Continue? [Y/n/abort]"</td></tr>
-  <tr><td><code>!&rarr;</code></td><td>MUST-PASS</td><td>Continue automatically</td><td><strong>HALT flow.</strong> Suggest /healer:fix</td></tr>
-</table>
+<!-- RECIPES -->
+<section class="section" id="recipes">
+  <h2>Custom Recipes (24+)</h2>
+  <p>Defined in <code>config/recipes.yaml</code>. Custom recipes take precedence over built-in presets. Categorized by purpose.</p>
 
-<!-- ALL RECIPES -->
-<h2 id="recipes">All 28 Flow Recipes</h2>
+  <h3>Development Lifecycle</h3>
+  <table><tr><th>Recipe</th><th>Description</th><th>Steps</th></tr>
+    <tr><td><code>full-feature</code></td><td>Idea to production (10 steps)</td><td>brainstorm ?&#8594; research &#8594; design ?&#8594; spec ?&#8594; plan ?&#8594; tdd &#8594; coverage &#8594; review ?&#8594; docs &#8594; ship !&#8594;</td></tr>
+    <tr><td><code>quick-feature</code></td><td>Fast feature, skip brainstorm</td><td>plan ?&#8594; implement &#8594; test !&#8594; push ?&#8594;</td></tr>
+    <tr><td><code>spike</code></td><td>Research then prototype</td><td>research &#8594; brainstorm ?&#8594; implement &#8594; test</td></tr>
+  </table>
 
-<div class="section-group-title">Built-in Presets (8)</div>
+  <h3>Bug Fixing</h3>
+  <table><tr><th>Recipe</th><th>Description</th><th>Steps</th></tr>
+    <tr><td><code>deep-fix</code></td><td>Thorough investigation</td><td>diagnose &#8594; research &#8594; debug &#8594; fix &#8594; test !&#8594; review ?&#8594; push ?&#8594;</td></tr>
+    <tr><td><code>hotfix</code></td><td>Emergency fix</td><td>debug &#8594; fix &#8594; test !&#8594; ship !&#8594;</td></tr>
+    <tr><td><code>flaky-hunt</code></td><td>Fix flaky tests</td><td>diagnose &#8594; coverage &#8594; fix(unit) &#8594; fix(e2e) &#8594; report</td></tr>
+    <tr><td><code>ci-fix</code></td><td>Fix all CI failures</td><td>fix(types) &#8594; fix(lint) &#8594; fix(unit) &#8594; fix(build) &#8594; report &#8594; push ?&#8594;</td></tr>
+  </table>
 
-<div class="flow-card">
-  <div class="flow-name">/healer:flow feature</div>
-  <div class="flow-desc">Full feature development lifecycle</div>
-  <div class="flow-steps">brainstorm ?&rarr; plan ?&rarr; implement &rarr; test !&rarr; review ?&rarr; ship !&rarr;</div>
-</div>
-<div class="flow-card">
-  <div class="flow-name">/healer:flow fix</div>
-  <div class="flow-desc">Diagnose and fix issues</div>
-  <div class="flow-steps">diagnose &rarr; debug &rarr; fix &rarr; test !&rarr; push ?&rarr;</div>
-</div>
-<div class="flow-card">
-  <div class="flow-name">/healer:flow deploy</div>
-  <div class="flow-desc">Safe deployment pipeline</div>
-  <div class="flow-steps">diagnose !&rarr; review ?&rarr; ship !&rarr;</div>
-</div>
-<div class="flow-card">
-  <div class="flow-name">/healer:flow audit</div>
-  <div class="flow-desc">Comprehensive health audit</div>
-  <div class="flow-steps">analyze &rarr; audit &rarr; coverage &rarr; report &rarr;</div>
-</div>
-<div class="flow-card">
-  <div class="flow-name">/healer:flow morning</div>
-  <div class="flow-desc">Quick morning health check</div>
-  <div class="flow-steps">diagnose &rarr; report &rarr;</div>
-</div>
-<div class="flow-card">
-  <div class="flow-name">/healer:flow refactor</div>
-  <div class="flow-desc">Research-backed code improvement</div>
-  <div class="flow-steps">analyze &rarr; plan ?&rarr; refactor &rarr; test !&rarr; review ?&rarr; push ?&rarr;</div>
-</div>
-<div class="flow-card">
-  <div class="flow-name">/healer:flow tdd</div>
-  <div class="flow-desc">Test-driven development flow</div>
-  <div class="flow-steps">plan ?&rarr; tdd &rarr; coverage &rarr; review ?&rarr; push ?&rarr;</div>
-</div>
-<div class="flow-card">
-  <div class="flow-name">/healer:flow research</div>
-  <div class="flow-desc">Deep research to specification</div>
-  <div class="flow-steps">research &rarr; brainstorm ?&rarr; design ?&rarr; spec &rarr;</div>
-</div>
+  <h3>Quality &amp; Health</h3>
+  <table><tr><th>Recipe</th><th>Description</th><th>Steps</th></tr>
+    <tr><td><code>full-audit</code></td><td>Quality + security + coverage</td><td>analyze &#8594; audit &#8594; coverage &#8594; optimize &#8594; report</td></tr>
+    <tr><td><code>pre-release</code></td><td>Everything must pass</td><td>diagnose !&#8594; audit !&#8594; coverage &#8594; review ?&#8594; docs &#8594; ship !&#8594;</td></tr>
+    <tr><td><code>safe-deploy</code></td><td>Maximum safety</td><td>diagnose !&#8594; audit !&#8594; coverage &#8594; review ?&#8594; ship !&#8594;</td></tr>
+  </table>
 
-<div class="section-group-title">Custom Recipes (20) — from ~/.healer/recipes.yaml</div>
+  <h3>Design &amp; Brand <span class="badge badge-new">NEW v6</span></h3>
+  <table><tr><th>Recipe</th><th>Description</th><th>Steps</th></tr>
+    <tr><td><code>brand-identity</code></td><td>Complete brand from scratch</td><td>brainstorm ?&#8594; brand ?&#8594; logo ?&#8594; icon ?&#8594; cip ?&#8594; design-system ?&#8594; design-review</td></tr>
+    <tr><td><code>visual-full</code></td><td>Full visual pipeline</td><td>brand ?&#8594; design-system ?&#8594; design ?&#8594; slides ?&#8594; design-review</td></tr>
+    <tr><td><code>marketing-kit</code></td><td>Marketing materials</td><td>brand ?&#8594; logo ?&#8594; banner ?&#8594; slides ?&#8594;</td></tr>
+    <tr><td><code>design-polish</code></td><td>Iterate on design</td><td>design-review &#8594; design ?&#8594; design-review</td></tr>
+  </table>
 
-<div class="flow-card">
-  <div class="flow-name">/healer:flow full-feature</div>
-  <div class="flow-desc">Complete feature from idea to production (10 steps)</div>
-  <div class="flow-steps">brainstorm ?&rarr; research &rarr; design ?&rarr; spec ?&rarr; plan ?&rarr; tdd &rarr; coverage &rarr; review ?&rarr; docs &rarr; ship !&rarr;</div>
-</div>
-<div class="flow-card">
-  <div class="flow-name">/healer:flow quick-feature</div>
-  <div class="flow-desc">Fast feature &mdash; skip brainstorm, go straight to plan</div>
-  <div class="flow-steps">plan ?&rarr; implement &rarr; test !&rarr; push ?&rarr;</div>
-</div>
-<div class="flow-card">
-  <div class="flow-name">/healer:flow spike</div>
-  <div class="flow-desc">Research spike &mdash; explore then prototype</div>
-  <div class="flow-steps">research &rarr; brainstorm ?&rarr; implement &rarr; test &rarr;</div>
-</div>
-<div class="flow-card">
-  <div class="flow-name">/healer:flow deep-fix</div>
-  <div class="flow-desc">Thorough bug investigation and fix</div>
-  <div class="flow-steps">diagnose &rarr; research &rarr; debug &rarr; fix &rarr; test !&rarr; review ?&rarr; push ?&rarr;</div>
-</div>
-<div class="flow-card">
-  <div class="flow-name">/healer:flow hotfix</div>
-  <div class="flow-desc">Emergency fix &mdash; minimal steps to production</div>
-  <div class="flow-steps">debug &rarr; fix &rarr; test !&rarr; ship !&rarr;</div>
-</div>
-<div class="flow-card">
-  <div class="flow-name">/healer:flow flaky-hunt</div>
-  <div class="flow-desc">Find and fix flaky tests</div>
-  <div class="flow-steps">diagnose &rarr; coverage &rarr; fix(unit) &rarr; fix(e2e) &rarr; report &rarr;</div>
-</div>
-<div class="flow-card">
-  <div class="flow-name">/healer:flow full-audit</div>
-  <div class="flow-desc">Complete quality, security, and coverage audit</div>
-  <div class="flow-steps">analyze &rarr; audit &rarr; coverage &rarr; optimize &rarr; report &rarr;</div>
-</div>
-<div class="flow-card">
-  <div class="flow-name">/healer:flow pre-release</div>
-  <div class="flow-desc">Pre-release checklist &mdash; everything must pass</div>
-  <div class="flow-steps">diagnose !&rarr; audit !&rarr; coverage &rarr; review ?&rarr; docs &rarr; ship !&rarr;</div>
-</div>
-<div class="flow-card">
-  <div class="flow-name">/healer:flow health-deep</div>
-  <div class="flow-desc">Deep health analysis with recommendations</div>
-  <div class="flow-steps">diagnose &rarr; analyze &rarr; coverage &rarr; audit &rarr; report &rarr;</div>
-</div>
-<div class="flow-card">
-  <div class="flow-name">/healer:flow architect-feature</div>
-  <div class="flow-desc">Architecture-first feature development</div>
-  <div class="flow-steps">research &rarr; brainstorm ?&rarr; architect ?&rarr; design ?&rarr; spec &rarr; plan ?&rarr;</div>
-</div>
-<div class="flow-card">
-  <div class="flow-name">/healer:flow design-review</div>
-  <div class="flow-desc">Design then validate with review</div>
-  <div class="flow-steps">design ?&rarr; spec &rarr; review ?&rarr;</div>
-</div>
-<div class="flow-card">
-  <div class="flow-name">/healer:flow deep-refactor</div>
-  <div class="flow-desc">Research-backed refactoring with full verification</div>
-  <div class="flow-steps">analyze &rarr; research &rarr; plan ?&rarr; refactor &rarr; test !&rarr; optimize &rarr; review ?&rarr; push ?&rarr;</div>
-</div>
-<div class="flow-card">
-  <div class="flow-name">/healer:flow perf-deep</div>
-  <div class="flow-desc">Deep performance investigation</div>
-  <div class="flow-steps">analyze &rarr; research &rarr; optimize &rarr; test !&rarr; report &rarr;</div>
-</div>
-<div class="flow-card">
-  <div class="flow-name">/healer:flow tech-debt</div>
-  <div class="flow-desc">Systematic tech debt reduction</div>
-  <div class="flow-steps">analyze &rarr; coverage &rarr; refactor &rarr; test !&rarr; docs &rarr; push ?&rarr;</div>
-</div>
-<div class="flow-card">
-  <div class="flow-name">/healer:flow document-all</div>
-  <div class="flow-desc">Full documentation generation</div>
-  <div class="flow-steps">analyze &rarr; docs &rarr; review ?&rarr; push ?&rarr;</div>
-</div>
-<div class="flow-card">
-  <div class="flow-name">/healer:flow safe-deploy</div>
-  <div class="flow-desc">Maximum safety deployment pipeline</div>
-  <div class="flow-steps">diagnose !&rarr; audit !&rarr; coverage &rarr; review ?&rarr; ship !&rarr;</div>
-</div>
-<div class="flow-card">
-  <div class="flow-name">/healer:flow ci-fix</div>
-  <div class="flow-desc">Fix CI failures and ship</div>
-  <div class="flow-steps">fix(types) &rarr; fix(lint) &rarr; fix(unit) &rarr; fix(build) &rarr; report &rarr; push ?&rarr;</div>
-</div>
-<div class="flow-card">
-  <div class="flow-name">/healer:flow end-of-day</div>
-  <div class="flow-desc">End of day &mdash; review, document, push</div>
-  <div class="flow-steps">review &rarr; docs &rarr; push ?&rarr;</div>
-</div>
-<div class="flow-card">
-  <div class="flow-name">/healer:flow weekly-review</div>
-  <div class="flow-desc">Weekly comprehensive review</div>
-  <div class="flow-steps">analyze &rarr; audit &rarr; coverage &rarr; optimize &rarr; docs &rarr; report &rarr;</div>
-</div>
+  <h3>Daily Routines</h3>
+  <table><tr><th>Recipe</th><th>Description</th><th>Steps</th></tr>
+    <tr><td><code>morning</code></td><td>Morning check</td><td>diagnose &#8594; report</td></tr>
+    <tr><td><code>end-of-day</code></td><td>Review, document, push</td><td>review &#8594; docs &#8594; push ?&#8594;</td></tr>
+    <tr><td><code>weekly-review</code></td><td>Weekly comprehensive</td><td>analyze &#8594; audit &#8594; coverage &#8594; optimize &#8594; docs &#8594; report</td></tr>
+  </table>
+</section>
 
-<!-- SMART SUGGEST -->
-<h2 id="smart-suggest">Smart Next-Step Suggestions</h2>
-<p>Every healer sub-command knows what naturally comes next. When you run <code>/healer</code> with no arguments after completing a sub-command, it reads <code>.healer/state.json</code> and proposes the logical next step.</p>
+<!-- ENFORCEMENT -->
+<section class="section" id="enforcement">
+  <h2>Enforcement Protocol</h2>
+  <p>The shared layer ALL commands follow. This prevents common AI-assisted development failure modes.</p>
 
-<div class="next-map">
-  <span class="from">brainstorm</span> <span class="arrow">&rarr;</span> <span class="to">plan, design, architect, spec</span><br>
-  <span class="from">plan</span> <span class="arrow">&rarr;</span> <span class="to">implement, tdd</span><br>
-  <span class="from">design</span> <span class="arrow">&rarr;</span> <span class="to">spec, architect, implement</span><br>
-  <span class="from">architect</span> <span class="arrow">&rarr;</span> <span class="to">spec, design, plan</span><br>
-  <span class="from">spec</span> <span class="arrow">&rarr;</span> <span class="to">plan, implement</span><br>
-  <span class="from">implement</span> <span class="arrow">&rarr;</span> <span class="to">test, review, push</span><br>
-  <span class="from">tdd</span> <span class="arrow">&rarr;</span> <span class="to">coverage, review, push</span><br>
-  <span class="from">test</span> <span class="arrow">&rarr;</span> <span class="to">coverage, fix, push</span><br>
-  <span class="from">coverage</span> <span class="arrow">&rarr;</span> <span class="to">test, fix</span><br>
-  <span class="from">debug</span> <span class="arrow">&rarr;</span> <span class="to">fix, test</span><br>
-  <span class="from">fix</span> <span class="arrow">&rarr;</span> <span class="to">test, diagnose, push</span><br>
-  <span class="from">refactor</span> <span class="arrow">&rarr;</span> <span class="to">test, review, push</span><br>
-  <span class="from">optimize</span> <span class="arrow">&rarr;</span> <span class="to">test, review, push</span><br>
-  <span class="from">review</span> <span class="arrow">&rarr;</span> <span class="to">fix, push, ship</span><br>
-  <span class="from">analyze</span> <span class="arrow">&rarr;</span> <span class="to">refactor, audit, fix</span><br>
-  <span class="from">audit</span> <span class="arrow">&rarr;</span> <span class="to">fix, implement</span><br>
-  <span class="from">diagnose</span> <span class="arrow">&rarr;</span> <span class="to">fix, report, deploy</span><br>
-  <span class="from">report</span> <span class="arrow">&rarr;</span> <span class="to">fix, deploy</span><br>
-  <span class="from">research</span> <span class="arrow">&rarr;</span> <span class="to">brainstorm, design, implement</span><br>
-  <span class="from">push</span> <span class="arrow">&rarr;</span> <span class="to">ship, deploy</span><br>
-  <span class="from">docs</span> <span class="arrow">&rarr;</span> <span class="to">push</span><br>
-  <span class="from">ship</span> <span class="arrow">&rarr;</span> <span class="to">(done)</span><br>
-  <span class="from">deploy</span> <span class="arrow">&rarr;</span> <span class="to">(done)</span>
+  <h3>Research Protocol</h3>
+  <div class="hard-gate"><strong>HARD-GATE:</strong> No code changes without completing research. MUST use actual tools (WebSearch, WebFetch, Context7) -- not training knowledge. Context7 first for libraries, WebSearch for broader context, WebFetch for deep reading.</div>
+
+  <h3>Verification Protocol</h3>
+  <div class="hard-gate"><strong>HARD-GATE:</strong> No success claims without fresh evidence. Run the command, read complete output, check exit code, count actual pass/fail. Only then fill in the report.</div>
+  <table>
+    <tr><th>Claim</th><th>Required Proof</th></tr>
+    <tr><td>"Tests pass"</td><td>Output showing 0 failures + exit code 0</td></tr>
+    <tr><td>"Build succeeds"</td><td>Build command with exit code 0</td></tr>
+    <tr><td>"Bug is fixed"</td><td>Previously failing test passes + full suite green</td></tr>
+    <tr><td>"Performance improved"</td><td>Before AND after benchmark numbers</td></tr>
+  </table>
+
+  <h3>Fix-Verify Cycle</h3>
+  <div class="hard-gate"><strong>HARD-GATE:</strong> Apply fix &#8594; run verification &#8594; confirm output. If it didn't work, REVERT before trying next approach. If 3 attempts fail, STOP and escalate.</div>
+
+  <h3>Anti-Rationalization</h3>
+  <table>
+    <tr><th>Thought</th><th>Reality</th><th>Action</th></tr>
+    <tr><td>"I already know how to fix this"</td><td>Training data may be outdated</td><td>Search for the actual error</td></tr>
+    <tr><td>"Research will slow me down"</td><td>Wrong fixes cost MORE time</td><td>30 seconds of research saves 30 minutes</td></tr>
+    <tr><td>"The tests probably pass"</td><td>"Probably" is not evidence</td><td>Run the command, read the output</td></tr>
+    <tr><td>"I'll verify at the end"</td><td>Can't isolate which fix broke what</td><td>Verify after EACH change</td></tr>
+    <tr><td>"I can see it works from code"</td><td>Reading is not running</td><td>Run it. Testing catches 90% of bugs</td></tr>
+  </table>
+
+  <h3>The Iron Law</h3>
+  <div class="success-box"><strong>Evidence before assertions. Always.</strong> If you haven't run it, you can't claim it. If you haven't searched, you can't prescribe. If you haven't verified, you can't report.</div>
+</section>
+
+<!-- DESIGN INTELLIGENCE -->
+<section class="section" id="design-intel">
+  <h2>Design Intelligence <span class="badge badge-new">NEW v6</span></h2>
+  <p>Integrated from UI-UX-Pro-Max. Local data layer supplements web research for all design commands.</p>
+
+  <h3>Data Layer</h3>
+  <table>
+    <tr><th>Resource</th><th>Count</th><th>Used By</th></tr>
+    <tr><td>Color palettes</td><td>161</td><td>design-system, design, brand</td></tr>
+    <tr><td>Font pairings</td><td>57</td><td>design-system, design, slides</td></tr>
+    <tr><td>UX guidelines</td><td>99</td><td>design-review, audit, implement</td></tr>
+    <tr><td>UI styles</td><td>50+</td><td>design, design-review</td></tr>
+    <tr><td>Stack-specific guidelines</td><td>14 files</td><td>implement, design-system</td></tr>
+    <tr><td>Banner sizes &amp; styles</td><td>22 styles, 9+ platforms</td><td>banner</td></tr>
+    <tr><td>Icon styles</td><td>15</td><td>icon</td></tr>
+    <tr><td>Logo styles</td><td>55+</td><td>logo</td></tr>
+    <tr><td>Chart types</td><td>25</td><td>slides</td></tr>
+  </table>
+
+  <h3>Queried via search.py</h3>
+  <pre><code>python3 scripts/search.py "fintech premium" --design-system    # Multi-domain
+python3 scripts/search.py "accessibility" --domain ux            # UX rules
+python3 scripts/search.py "warm earthy" --domain color           # Palettes
+python3 scripts/search.py "modern sans" --domain typography      # Fonts
+python3 scripts/search.py "forms" --stack react                  # Stack-specific</code></pre>
+
+  <p>Available stacks: react, nextjs, vue, svelte, astro, swiftui, react-native, flutter, nuxtjs, nuxt-ui, html-tailwind, shadcn, jetpack-compose, threejs.</p>
+</section>
+
+<!-- WORKFLOWS -->
+<section class="section" id="workflows">
+  <h2>Workflows &amp; Examples</h2>
+
+  <h3>Ideation Flow</h3>
+  <div class="info-box">For new products or features needing validation before engineering time.</div>
+  <pre><code>/healer:flow ideate                     # Full preset
+# Or manually:
+/healer:validate my-idea                # Worth building?
+/healer:brainstorm my-idea              # Explore approaches
+/healer:research "my-idea" --product    # Market + technical
+/healer:design dashboard for my-idea    # Design solution
+/healer:strategy                        # CEO-level review
+/healer:spec                            # Technical spec
+/healer:plan                            # Implementation plan</code></pre>
+
+  <h3>Fix Flow</h3>
+  <div class="info-box">For test failures, production bugs, CI failures.</div>
+  <pre><code>/healer:flow fix                        # Standard fix flow
+/healer:flow hotfix                     # Emergency to production
+/healer:flow ci-fix                     # Fix all CI failures</code></pre>
+
+  <h3>Brand Identity Flow</h3>
+  <div class="info-box">For new projects needing complete visual identity.</div>
+  <pre><code>/healer:flow identity                   # Brand > logo > cip > design-system
+/healer:flow visual                     # Brand > design-system > design > review
+/healer:flow marketing-kit              # Brand > logo > banner > slides</code></pre>
+
+  <h3>Pre-Release Flow</h3>
+  <div class="info-box">Maximum confidence before shipping. Every gate must pass.</div>
+  <pre><code>/healer:flow pre-release                # All gates must pass
+/healer:flow safe-deploy                # Maximum safety deployment</code></pre>
+
+  <h3>Daily Routines</h3>
+  <pre><code>/healer:flow morning                    # Morning health check
+/healer:flow end-of-day                 # Review, document, push
+/healer:flow weekly-review              # Weekly comprehensive review</code></pre>
+
+  <h3>Smart Next-Step</h3>
+  <pre><code>/healer:brainstorm user auth     # Complete brainstorming
+/healer                          # Suggests: /healer:plan
+
+/healer:test src/lib/auth        # Complete testing
+/healer                          # Suggests: /healer:coverage or /healer:push</code></pre>
+</section>
+
+<hr>
+<p style="text-align:center; color:#484f58; font-size:.75rem; padding: 16px 0;">Healer v6 -- Universal Autonomous Codebase Health &amp; Development Engine -- by Anand S</p>
+
+</main>
 </div>
 
-<!-- CUSTOM RECIPES -->
-<h2 id="custom">Custom Recipes</h2>
-<p>Define your own flows in <code>~/.healer/recipes.yaml</code>:</p>
-<pre>
-flows:
-  my-workflow:
-    description: "My custom pipeline"
-    steps:
-      - command: diagnose
-        gate: must-pass        # !&rarr;
-      - command: fix
-        args: "unit"
-        gate: auto             # &rarr;
-      - command: review
-        gate: interactive      # ?&rarr;
-      - command: push
-        gate: interactive      # ?&rarr;
-</pre>
-<p>Then run: <code>/healer:flow my-workflow</code></p>
+<!-- Back to top -->
+<button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0})" aria-label="Back to top">&#8593;</button>
 
-<!-- SUPPORTED STACKS -->
-<h2 id="stacks">Supported Stacks</h2>
-<p>Healer auto-detects the stack by scanning for manifest files. Every command adapts to the detected toolchain.</p>
-<div class="command-grid">
-  <div class="command-card"><div class="command-name">JavaScript / TypeScript</div><div class="command-desc">package.json, tsconfig.json &bull; pnpm/yarn/npm/bun &bull; Next.js, Vite, Angular &bull; Vitest, Jest, Playwright</div></div>
-  <div class="command-card"><div class="command-name">Python</div><div class="command-desc">pyproject.toml, requirements.txt &bull; pip/poetry/uv &bull; Django, FastAPI, Flask &bull; pytest, mypy, ruff</div></div>
-  <div class="command-card"><div class="command-name">Go</div><div class="command-desc">go.mod &bull; go test, golangci-lint &bull; go build</div></div>
-  <div class="command-card"><div class="command-name">Rust</div><div class="command-desc">Cargo.toml &bull; cargo test, cargo clippy &bull; cargo bench, cargo audit</div></div>
-  <div class="command-card"><div class="command-name">Swift / iOS / macOS</div><div class="command-desc">Package.swift, *.xcodeproj &bull; SPM, CocoaPods &bull; XCTest, XCUITest &bull; SwiftLint</div></div>
-  <div class="command-card"><div class="command-name">Kotlin / Android</div><div class="command-desc">build.gradle &bull; Gradle &bull; JUnit, Espresso, Compose Test &bull; ktlint, detekt</div></div>
-  <div class="command-card"><div class="command-name">.NET / C#</div><div class="command-desc">*.sln, *.csproj &bull; NuGet &bull; xUnit, NUnit &bull; dotnet format</div></div>
-  <div class="command-card"><div class="command-name">Flutter / Dart</div><div class="command-desc">pubspec.yaml &bull; flutter test &bull; dart analyze &bull; flutter build</div></div>
-  <div class="command-card"><div class="command-name">Ruby</div><div class="command-desc">Gemfile &bull; RSpec, Minitest &bull; RuboCop &bull; Rails</div></div>
-  <div class="command-card"><div class="command-name">Java</div><div class="command-desc">pom.xml, build.gradle &bull; Maven/Gradle &bull; JUnit &bull; Spring Boot</div></div>
-  <div class="command-card"><div class="command-name">C / C++</div><div class="command-desc">CMakeLists.txt, Makefile &bull; GTest, Catch2 &bull; clang-tidy</div></div>
-  <div class="command-card"><div class="command-name">Elixir, Haskell, OCaml, Julia</div><div class="command-desc">mix.exs, *.cabal, dune-project, Project.toml</div></div>
-</div>
-
-<footer>
-  <p><strong>Healer v4</strong> &mdash; 26 commands &bull; 28 flow recipes &bull; Enforcement protocol &bull; Universal across all projects</p>
-  <p>Global installation: <code>~/.claude/commands/healer*.md</code></p>
-  <p>Custom recipes: <code>~/.healer/recipes.yaml</code></p>
-  <p>Built by Anand S &bull; WeaverBird LLC &bull; 2026</p>
-</footer>
-
+<script>
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlay').classList.toggle('open')}
+function toggleCategory(e){e.parentElement.classList.toggle('collapsed')}
+function toggleCard(b){var c=b.closest('.cmd-card');c.classList.toggle('expanded');b.textContent=c.classList.contains('expanded')?'Hide details':'Show details'}
+function handleSearch(q){var cards=document.querySelectorAll('.cmd-card[data-search]');q=q.toLowerCase().trim();if(!q){cards.forEach(function(c){c.classList.remove('search-hidden')});return}cards.forEach(function(c){var d=(c.getAttribute('data-search')||'')+' '+c.textContent;c.classList[d.toLowerCase().indexOf(q)!==-1?'remove':'add']('search-hidden')})}
+window.addEventListener('scroll',function(){var b=document.getElementById('backToTop');b.classList[window.scrollY>400?'add':'remove']('visible')});
+var navLinks=document.querySelectorAll('.nav-items a');
+navLinks.forEach(function(link){link.addEventListener('click',function(){if(window.innerWidth<=768){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('open')}})});
+</script>
 </body>
 </html>
