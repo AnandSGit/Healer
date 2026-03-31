@@ -139,11 +139,13 @@ When ANY healer sub-command finishes (even outside a flow), it should write to `
 The **SUGGESTED NEXT graph** (what naturally follows what):
 
 ```
-brainstorm    → plan, design, architect, spec
+validate      → brainstorm, research
+brainstorm    → plan, design, architect, spec, strategy
 plan          → implement, tdd
-design        → spec, architect, implement
+design        → spec, architect, implement, design-review
 architect     → spec, design, plan
 spec          → plan, implement
+strategy      → plan, spec, implement
 implement     → test, review, push
 tdd           → coverage, review, push
 test          → coverage, fix, push
@@ -168,6 +170,8 @@ cip           → design-system, banner
 banner        → slides, push
 icon          → implement, push
 slides        → push, ship
+design-system → design, design-review, implement
+design-review → design, implement, fix
 ```
 
 When `/healer` is called with NO arguments and state exists:
@@ -311,45 +315,6 @@ research:
       gate: interactive
     - command: spec
       gate: auto
-```
-
-## Custom Recipes
-
-Users can define custom recipes in `~/.healer/recipes.yaml`:
-
-```yaml
-# ~/.healer/recipes.yaml
-flows:
-  pre-release:
-    description: "Pre-release checklist"
-    steps:
-      - command: diagnose
-        gate: must-pass
-      - command: audit
-        gate: must-pass
-      - command: coverage
-        gate: auto
-      - command: review
-        gate: interactive
-      - command: docs
-        gate: auto
-      - command: ship
-        gate: must-pass
-
-  quick-check:
-    description: "Fast health check and fix"
-    steps:
-      - command: diagnose
-        gate: auto
-      - command: fix
-        args: "types"
-        gate: auto
-      - command: fix
-        args: "lint"
-        gate: auto
-      - command: report
-        gate: auto
-```
 
 ideate:
   description: "Full ideation pipeline from validation to plan"
@@ -410,6 +375,44 @@ brand-to-prod:
       gate: interactive
     - command: ship
       gate: must-pass
+```
+
+## Custom Recipes
+
+Users can define custom recipes in `~/.healer/recipes.yaml`:
+
+```yaml
+# ~/.healer/recipes.yaml
+flows:
+  pre-release:
+    description: "Pre-release checklist"
+    steps:
+      - command: diagnose
+        gate: must-pass
+      - command: audit
+        gate: must-pass
+      - command: coverage
+        gate: auto
+      - command: review
+        gate: interactive
+      - command: docs
+        gate: auto
+      - command: ship
+        gate: must-pass
+
+  quick-check:
+    description: "Fast health check and fix"
+    steps:
+      - command: diagnose
+        gate: auto
+      - command: fix
+        args: "types"
+        gate: auto
+      - command: fix
+        args: "lint"
+        gate: auto
+      - command: report
+        gate: auto
 ```
 
 When a recipe name is provided, check `~/.healer/recipes.yaml` FIRST, then fall back to built-in presets.

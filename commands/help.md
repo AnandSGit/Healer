@@ -20,7 +20,7 @@ Parse the arguments to determine which help mode to use:
 |-------|------|
 | *(empty / no args)* | **overview** — Show welcome banner + category summary + quick tips |
 | `commands` | **commands** — List all commands in categorized tables |
-| `flows` | **flows** — List all 8 built-in flow presets with their pipelines |
+| `flows` | **flows** — List all 12 built-in flow presets with their pipelines |
 | `recipes` | **recipes** — Read `~/.healer/recipes.yaml` and list all custom recipes |
 | `gates` | **gates** — Explain gate operators with examples |
 | `examples` | **examples** — Show common usage patterns and real-world scenarios |
@@ -43,15 +43,15 @@ Display:
 HEALER — Help
 ═══════════════════════════════════════════════════════════
 Universal Autonomous Codebase Health & Development Engine
-v6 — 32 commands | 11 flow presets | 24+ recipes
+v6 — 36 commands | 12 flow presets | 24+ recipes
      Shared enforcement layer for research, verification & fixes
      Integrated design intelligence: 161 palettes, 57 fonts, 99 UX rules
 
 CATEGORIES
 ──────────────────────────────────────────────────
   Core (2)            /healer, /healer:flow
-  Ideation (6)        brainstorm, research, design, architect, spec, plan
-  Design Intel (6)    brand, logo, cip, banner, icon, slides
+  Ideation (8)        validate, brainstorm, research, design, architect, spec, plan, strategy
+  Design Intel (8)    brand, logo, cip, banner, icon, slides, design-system, design-review
   Implementation (4)  implement, tdd, refactor, optimize
   Quality (4)         test, coverage, review, audit
   Debug & Fix (2)     debug, fix
@@ -69,7 +69,7 @@ QUICK START
 
 MORE HELP
 ──────────────────────────────────────────────────
-  /healer:help commands            All 32 commands
+  /healer:help commands            All 36 commands
   /healer:help flows               Built-in flow presets
   /healer:help recipes             Custom recipe pipelines
   /healer:help gates               Gate operator reference
@@ -82,14 +82,14 @@ MORE HELP
 
 ### Mode: commands
 
-Read the command files from `~/.claude/commands/healer*.md`. For each file:
+Read the command files from `${CLAUDE_PLUGIN_ROOT}/commands/*.md`. For each file:
 1. Read the YAML frontmatter `description` field
-2. Extract the command name from the filename (e.g., `healer:brainstorm.md` → `brainstorm`)
+2. Extract the command name from the filename (e.g., `brainstorm.md` → `brainstorm`)
 
 Display ALL commands organized by category:
 
 ```
-HEALER — Commands (26)
+HEALER — Commands (36)
 ═══════════════════════════════════════════════════════════
 
 CORE
@@ -97,14 +97,16 @@ CORE
   /healer                  {description from frontmatter}
   /healer:flow             {description from frontmatter}
 
-IDEATION & DESIGN
+IDEATION & STRATEGY
 ─────────────────────────────────────────────────────────
+  /healer:validate         {description}
   /healer:brainstorm       {description}
   /healer:research         {description}
   /healer:design           {description}
   /healer:architect        {description}
   /healer:spec             {description}
   /healer:plan             {description}
+  /healer:strategy         {description}
 
 IMPLEMENTATION
 ─────────────────────────────────────────────────────────
@@ -139,6 +141,8 @@ DESIGN INTELLIGENCE (v6 — integrated from UI-UX-Pro-Max)
   /healer:banner           Banner & social media — 22 styles, 9+ platforms
   /healer:icon             Icon system — 15 styles, SVG, accessibility
   /healer:slides           HTML presentations — Chart.js, copywriting
+  /healer:design-system    Design system generator — tokens, typography, color, components
+  /healer:design-review    Visual & UX quality review — 7 dimensions, AI slop detection
 
   Data: 161 color palettes, 57 font pairings, 99 UX guidelines,
         50+ UI styles, 14 stack-specific guideline files
@@ -166,7 +170,8 @@ Tip: /healer:help <command> for detailed help on any command
 
 ```yaml
 core: [healer, flow]
-ideation: [brainstorm, research, design, architect, spec, plan]
+ideation: [validate, brainstorm, research, design, architect, spec, plan, strategy]
+design-intel: [brand, logo, cip, banner, icon, slides, design-system, design-review]
 implementation: [implement, tdd, refactor, optimize]
 quality: [test, coverage, review, audit]
 debug: [debug, fix]
@@ -180,7 +185,7 @@ help: [help]
 Display all 8 built-in flow presets:
 
 ```
-HEALER — Flow Presets (8)
+HEALER — Flow Presets (12)
 ═══════════════════════════════════════════════════════════
 
   PRESET          PIPELINE
@@ -193,6 +198,10 @@ HEALER — Flow Presets (8)
   refactor        analyze → plan ?→ refactor → test !→ review ?→ push ?→
   tdd             plan ?→ tdd → coverage → review ?→ push ?→
   research        research → brainstorm ?→ design ?→ spec
+  ideate          validate ?→ brainstorm ?→ research → design ?→ strategy ?→ spec ?→ plan ?→
+  visual          brand ?→ design-system ?→ design ?→ design-review
+  identity        brand ?→ logo ?→ cip ?→ design-system ?→
+  brand-to-prod   brand ?→ design-system ?→ design ?→ implement → test !→ review ?→ ship !→
 
 GATE OPERATORS
   →   AUTO          Continue automatically
@@ -331,10 +340,22 @@ FLOW PIPELINES
   /healer:flow brainstorm → plan → tdd    Custom pipeline
 
 RESEARCH & DESIGN
+  /healer:validate SaaS idea             Demand validation before building
   /healer:research WebSocket scaling      Deep research
   /healer:architect microservices         Architecture design
   /healer:design REST API for users       API/UX design
   /healer:spec GraphQL subscriptions      Technical specification
+  /healer:strategy                        CEO-level plan review
+
+DESIGN INTELLIGENCE
+  /healer:brand my-product               Brand voice + visual identity
+  /healer:logo my-brand                  Logo design brief
+  /healer:design-system                  Full design system generator
+  /healer:design-review                  Visual & UX quality audit
+  /healer:banner launch campaign         Banner & social media design
+  /healer:slides pitch deck              HTML presentation
+  /healer:flow visual                    Brand → design system → review
+  /healer:flow identity                  Brand → logo → CIP → system
 
 ADVANCED
   /healer --check                         Assessment only (no changes)
@@ -356,7 +377,7 @@ HEALER — Quick Start Guide
 ═══════════════════════════════════════════════════════════
 
 WHAT IS HEALER?
-  A 26-command suite for Claude Code that turns your AI
+  A 36-command suite for Claude Code that turns your AI
   assistant into a research-augmented development engine.
   Every command searches for best practices BEFORE acting.
 
@@ -393,7 +414,7 @@ FIX A BUG
   Or: /healer:flow fix
 
 KEY CONCEPTS
-  • Commands    — 26 specialized tools (run /healer:help commands)
+  • Commands    — 36 specialized tools (run /healer:help commands)
   • Flows       — Chain commands into pipelines (run /healer:help flows)
   • Recipes     — Custom reusable flows in ~/.healer/recipes.yaml
   • Gates       — Control flow progression: → ?→ !→
@@ -439,7 +460,7 @@ Use section dividers between each.
 
 ### Mode: search <term>
 
-1. Read all command files from `~/.claude/commands/healer*.md`
+1. Read all command files from `${CLAUDE_PLUGIN_ROOT}/commands/*.md`
 2. Read `~/.healer/recipes.yaml`
 3. Search for `<term>` (case-insensitive) in:
    - Command names
@@ -475,7 +496,7 @@ If no results: `No results found for "{term}". Try /healer:help commands to brow
 
 When the user provides a command name (e.g., `brainstorm`, `flow`, `fix`):
 
-1. Find the matching file: `~/.claude/commands/healer:{name}.md` (or `healer.md` if name is "healer")
+1. Find the matching file: `${CLAUDE_PLUGIN_ROOT}/commands/{name}.md` (or `healer.md` if name is "healer")
 2. Read the file
 3. Extract and display:
    - **Name** and **description** from frontmatter
@@ -516,7 +537,7 @@ RELATED COMMANDS
   /healer:{related1}     {description}
   /healer:{related2}     {description}
 
-Full docs: Read ~/.claude/commands/healer:{name}.md
+Full docs: Read ${CLAUDE_PLUGIN_ROOT}/commands/{name}.md
 ═══════════════════════════════════════════════════════════
 ```
 
@@ -527,11 +548,13 @@ Full docs: Read ~/.claude/commands/healer:{name}.md
 Use this graph to populate the "After this command" section:
 
 ```yaml
-brainstorm: [plan, design, architect, spec]
+validate: [brainstorm, research]
+brainstorm: [plan, design, architect, spec, strategy]
 research: [brainstorm, design, implement]
-design: [spec, architect, implement]
+design: [spec, architect, implement, design-review]
 architect: [spec, design, plan]
 spec: [plan, implement]
+strategy: [plan, spec, implement]
 plan: [implement, tdd]
 implement: [test, review, push]
 tdd: [coverage, review, push]
@@ -550,6 +573,14 @@ push: [ship, deploy]
 ship: []
 deploy: []
 docs: [push]
+brand: [logo, design-system, cip]
+logo: [icon, cip, brand]
+cip: [design-system, banner]
+banner: [slides, push]
+icon: [implement, push]
+slides: [push, ship]
+design-system: [design, design-review, implement]
+design-review: [design, implement, fix]
 flow: []
 help: []
 healer: []
@@ -561,7 +592,8 @@ healer: []
 
 ```yaml
 core: [healer, flow]
-ideation: [brainstorm, research, design, architect, spec, plan]
+ideation: [validate, brainstorm, research, design, architect, spec, plan, strategy]
+design-intel: [brand, logo, cip, banner, icon, slides, design-system, design-review]
 implementation: [implement, tdd, refactor, optimize]
 quality: [test, coverage, review, audit]
 debug: [debug, fix]

@@ -12,7 +12,7 @@ HEALER_CONFIG="$HOME/.healer"
 echo "═══════════════════════════════════════════════════"
 echo "  Healer v6 — Universal Development Lifecycle Engine"
 echo "  with Design Intelligence"
-echo "  36 commands | 11 flow presets | 24+ recipes"
+echo "  36 commands | 12 flow presets | 24+ recipes"
 echo "  161 palettes | 57 fonts | 99 UX guidelines"
 echo "═══════════════════════════════════════════════════"
 echo ""
@@ -77,46 +77,32 @@ print("  ✅ Marketplace registered: healer → " + healer_path)
 print("  ✅ Plugin enabled: healer@healer")
 PYEOF
 
-# ─── Step 3: Install supporting data files ───
+# ─── Step 3: Install user-local files ───
+# Note: Commands access data/references/scripts via ${CLAUDE_PLUGIN_ROOT}
+# (resolved by the plugin system to $SCRIPT_DIR). Only user-local state
+# (recipes, brainstorms, research) lives in ~/.healer/.
 mkdir -p "$HEALER_CONFIG"
 
-# Copy config
+# Copy user recipes (custom flow pipelines)
 echo "Installing recipes..."
 cp "$SCRIPT_DIR/config/recipes.yaml" "$HEALER_CONFIG/"
-echo "  ✅ Recipes installed"
+echo "  ✅ Recipes installed to $HEALER_CONFIG/recipes.yaml"
 
-# Copy data (design intelligence CSVs)
-if [ -d "$SCRIPT_DIR/data" ]; then
-  echo "Installing design intelligence data..."
-  mkdir -p "$HEALER_CONFIG/data/stacks"
-  cp "$SCRIPT_DIR/data/"*.csv "$HEALER_CONFIG/data/" 2>/dev/null || true
-  cp "$SCRIPT_DIR/data/stacks/"*.csv "$HEALER_CONFIG/data/stacks/" 2>/dev/null || true
-  CSV_COUNT=$(find "$HEALER_CONFIG/data" -name "*.csv" | wc -l | tr -d ' ')
-  echo "  ✅ $CSV_COUNT CSV data files installed"
-fi
+# Create user state directories
+mkdir -p "$HEALER_CONFIG/brainstorms"
+mkdir -p "$HEALER_CONFIG/research"
+mkdir -p "$HEALER_CONFIG/validations"
+mkdir -p "$HEALER_CONFIG/strategies"
+echo "  ✅ State directories created"
 
-# Copy references
-if [ -d "$SCRIPT_DIR/references" ]; then
-  echo "Installing reference documents..."
-  cp -r "$SCRIPT_DIR/references" "$HEALER_CONFIG/"
-  REF_COUNT=$(find "$HEALER_CONFIG/references" -name "*.md" | wc -l | tr -d ' ')
-  echo "  ✅ $REF_COUNT reference docs installed"
-fi
-
-# Copy scripts (search engine)
-if [ -d "$SCRIPT_DIR/scripts" ]; then
-  echo "Installing search engine scripts..."
-  mkdir -p "$HEALER_CONFIG/scripts"
-  cp "$SCRIPT_DIR/scripts/"*.py "$HEALER_CONFIG/scripts/" 2>/dev/null || true
-  cp "$SCRIPT_DIR/scripts/"*.sh "$HEALER_CONFIG/scripts/" 2>/dev/null || true
-  chmod +x "$HEALER_CONFIG/scripts/"*.sh 2>/dev/null || true
-  echo "  ✅ Search engine installed"
-fi
-
-# Copy docs
+# Copy user guide
 echo "Installing documentation..."
 cp "$SCRIPT_DIR/docs/healer-user-guide.html" "$HEALER_CONFIG/" 2>/dev/null || true
 echo "  ✅ Documentation installed"
+
+# Count plugin assets (accessed via ${CLAUDE_PLUGIN_ROOT})
+CSV_COUNT=$(find "$SCRIPT_DIR/data" -name "*.csv" 2>/dev/null | wc -l | tr -d ' ')
+REF_COUNT=$(find "$SCRIPT_DIR/references" -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
 
 echo ""
 echo "═══════════════════════════════════════════════════"
@@ -125,9 +111,9 @@ echo ""
 echo "  Plugin:     healer@healer (registered in settings.json)"
 echo "  Source:     $SCRIPT_DIR"
 echo "  Recipes:    $HEALER_CONFIG/recipes.yaml"
-echo "  Data:       $HEALER_CONFIG/data/ ($CSV_COUNT CSVs)"
-echo "  References: $HEALER_CONFIG/references/ ($REF_COUNT docs)"
-echo "  Scripts:    $HEALER_CONFIG/scripts/"
+echo "  Data:       $CSV_COUNT CSVs (via plugin root)"
+echo "  References: $REF_COUNT docs (via plugin root)"
+echo "  Scripts:    search engine + sync (via plugin root)"
 echo ""
 echo "  ⚠️  Restart Claude Code for the plugin to take effect."
 echo ""

@@ -1,5 +1,5 @@
 ---
-description: "Full autonomous codebase engine — discover, understand, assess, research, plan, execute, and verify any project in any language on any platform. 36 sub-commands, 11 flow presets, design intelligence."
+description: "Full autonomous codebase engine — discover, understand, assess, research, plan, execute, and verify any project in any language on any platform. 35 sub-commands, 12 flow presets, design intelligence."
 ---
 
 # Healer v6 — Universal Autonomous Codebase Health & Development Engine
@@ -52,6 +52,8 @@ Specialized modes for targeted work. Each auto-detects the stack using the same 
 /healer:plan [feature]               # Structured planning with task tracking + dependencies
 /healer:ship [message]               # Full PR workflow — commit, PR, review loop, merge, deploy
 /healer:docs [scope]                 # Research-augmented documentation generation
+/healer:validate [idea]              # Demand validation — YC-style forcing questions before building
+/healer:strategy [plan]              # CEO-level strategic review — scope, assumptions, 10x thinking
 /healer:flow [preset|chain]          # Flow orchestrator — chain commands into pipelines
 /healer:help [topic|command]         # Interactive help — commands, flows, recipes, gates, examples
 
@@ -62,6 +64,8 @@ Specialized modes for targeted work. Each auto-detects the stack using the same 
 /healer:banner [campaign]            # Banner & social media design — 22 styles, 9+ platforms
 /healer:icon [system]                # Icon system design — 15 styles, SVG, accessibility
 /healer:slides [topic]               # HTML presentations — Chart.js, copywriting, slide strategies
+/healer:design-system [product]      # Design system generator — tokens, typography, color, components
+/healer:design-review [target]       # Visual & UX quality review — 7 dimensions, AI slop detection
 ```
 
 ## Flow Orchestrator
