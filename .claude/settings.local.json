@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls data/*.csv)",
+      "Bash(ls data/stacks/*.csv)",
+      "Bash(find references/ -name *.md)",
+      "Bash(ls scripts/*.py)",
+      "Bash(ls commands/healer*.md)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
+    ]
+  }
+}

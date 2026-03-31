@@ -42,13 +42,16 @@ fi
 # ─── Step 2: Register Healer as a local marketplace ───
 echo "Registering Healer plugin..."
 
-# Use python3 to safely modify settings.json
+# Use python3 to safely modify settings.json and installed_plugins.json
 python3 << PYEOF
-import json, sys
+import json, sys, os
+from datetime import datetime, timezone
 
 settings_path = "$CLAUDE_SETTINGS"
 healer_path = "$SCRIPT_DIR"
+installed_path = os.path.join(os.path.dirname(settings_path), "plugins", "installed_plugins.json")
 
+# --- Update settings.json ---
 with open(settings_path, 'r') as f:
     settings = json.load(f)
 
@@ -75,6 +78,29 @@ with open(settings_path, 'w') as f:
 
 print("  ✅ Marketplace registered: healer → " + healer_path)
 print("  ✅ Plugin enabled: healer@healer")
+
+# --- Update installed_plugins.json ---
+if os.path.exists(installed_path):
+    with open(installed_path, 'r') as f:
+        installed = json.load(f)
+else:
+    installed = {"version": 2, "plugins": {}}
+
+plugins = installed.setdefault('plugins', {})
+now = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%S.000Z')
+plugins['healer@healer'] = [{
+    "scope": "user",
+    "installPath": healer_path,
+    "version": "6.0.0",
+    "installedAt": now,
+    "lastUpdated": now
+}]
+
+with open(installed_path, 'w') as f:
+    json.dump(installed, f, indent=2)
+    f.write('\n')
+
+print("  ✅ Plugin registered in installed_plugins.json")
 PYEOF
 
 # ─── Step 3: Install user-local files ───
