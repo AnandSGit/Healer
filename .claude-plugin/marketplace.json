@@ -1,0 +1,34 @@
+{
+  "name": "healer",
+  "owner": {
+    "name": "WeaverBird LLC"
+  },
+  "metadata": {
+    "description": "Universal Development Lifecycle Engine — 36 commands, 12 flow presets, design intelligence with 161 palettes, 57 fonts, and 99 UX guidelines.",
+    "version": "6.0.0",
+    "pluginRoot": "./"
+  },
+  "plugins": [
+    {
+      "name": "healer",
+      "source": "./",
+      "description": "Universal Development Lifecycle Engine with design intelligence",
+      "category": "development",
+      "tags": [
+        "healer",
+        "development",
+        "testing",
+        "design",
+        "brand",
+        "UI",
+        "UX",
+        "design-system",
+        "code-review",
+        "deployment"
+      ],
+      "author": {
+        "name": "WeaverBird LLC"
+      }
+    }
+  ]
+}
