@@ -20,7 +20,7 @@ Parse the arguments to determine which help mode to use:
 |-------|------|
 | *(empty / no args)* | **overview** — Show welcome banner + category summary + quick tips |
 | `commands` | **commands** — List all commands in categorized tables |
-| `flows` | **flows** — List all 12 built-in flow presets with their pipelines |
+| `flows` | **flows** — List all 14 built-in flow presets with their pipelines |
 | `recipes` | **recipes** — Read `~/.healer/recipes.yaml` and list all custom recipes |
 | `gates` | **gates** — Explain gate operators with examples |
 | `examples` | **examples** — Show common usage patterns and real-world scenarios |
@@ -43,17 +43,17 @@ Display:
 HEALER — Help
 ═══════════════════════════════════════════════════════════
 Universal Autonomous Codebase Health & Development Engine
-v6 — 36 commands | 12 flow presets | 24+ recipes
-     Shared enforcement layer for research, verification & fixes
-     Integrated design intelligence: 161 palettes, 57 fonts, 99 UX rules
+v6.1 — 38 commands | 14 flow presets | 24+ recipes
+      Shared enforcement layer for research, verification & fixes
+      Integrated design intelligence: 161 palettes, 57 fonts, 99 UX rules
 
 CATEGORIES
-──────────────────────────────────────────────────
+───────────────────────────────────────────────���──
   Core (2)            /healer, /healer:flow
   Ideation (8)        validate, brainstorm, research, design, architect, spec, plan, strategy
   Design Intel (8)    brand, logo, cip, banner, icon, slides, design-system, design-review
   Implementation (4)  implement, tdd, refactor, optimize
-  Quality (4)         test, coverage, review, audit
+  Quality (6)         test, coverage, review, audit, conform, catchup
   Debug & Fix (2)     debug, fix
   Health (3)          diagnose, report, analyze
   Shipping (4)        push, ship, deploy, docs
@@ -69,7 +69,7 @@ QUICK START
 
 MORE HELP
 ──────────────────────────────────────────────────
-  /healer:help commands            All 36 commands
+  /healer:help commands            All 38 commands
   /healer:help flows               Built-in flow presets
   /healer:help recipes             Custom recipe pipelines
   /healer:help gates               Gate operator reference
@@ -89,7 +89,7 @@ Read the command files from `${CLAUDE_PLUGIN_ROOT}/commands/*.md`. For each file
 Display ALL commands organized by category:
 
 ```
-HEALER — Commands (36)
+HEALER — Commands (38)
 ═══════════════════════════════════════════════════════════
 
 CORE
@@ -121,6 +121,7 @@ TESTING & QUALITY
   /healer:coverage         {description}
   /healer:review           {description}
   /healer:audit            {description}
+  /healer:conform          {description}
 
 DEBUGGING & FIXING
 ─────────────────────────────────────────────────────────
@@ -173,7 +174,7 @@ core: [healer, flow]
 ideation: [validate, brainstorm, research, design, architect, spec, plan, strategy]
 design-intel: [brand, logo, cip, banner, icon, slides, design-system, design-review]
 implementation: [implement, tdd, refactor, optimize]
-quality: [test, coverage, review, audit]
+quality: [test, coverage, review, audit, conform]
 debug: [debug, fix]
 health: [diagnose, report, analyze]
 shipping: [push, ship, deploy, docs]
@@ -185,7 +186,7 @@ help: [help]
 Display all 8 built-in flow presets:
 
 ```
-HEALER — Flow Presets (12)
+HEALER — Flow Presets (14)
 ═══════════════════════════════════════════════════════════
 
   PRESET          PIPELINE
@@ -201,6 +202,7 @@ HEALER — Flow Presets (12)
   ideate          validate ?→ brainstorm ?→ research → design ?→ strategy ?→ spec ?→ plan ?→
   visual          brand ?→ design-system ?→ design ?→ design-review
   identity        brand ?→ logo ?→ cip ?→ design-system ?→
+  conform         conform !→ implement → conform !→ test !→ push ?→
   brand-to-prod   brand ?→ design-system ?→ design ?→ implement → test !→ review ?→ ship !→
 
 GATE OPERATORS
@@ -377,7 +379,7 @@ HEALER — Quick Start Guide
 ═══════════════════════════════════════════════════════════
 
 WHAT IS HEALER?
-  A 36-command suite for Claude Code that turns your AI
+  A 38-command suite for Claude Code that turns your AI
   assistant into a research-augmented development engine.
   Every command searches for best practices BEFORE acting.
 
@@ -414,7 +416,7 @@ FIX A BUG
   Or: /healer:flow fix
 
 KEY CONCEPTS
-  • Commands    — 36 specialized tools (run /healer:help commands)
+  • Commands    — 38 specialized tools (run /healer:help commands)
   • Flows       — Chain commands into pipelines (run /healer:help flows)
   • Recipes     — Custom reusable flows in ~/.healer/recipes.yaml
   • Gates       — Control flow progression: → ?→ !→
@@ -556,7 +558,7 @@ architect: [spec, design, plan]
 spec: [plan, implement]
 strategy: [plan, spec, implement]
 plan: [implement, tdd]
-implement: [test, review, push]
+implement: [test, conform, review, push]
 tdd: [coverage, review, push]
 refactor: [test, review, push]
 optimize: [test, review, push]
@@ -579,8 +581,9 @@ cip: [design-system, banner]
 banner: [slides, push]
 icon: [implement, push]
 slides: [push, ship]
-design-system: [design, design-review, implement]
-design-review: [design, implement, fix]
+design-system: [design, design-review, conform, implement]
+design-review: [design, implement, conform, fix]
+conform: [implement, fix, push]
 flow: []
 help: []
 healer: []
@@ -595,7 +598,7 @@ core: [healer, flow]
 ideation: [validate, brainstorm, research, design, architect, spec, plan, strategy]
 design-intel: [brand, logo, cip, banner, icon, slides, design-system, design-review]
 implementation: [implement, tdd, refactor, optimize]
-quality: [test, coverage, review, audit]
+quality: [test, coverage, review, audit, conform]
 debug: [debug, fix]
 health: [diagnose, report, analyze]
 shipping: [push, ship, deploy, docs]

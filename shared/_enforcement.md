@@ -148,6 +148,9 @@ These are the thoughts that lead to ineffective Healer sessions. When you notice
 | "The research didn't find anything useful" | You searched with bad queries, or didn't read the results deeply enough | Try 3 different query formulations. Read at least 3 full results. |
 | "I need to move fast" | Moving fast with wrong fixes = moving backwards | Correct once > wrong three times. |
 | "The user just wants it fixed, not researched" | The user wants it ACTUALLY FIXED. Research is HOW you actually fix it. | Research is not separate from fixing. It IS the fixing process. |
+| "The design spec is just a guideline" | Design specs are requirements. Every class, color, and font matters. | Read the spec. Implement exactly. Deviate only with approval. |
+| "I'll match the design in a polish pass" | Polish passes never happen. Ship matches spec or doesn't ship. | Match the design during implementation, not after. |
+| "The user won't notice this difference" | The user approved specific designs. Differences erode trust. | If the user won't notice, it's easy to get right. Do it. |
 
 ---
 
@@ -318,6 +321,75 @@ Before claiming ANY implementation is complete:
    ```
 
 4. **HARD-GATE: If coverage < 80%, flag it.** Do NOT claim "done" without addressing gaps.
+
+---
+
+## Design Conformance Protocol
+
+<HARD-GATE>
+UI CODE WITHOUT DESIGN SPEC READING IS PROHIBITED.
+Before writing or modifying ANY file that renders UI (page.tsx, component.tsx, layout.tsx):
+1. Find the corresponding design spec section
+2. Read it completely
+3. Extract CSS classes, fonts, colors, spacing, components, animations
+4. Only THEN write code
+5. After writing, verify conformance against the spec
+</HARD-GATE>
+
+### The Design Spec Reading Checklist
+
+Before implementing ANY UI page:
+
+```
+PRE-IMPLEMENTATION DESIGN CHECK:
+
+  □ Found design spec section for this page/component
+  □ Read the spec COMPLETELY (not skimmed)
+  □ Extracted: layout structure (grid/flex, columns, max-width)
+  □ Extracted: typography (font-display vs font-body, text-* tokens)
+  □ Extracted: colors (cream, terracotta, sage, ink — no raw hex)
+  □ Extracted: spacing (py-12 md:py-24 pattern, gap values, padding)
+  □ Extracted: component patterns (button hover, card hover, input focus)
+  □ Extracted: animations (scroll-reveal, stagger, particles, count-up)
+  □ Extracted: responsive behavior (mobile/tablet/desktop layouts)
+  □ Extracted: chrome requirements (nav, footer, skeletons, empty states)
+  □ Compared with existing code (if modifying)
+  □ Flagged intentional deviations (if any)
+```
+
+### Post-Implementation Design Verification
+
+After implementing ANY UI page:
+
+```
+POST-IMPLEMENTATION DESIGN CHECK:
+
+  □ All sections from spec exist in code (no missing sections)
+  □ Section order matches spec
+  □ Font usage: font-display for headings, font-body for text
+  □ Text sizes: design tokens only (no generic text-sm/text-lg)
+  □ Colors: design tokens only (no raw hex values)
+  □ Spacing: correct section rhythm (py-12 md:py-24)
+  □ Container: max-w-7xl mx-auto px-6 lg:px-8
+  □ Component patterns: correct hover effects, border styles
+  □ Animations: scroll-reveal on sections, stagger on grids
+  □ Chrome: navigation present, footer present
+  □ Responsive: tested at mobile/tablet/desktop breakpoints
+  □ Skeleton loaders: for all async content
+  □ Empty states: for all lists/grids
+```
+
+### Common Design Conformance Traps
+
+| Trap | Impact | Prevention |
+|------|--------|------------|
+| "I'll add animations later" | They never get added | Add them during initial implementation |
+| "The footer can wait" | Every page ships without it | Footer is a requirement, not optional |
+| "Close enough on spacing" | Inconsistent visual rhythm | Use exact tokens from DESIGN.md |
+| "text-sm is fine" | Breaks the type scale | Use text-body, text-label, text-micro |
+| "I'll use a placeholder nav" | Placeholder becomes permanent | Use the shared Navbar component |
+| "Raw hex is just for this one spot" | Hex values proliferate | Always use design tokens |
+| "The design says X but Y is better" | Unapproved deviation | Flag and get approval first |
 
 ---
 

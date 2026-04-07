@@ -1,5 +1,5 @@
 ---
-description: "Flow orchestrator — chains multiple healer sub-commands into pipelines with gate controls, built-in presets, custom YAML recipes, and smart next-step suggestions. The conductor of the healer orchestra."
+description: "Flow orchestrator — chains multiple healer sub-commands into pipelines with gate controls, 14 built-in presets, custom YAML recipes, and smart next-step suggestions. The conductor of the healer orchestra."
 ---
 
 **ENFORCEMENT: Read and apply all protocols from `${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**
@@ -28,6 +28,8 @@ The user provides: $ARGUMENTS
 /healer:flow visual           # Visual design: brand → design-system → design → design-review
 /healer:flow identity         # Brand identity: brand → logo → cip → design-system
 /healer:flow brand-to-prod    # Brand-aware feature: brand → design-system → design → implement → test → review → ship
+/healer:flow conform          # Design conformance: conform → implement → conform → test → push
+/healer:flow catchup          # Gap analysis + fix: catchup → test → review
 ```
 
 ### Inline Custom Flow
@@ -146,7 +148,7 @@ design        → spec, architect, implement, design-review
 architect     → spec, design, plan
 spec          → plan, implement
 strategy      → plan, spec, implement
-implement     → test, review, push
+implement     → test, conform, review, push
 tdd           → coverage, review, push
 test          → coverage, fix, push
 coverage      → test, fix
@@ -170,8 +172,10 @@ cip           → design-system, banner
 banner        → slides, push
 icon          → implement, push
 slides        → push, ship
-design-system → design, design-review, implement
-design-review → design, implement, fix
+design-system → design, design-review, conform, implement
+design-review → design, implement, conform, fix
+conform       → implement, fix, push
+catchup       → test, review, implement, deploy
 ```
 
 When `/healer` is called with NO arguments and state exists:
@@ -375,6 +379,30 @@ brand-to-prod:
       gate: interactive
     - command: ship
       gate: must-pass
+
+conform:
+  description: "Design conformance gate around implementation"
+  steps:
+    - command: conform
+      gate: must-pass
+    - command: implement
+      gate: auto
+    - command: conform
+      gate: must-pass
+    - command: test
+      gate: must-pass
+    - command: push
+      gate: interactive
+
+catchup:
+  description: "Full-pipeline gap analysis and auto-fix"
+  steps:
+    - command: catchup
+      gate: auto
+    - command: test
+      gate: must-pass
+    - command: review
+      gate: interactive
 ```
 
 ## Custom Recipes
