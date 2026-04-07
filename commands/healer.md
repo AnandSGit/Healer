@@ -1,5 +1,5 @@
 ---
-description: "Full autonomous codebase engine — discover, understand, assess, research, plan, execute, and verify any project in any language on any platform. 35 sub-commands, 12 flow presets, design intelligence."
+description: "Full autonomous codebase engine — discover, understand, assess, research, plan, execute, and verify any project in any language on any platform. 38 sub-commands, 14 flow presets, design intelligence."
 ---
 
 # Healer v6 — Universal Autonomous Codebase Health & Development Engine
@@ -49,6 +49,7 @@ Specialized modes for targeted work. Each auto-detects the stack using the same 
 /healer:debug [bug]                  # Systematic debugging with hypothesis testing
 /healer:review [scope]               # Research-augmented code review
 /healer:coverage [module]            # Test coverage analysis with risk prioritization
+/healer:conform [page|file]          # Design conformance gate — spec vs code compliance check
 /healer:plan [feature]               # Structured planning with task tracking + dependencies
 /healer:ship [message]               # Full PR workflow — commit, PR, review loop, merge, deploy
 /healer:docs [scope]                 # Research-augmented documentation generation
@@ -80,6 +81,7 @@ Chain multiple sub-commands into pipelines with gate controls:
 /healer:flow morning                 # Built-in: diagnose → report
 /healer:flow visual                  # Built-in: brand → design-system → design → design-review
 /healer:flow identity                # Built-in: brand → logo → cip → design-system
+/healer:flow conform                 # Built-in: conform → implement → conform → test → push
 /healer:flow brand-to-prod           # Built-in: brand → design-system → design → implement → test → review → ship
 
 # Inline custom chains with gate operators:
