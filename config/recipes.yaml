@@ -391,3 +391,42 @@ flows:
         gate: interactive
       - command: design-review
         gate: auto
+
+  # ─────────────────────────────────────────────────
+  # VERIFICATION FLOWS
+  # ─────────────────────────────────────────────────
+
+  verify-and-ship:
+    description: "Full verification gate before shipping"
+    steps:
+      - command: conform
+        gate: must-pass
+      - command: verify
+        gate: must-pass
+      - command: test
+        gate: must-pass
+      - command: review
+        gate: interactive
+      - command: ship
+        gate: must-pass
+
+  verify-only:
+    description: "Verification report without fixes"
+    steps:
+      - command: verify
+        args: "--report-only"
+        gate: auto
+      - command: report
+        gate: auto
+
+  post-implement:
+    description: "Run after implementing a feature"
+    steps:
+      - command: verify
+        gate: must-pass
+      - command: conform
+        gate: must-pass
+      - command: review
+        gate: interactive
+      - command: push
+        gate: interactive

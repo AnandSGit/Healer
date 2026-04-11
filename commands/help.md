@@ -43,7 +43,7 @@ Display:
 HEALER — Help
 ═══════════════════════════════════════════════════════════
 Universal Autonomous Codebase Health & Development Engine
-v6.1 — 38 commands | 14 flow presets | 24+ recipes
+v6.2 — 39 commands | 17 flow presets | 27+ recipes
       Shared enforcement layer for research, verification & fixes
       Integrated design intelligence: 161 palettes, 57 fonts, 99 UX rules
 
@@ -53,7 +53,7 @@ CATEGORIES
   Ideation (8)        validate, brainstorm, research, design, architect, spec, plan, strategy
   Design Intel (8)    brand, logo, cip, banner, icon, slides, design-system, design-review
   Implementation (4)  implement, tdd, refactor, optimize
-  Quality (6)         test, coverage, review, audit, conform, catchup
+  Quality (7)         test, coverage, review, audit, conform, verify, catchup
   Debug & Fix (2)     debug, fix
   Health (3)          diagnose, report, analyze
   Shipping (4)        push, ship, deploy, docs
@@ -69,7 +69,7 @@ QUICK START
 
 MORE HELP
 ──────────────────────────────────────────────────
-  /healer:help commands            All 38 commands
+  /healer:help commands            All 39 commands
   /healer:help flows               Built-in flow presets
   /healer:help recipes             Custom recipe pipelines
   /healer:help gates               Gate operator reference
@@ -89,7 +89,7 @@ Read the command files from `${CLAUDE_PLUGIN_ROOT}/commands/*.md`. For each file
 Display ALL commands organized by category:
 
 ```
-HEALER — Commands (38)
+HEALER — Commands (39)
 ═══════════════════════════════════════════════════════════
 
 CORE
@@ -122,6 +122,8 @@ TESTING & QUALITY
   /healer:review           {description}
   /healer:audit            {description}
   /healer:conform          {description}
+  /healer:verify           {description}
+  /healer:catchup          {description}
 
 DEBUGGING & FIXING
 ─────────────────────────────────────────────────────────

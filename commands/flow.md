@@ -29,6 +29,9 @@ The user provides: $ARGUMENTS
 /healer:flow identity         # Brand identity: brand → logo → cip → design-system
 /healer:flow brand-to-prod    # Brand-aware feature: brand → design-system → design → implement → test → review → ship
 /healer:flow conform          # Design conformance: conform → implement → conform → test → push
+/healer:flow verify           # Requirement verification + fix: verify !→ push
+/healer:flow full-verify      # Full verification gate: conform !→ verify !→ test !→ review → ship
+/healer:flow pre-ship         # Pre-ship gate: verify !→ review → ship
 /healer:flow catchup          # Gap analysis + fix: catchup → test → review
 ```
 
@@ -148,7 +151,7 @@ design        → spec, architect, implement, design-review
 architect     → spec, design, plan
 spec          → plan, implement
 strategy      → plan, spec, implement
-implement     → test, conform, review, push
+implement     → verify, test, conform, review, push
 tdd           → coverage, review, push
 test          → coverage, fix, push
 coverage      → test, fix
@@ -174,8 +177,9 @@ icon          → implement, push
 slides        → push, ship
 design-system → design, design-review, conform, implement
 design-review → design, implement, conform, fix
-conform       → implement, fix, push
-catchup       → test, review, implement, deploy
+conform       → verify, implement, fix, push
+verify        → fix, implement, test, push, ship
+catchup       → test, review, implement, verify, deploy
 ```
 
 When `/healer` is called with NO arguments and state exists:
@@ -393,6 +397,38 @@ conform:
       gate: must-pass
     - command: push
       gate: interactive
+
+verify:
+  description: "Requirement-driven verification and autonomous fix"
+  steps:
+    - command: verify
+      gate: must-pass
+    - command: push
+      gate: interactive
+
+full-verify:
+  description: "Visual + behavioral verification before shipping"
+  steps:
+    - command: conform
+      gate: must-pass
+    - command: verify
+      gate: must-pass
+    - command: test
+      gate: must-pass
+    - command: review
+      gate: interactive
+    - command: ship
+      gate: must-pass
+
+pre-ship:
+  description: "Verification gate before shipping to production"
+  steps:
+    - command: verify
+      gate: must-pass
+    - command: review
+      gate: interactive
+    - command: ship
+      gate: must-pass
 
 catchup:
   description: "Full-pipeline gap analysis and auto-fix"

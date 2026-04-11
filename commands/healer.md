@@ -50,6 +50,7 @@ Specialized modes for targeted work. Each auto-detects the stack using the same 
 /healer:review [scope]               # Research-augmented code review
 /healer:coverage [module]            # Test coverage analysis with risk prioritization
 /healer:conform [page|file]          # Design conformance gate — spec vs code compliance check
+/healer:verify [page|feature]        # Functional verification engine — 9 dimensions, autonomous fix loop
 /healer:plan [feature]               # Structured planning with task tracking + dependencies
 /healer:ship [message]               # Full PR workflow — commit, PR, review loop, merge, deploy
 /healer:docs [scope]                 # Research-augmented documentation generation
@@ -82,6 +83,9 @@ Chain multiple sub-commands into pipelines with gate controls:
 /healer:flow visual                  # Built-in: brand → design-system → design → design-review
 /healer:flow identity                # Built-in: brand → logo → cip → design-system
 /healer:flow conform                 # Built-in: conform → implement → conform → test → push
+/healer:flow verify                  # Built-in: verify !→ push
+/healer:flow full-verify             # Built-in: conform !→ verify !→ test !→ review → ship
+/healer:flow pre-ship                # Built-in: verify !→ review → ship
 /healer:flow brand-to-prod           # Built-in: brand → design-system → design → implement → test → review → ship
 
 # Inline custom chains with gate operators:
