@@ -35,14 +35,14 @@ The user provides: $ARGUMENTS
 /healer:flow full-verify      # Full verification gate: conform !→ verify !→ test !→ review → ship
 /healer:flow pre-ship         # Pre-ship gate: verify !→ review → ship
 /healer:flow catchup          # Gap analysis + fix: catchup → test → review
-/healer:flow record-test      # Record flows + test them: record → indulge !→
-/healer:flow record-full      # Full 10x recording + testing: record --full → indulge --full !→ push
-/healer:flow full-qa          # Complete QA: record → indulge !→ coverage → report
-/healer:flow onboard          # Onboarding (read-only): record → report
-/healer:flow record-secure    # Security-focused: record --risk → indulge --security → audit → report
-/healer:flow record-visual    # Visual audit: record --design-only → indulge --visual --a11y → design-review → report
-/healer:flow record-onboard   # Full onboarding + CLAUDE.md: record --full --claude-md → report
-/healer:flow record-regression # Regression detection: record --diff → indulge --regression → report
+/healer:flow imitate-test      # Imitate flows + test them: imitate → indulge !→
+/healer:flow imitate-full      # Full 10x imitation + testing: imitate --full → indulge --full !→ push
+/healer:flow full-qa           # Complete QA: imitate → indulge !→ coverage → report
+/healer:flow onboard           # Onboarding (read-only): imitate → report
+/healer:flow imitate-secure    # Security-focused: imitate --risk → indulge --security → audit → report
+/healer:flow imitate-visual    # Visual audit: imitate --layer=frontend → indulge --visual --a11y → design-review → report
+/healer:flow imitate-onboard   # Full onboarding + CLAUDE.md: imitate --full --claude-md → report
+/healer:flow imitate-regression # Regression detection: imitate --diff → indulge --regression → report
 ```
 
 ### Inline Custom Flow
@@ -190,7 +190,7 @@ design-review → design, implement, conform, fix
 conform       → verify, implement, fix, push
 verify        → fix, implement, test, push, ship
 catchup       → test, review, implement, verify, deploy
-record        → indulge, verify, test, report, analyze
+imitate       → indulge, verify, test, report, analyze
 indulge       → fix, test, push, report, coverage
 ```
 

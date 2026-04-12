@@ -163,9 +163,9 @@ DESIGN INTELLIGENCE (v6 — integrated from UI-UX-Pro-Max)
         50+ UI styles, 14 stack-specific guideline files
   Sync: SessionStart hook auto-syncs from UI-UX-Pro-Max upstream
 
-RECORDING & FLOW TESTING (v7 — reverse engineering + systematic testing)
+IMITATE & FLOW TESTING (v8 — layer-scoped reverse engineering + systematic testing)
 ─────────────────────────────────────────────────────────
-  /healer:record           {description}
+  /healer:imitate          {description}
   /healer:indulge          {description}
 
 SHIPPING
@@ -379,16 +379,18 @@ DESIGN INTELLIGENCE
   /healer:flow visual                    Brand → design system → review
   /healer:flow identity                  Brand → logo → CIP → system
 
-RECORDING & FLOW TESTING
-  /healer:record                          Reverse-engineer entire app into flow document
-  /healer:record --full --claude-md       Full recording + CLAUDE.md (18 flags, 21 sections)
-  /healer:record --risk                   Record with risk scoring per flow
-  /healer:record --impact src/payment.ts  Show all flows affected by this file
-  /healer:record --diff                   Compare against previous recording
-  /healer:record --user-stories           Generate user stories from flows
-  /healer:record --services --deps        Service map + dependency graph
-  /healer:record --validate               Check if existing record is stale
-  /healer:indulge                         Test every recorded flow (6 dimensions)
+IMITATE & FLOW TESTING
+  /healer:imitate                           Reverse-engineer all 5 layers into 4-in-1 doc
+  /healer:imitate --layer=frontend          Scope to one layer (frontend|backend|server|db|ai)
+  /healer:imitate --layer=backend,db        Scope to multiple layers
+  /healer:imitate --full --claude-md        Full imitation + CLAUDE.md (all 10x flags)
+  /healer:imitate --risk                    Imitate with risk scoring per flow
+  /healer:imitate --impact src/payment.ts   Show all flows affected by this file
+  /healer:imitate --diff                    Compare against previous imitate
+  /healer:imitate --user-stories            Generate user stories from flows
+  /healer:imitate --services --deps         Service map + dependency graph
+  /healer:imitate --validate                Check if existing imitate is stale
+  /healer:indulge                           Test every imitate-discovered flow (6 dimensions)
   /healer:indulge --full --dashboard      Full testing + HTML dashboard (22 flags)
   /healer:indulge --security --contract   Security + API contract testing
   /healer:indulge --flake-check --trace   Flakiness detection + trace capture

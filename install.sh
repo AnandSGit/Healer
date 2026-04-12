@@ -1,5 +1,5 @@
 #!/bin/bash
-# Healer v6 — Install Script
+# Healer — Install Script
 # Registers Healer as a Claude Code plugin (marketplace)
 
 set -e
@@ -8,11 +8,12 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CLAUDE_SETTINGS="$HOME/.claude/settings.json"
 CLAUDE_COMMANDS="$HOME/.claude/commands"
 HEALER_CONFIG="$HOME/.healer"
+HEALER_VERSION=$(python3 -c "import json; print(json.load(open('$SCRIPT_DIR/plugin.json'))['version'])")
 
 echo "═══════════════════════════════════════════════════"
-echo "  Healer v7.1 — Universal Development Lifecycle Engine"
+echo "  Healer v${HEALER_VERSION} — Universal Development Lifecycle Engine"
 echo "  with Postfix \`?\` Help + Self-Validating Catalog"
-echo "  41 commands | 26 flow presets | 36+ recipes"
+echo "  42 commands | 25 flow presets | layer-scoped imitate"
 echo "  161 palettes | 57 fonts | 99 UX guidelines"
 echo "═══════════════════════════════════════════════════"
 echo ""
@@ -88,10 +89,14 @@ else:
 
 plugins = installed.setdefault('plugins', {})
 now = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%S.000Z')
+with open(os.path.join(healer_path, "plugin.json")) as f:
+    plugin_manifest = json.load(f)
+healer_version = plugin_manifest["version"]
+
 plugins['healer@healer'] = [{
     "scope": "user",
     "installPath": healer_path,
-    "version": "6.0.0",
+    "version": healer_version,
     "installedAt": now,
     "lastUpdated": now
 }]
@@ -179,13 +184,14 @@ echo "    /healer:verify         # Functional verification (9 dimensions)"
 echo "    /healer:flow feature   # Feature pipeline"
 echo "    /healer:flow ideate    # Full ideation pipeline"
 echo ""
-echo "  Recording & Flow Testing (NEW in v7):"
-echo "    /healer:record         # Reverse-engineer app into flow document"
-echo "    /healer:record --full  # 10x: Mermaid, risk, timeline, impact, diff"
-echo "    /healer:indulge        # Test every flow (6 dimensions)"
-echo "    /healer:indulge --full # 10x: visual, a11y, security, perf, dashboard"
-echo "    /healer:flow record-test    # Record → test pipeline"
-echo "    /healer:flow record-onboard # Full onboarding + CLAUDE.md"
+echo "  Imitate & Flow Testing (NEW in v8 — renamed from record):"
+echo "    /healer:imitate               # Reverse-engineer all 5 layers into 4-in-1 doc"
+echo "    /healer:imitate --layer=frontend  # Scope: frontend | backend | server | db | ai"
+echo "    /healer:imitate --full        # 10x: Mermaid, risk, timeline, impact, diff"
+echo "    /healer:indulge               # Test every flow (6 dimensions)"
+echo "    /healer:indulge --full        # 10x: visual, a11y, security, perf, dashboard"
+echo "    /healer:flow imitate-test     # Imitate → test pipeline"
+echo "    /healer:flow imitate-onboard  # Full onboarding + CLAUDE.md"
 echo ""
 echo "  Design Intelligence:"
 echo "    /healer:brand          # Brand voice + identity"

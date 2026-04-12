@@ -1,5 +1,5 @@
 ---
-description: "Record-driven exhaustive flow testing engine — parses /healer:record output, systematically tests EVERY discovered flow across 6 dimensions (happy path, negative input, boundary cases, permission/auth, state violations, data integrity), generates repeatable test files, and produces detailed reports. Optional 10x features: visual regression, accessibility, security, performance, regression analysis, CI generation, auto-heal, HTML dashboard, and contract testing."
+description: "Imitate-driven exhaustive flow testing engine — parses /healer:imitate output, systematically tests EVERY discovered flow across 6 dimensions (happy path, negative input, boundary cases, permission/auth, state violations, data integrity), generates repeatable test files, and produces detailed reports. Optional 10x features: visual regression, accessibility, security, performance, regression analysis, CI generation, auto-heal, HTML dashboard, and contract testing."
 ---
 
 <!-- Help metadata: data/commands.yaml -->
@@ -8,13 +8,13 @@ description: "Record-driven exhaustive flow testing engine — parses /healer:re
 
 **ENFORCEMENT: Read and apply all protocols from `${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**
 
-You are the Healer in **Indulge Mode**. Your job is to take the record file produced by `/healer:record` and systematically test EVERY discovered flow using appropriate tooling — Playwright MCP for UI flows, API testing (curl/httpie) for backend flows, and generated unit tests for business logic. Each flow is tested across 6 dimensions. You produce repeatable test files AND detailed reports.
+You are the Healer in **Indulge Mode**. Your job is to take the imitate file produced by `/healer:imitate` and systematically test EVERY discovered flow using appropriate tooling — Playwright MCP for UI flows, API testing (curl/httpie) for backend flows, and generated unit tests for business logic. Each flow is tested across 6 dimensions. You produce repeatable test files AND detailed reports.
 
-**Where `/healer:record` discovers "what flows exist", `/healer:indulge` answers "do they actually work, and how do they break?"**
+**Where `/healer:imitate` discovers "what flows exist", `/healer:indulge` answers "do they actually work, and how do they break?"**
 
 **Where `/healer:test` writes tests for specific files/features, `/healer:indulge` tests entire FLOWS end-to-end across every dimension.**
 
-<HARD-GATE>INDULGE IS RECORD-DRIVEN. You MUST parse a record file before testing anything. No record file = no indulge run. Do not invent flows — they come from the record.</HARD-GATE>
+<HARD-GATE>INDULGE IS IMITATE-DRIVEN. You MUST parse an imitate file before testing anything. No imitate file = no indulge run. Do not invent flows — they come from the imitate file.</HARD-GATE>
 
 <HARD-GATE>ALL 6 DIMENSIONS ARE MANDATORY FOR EVERY FLOW. Do not skip a dimension because "it probably passes" or "it's not relevant." Every flow gets all 6. The only valid skip reason is tool unavailability (e.g., no Playwright MCP for UI flows), and that gets reported as SKIP, not PASS.</HARD-GATE>
 
@@ -61,9 +61,9 @@ Accepted arguments:
 
 | Argument | Effect |
 |----------|--------|
-| (no args) | Test all flows from the latest record file, all 6 dimensions |
+| (no args) | Test all flows from the latest imitate file, all 6 dimensions |
 | `{flow IDs}` | Test specific flows only (comma-separated: `BLF-001,CF-003,FF-012`) |
-| `--record {path}` | Use a specific record file instead of auto-detecting the latest |
+| `--imitate {path}` | Use a specific imitate file instead of auto-detecting the latest |
 | `--generate-only` | Generate test files but do NOT execute them |
 | `--api-only` | Test API flows only (skip browser/UI flows) |
 | `--ui-only` | Test UI flows only (skip API/logic flows) |
@@ -76,7 +76,7 @@ Accepted arguments:
 | `--ci` | Generate CI workflow file for automated flow testing |
 | `--auto-heal` | On test failure, dispatch /healer:fix, re-test, max 3 attempts |
 | `--dashboard` | Generate self-contained HTML dashboard with Chart.js |
-| `--contract` | Validate API responses against schemas from record |
+| `--contract` | Validate API responses against schemas from the imitate file |
 | `--traffic-aware` | Prioritize flows by estimated real usage (scan for analytics/log patterns) |
 | `--fixtures` | Generate network mock fixture files alongside test files for deterministic testing |
 | `--trace` | Capture Playwright traces (DOM snapshots, network, console) for debugging |
@@ -84,7 +84,7 @@ Accepted arguments:
 | `--component` | Generate component-level tests for CP-NNN patterns (Playwright experimental-ct) |
 | `--full` | Enable ALL features (all flags above) |
 
-If no arguments, test all flows from the latest record, 6 dimensions, base features only.
+If no arguments, test all flows from the latest imitate file, 6 dimensions, base features only.
 
 ## The 6 Test Dimensions (Always-On)
 
@@ -92,7 +92,7 @@ Every flow is tested across all 6 dimensions. These are not optional.
 
 | Dim | Name | What It Tests | Example Checks |
 |-----|------|---------------|----------------|
-| 1 | **Happy Path** | Does the flow work as discovered in the record? | Execute the exact steps from the record; verify expected outcome |
+| 1 | **Happy Path** | Does the flow work as discovered in the imitate file? | Execute the exact steps from the imitate file; verify expected outcome |
 | 2 | **Negative Input** | Bad data, missing fields, wrong types, invalid formats | Empty required fields, strings in number fields, SQL injection strings, XSS payloads, malformed JSON |
 | 3 | **Boundary Cases** | Empty values, max length, special characters, zero, negative numbers | Empty string, 1-char string, max-length+1 string, 0, -1, MAX_INT, unicode, emoji, null bytes |
 | 4 | **Permission/Auth** | Wrong role, no auth, expired token, other user's data | No auth header, expired JWT, wrong role token, accessing another user's resource (IDOR) |
@@ -113,13 +113,13 @@ Every flow is tested across all 6 dimensions. These are not optional.
 
 ## Procedure
 
-### Step 1: Locate Record File
+### Step 1: Locate Imitate File
 
-Find the record file to parse.
+Find the imitate file to parse.
 
 ```bash
-# If --record flag provided, use that path directly
-# Otherwise, find the latest record file
+# If --imitate flag provided, use that path directly
+# Otherwise, find the latest imitate file
 ls -t *_Business_Flows_Helper_*.md 2>/dev/null | head -1
 
 # Also check common locations
@@ -128,13 +128,13 @@ ls -t docs/*_Business_Flows_Helper_*.md 2>/dev/null | head -1
 ```
 
 **Error handling:**
-- If no record file found → **ERR_NO_RECORD**: "No record file found. Run `/healer:record` first."
-- If record file is older than 30 days → **ERR_RECORD_STALE**: "Record is {N} days old. Re-run `/healer:record` for fresh flow discovery."
-- If --record path doesn't exist → **ERR_FLOW_NOT_FOUND**: "Record file not found at {path}."
+- If no imitate file found → **ERR_NO_IMITATE**: "No imitate file found. Run `/healer:imitate` first."
+- If imitate file is older than 30 days → **ERR_IMITATE_STALE**: "Imitate is {N} days old. Re-run `/healer:imitate` for fresh flow discovery."
+- If --imitate path doesn't exist → **ERR_FLOW_NOT_FOUND**: "Imitate file not found at {path}."
 
-### Step 2: Parse Record File
+### Step 2: Parse Imitate File
 
-Read the record file completely. Extract ALL flow IDs with their details.
+Read the imitate file completely. Extract ALL flow IDs with their details.
 
 <HARD-GATE>READ THE ENTIRE RECORD FILE. Do not skim. Every flow ID, every step, every file reference, every decision point must be extracted. Missing a flow means missing test coverage.</HARD-GATE>
 
@@ -149,12 +149,12 @@ For each flow, extract:
 - **Expected outcomes** (what happens when the flow completes successfully)
 - **Error conditions** (documented failure modes)
 - **API schemas** (request/response shapes, if API flow)
-- **Risk score** (if the record includes risk assessment)
+- **Risk score** (if the imitate file includes risk assessment)
 
 Build a **Flow Registry**:
 
 ```
-FLOW REGISTRY (from record)
+FLOW REGISTRY (from imitate file)
 ═══════════════════════════════════════════════════
 Total flows: {N}
   FF (UI):       {N}
@@ -174,7 +174,7 @@ Total flows: {N}
 ═══════════════════════════════════════════════════
 ```
 
-If specific flow IDs were requested via arguments, filter to only those. If any requested ID is not in the record → **ERR_FLOW_NOT_FOUND**: "Flow {ID} not found in record file."
+If specific flow IDs were requested via arguments, filter to only those. If any requested ID is not in the imitate file → **ERR_FLOW_NOT_FOUND**: "Flow {ID} not found in imitate file."
 
 ### Step 3: Detect Testing Infrastructure
 
@@ -244,7 +244,7 @@ If `--full` is specified, enable ALL of the above.
 
 Order flows for testing by priority:
 
-**If the record includes risk scores:**
+**If the imitate file includes risk scores:**
 - Test highest-risk flows first
 
 **Otherwise, use type-based priority:**
@@ -281,7 +281,7 @@ For each flow in priority order:
 For this specific flow, generate concrete test scenarios:
 
 **Dimension 1 — Happy Path:**
-- Replay the exact steps from the record
+- Replay the exact steps from the imitate file
 - Use valid data matching the expected types
 - Assert the documented expected outcome
 
@@ -407,7 +407,7 @@ For each flow, run OWASP-based checks:
 For each flow:
 - Time each step individually (start-to-response)
 - Measure total flow duration
-- Compare against thresholds (if defined in record or NFRs):
+- Compare against thresholds (if defined in imitate file or NFRs):
   - API response < 200ms
   - Page load < 3s
   - Flow completion < 10s
@@ -418,7 +418,7 @@ For each flow:
 #### 6i. Contract Testing (if --contract and flow is API)
 
 For API flows:
-- Compare actual response shape against schema from record
+- Compare actual response shape against schema from imitate file
 - Flag: extra fields (not in schema), missing fields (in schema but not in response), wrong types
 - Validate status codes match documented codes
 - Check header expectations (Content-Type, cache headers, CORS)
@@ -508,7 +508,7 @@ export const mockResponses = {
 This makes E2E tests deterministic (no live API dependency) and fast (no network latency).
 
 **Component Tests (if --component or --full):**
-For each CP-NNN (component pattern) discovered by record, generate a component-level test:
+For each CP-NNN (component pattern) discovered by imitate, generate a component-level test:
 - Location: `tests/components/{cp_id}.spec.{ext}`
 - Format: Playwright experimental component testing (`@playwright/experimental-ct-react` or equivalent)
 - Test each component in isolation: default render, variant renders, state changes, interaction handlers
@@ -585,8 +585,8 @@ Contents:
 ```
 HEALER INDULGE REPORT
 ═══════════════════════════════════════════════════
-Record file: {path}
-Record date: {date}
+Imitate file: {path}
+Imitate date: {date}
 Flows tested: {N}/{total}
 Test scenarios executed: {N total across all flows and dimensions}
 Testing tools: {Playwright MCP, curl, Jest, etc.}
@@ -711,7 +711,7 @@ Next steps:
   - /healer:fix      — fix failing flows
   - /healer:test     — write additional tests beyond flow coverage
   - /healer:push     — commit generated test files
-  - /healer:record --diff — see what changed after fixes
+  - /healer:imitate --diff — see what changed after fixes
   - /healer:indulge --regression — track improvements over time
 ═══════════════════════════════════════════════════
 ```
@@ -722,11 +722,11 @@ Next steps:
 
 | Error | Condition | Message | Recovery |
 |-------|-----------|---------|----------|
-| ERR_NO_RECORD | No record file found in project | "No record file found. Run `/healer:record` first." | Run `/healer:record` |
-| ERR_RECORD_STALE | Record file older than 30 days | "Record is {N} days old. Re-run `/healer:record` for fresh flow discovery." | Run `/healer:record` |
+| ERR_NO_IMITATE | No imitate file found in project | "No imitate file found. Run `/healer:imitate` first." | Run `/healer:imitate` |
+| ERR_IMITATE_STALE | Imitate file older than 30 days | "Imitate is {N} days old. Re-run `/healer:imitate` for fresh flow discovery." | Run `/healer:imitate` |
 | ERR_NO_PLAYWRIGHT | UI flows present but no Playwright MCP available | "Playwright MCP not available. UI flows tested via generated spec files only." | Install Playwright MCP, or use `--api-only`, or use `--generate-only` |
 | ERR_NO_SERVER | API flows present but no running dev server | "No running dev server detected on ports 3000/5173/8080/4000/8000. Start the dev server or use `--generate-only`." | Start dev server, or use `--generate-only` |
-| ERR_FLOW_NOT_FOUND | Requested flow ID not present in record file | "Flow {ID} not found in record file. Available flows: {list}" | Check flow ID against record |
+| ERR_FLOW_NOT_FOUND | Requested flow ID not present in imitate file | "Flow {ID} not found in imitate file. Available flows: {list}" | Check flow ID against imitate file |
 | ERR_NO_PREVIOUS_RUN | `--regression` flag used but no previous indulge results found | "No previous indulge results found for regression comparison. This run will establish the baseline." | First run becomes baseline |
 | ERR_AUTO_HEAL_STUCK | `--auto-heal` exhausted 3 attempts for a flow | "Auto-heal stuck on {flow_id} after 3 attempts. Manual intervention required." | Use `/healer:fix` manually with more context |
 
@@ -740,7 +740,7 @@ After completion, write to `.healer/state.json`:
   "status": "completed|partial|failed",
   "suggested_next": "fix|test|push|report",
   "timestamp": "ISO-8601",
-  "record_file": "{path}",
+  "imitate_file": "{path}",
   "flows_tested": 0,
   "flows_passed": 0,
   "flows_failed": 0,
@@ -781,9 +781,9 @@ Also save detailed results for regression tracking:
 ```
 RED FLAGS:
 
-  STOP if you're testing flows that aren't in the record file
-  → Indulge is record-driven. Every flow comes from the record. If you found something
-    new, note it for the next /healer:record run, but don't test it now.
+  STOP if you're testing flows that aren't in the imitate file
+  → Indulge is imitate-driven. Every flow comes from the imitate file. If you found something
+    new, note it for the next /healer:imitate run, but don't test it now.
 
   STOP if you're marking a dimension PASS without actually executing the test
   → "It should pass" is not evidence. Run the test. Read the output. Then classify.
@@ -804,7 +804,7 @@ RED FLAGS:
     Fix the test setup before continuing.
 
   STOP if you're generating tests without understanding the flow's steps
-  → Re-read the flow from the record. Understand the trigger, steps, and expected
+  → Re-read the flow from the imitate file. Understand the trigger, steps, and expected
     outcome. Only then write meaningful test scenarios.
 
   STOP if 80%+ of flows are SKIP due to tool unavailability
@@ -824,7 +824,7 @@ RED FLAGS:
 | "Negative input testing is overkill for this" | Negative input testing catches the bugs that reach production. It's never overkill. | Generate the negative inputs. Run them. Report results. |
 | "The permission dimension doesn't apply — this is a public endpoint" | Public endpoints still need rate limiting, input validation, and abuse prevention checks. | Test with no auth, wrong auth, and rapid-fire. |
 | "I'll just generate the test files and mark everything PASS" | Generated files without execution are --generate-only mode. Don't fake results. | Execute the tests or use --generate-only honestly. |
-| "The record is probably accurate enough" | Records can be stale. But indulge doesn't re-discover — it tests what the record says. | Trust the record for flow definitions. Test for correctness. |
+| "The imitate file is probably accurate enough" | Imitate files can be stale. But indulge doesn't re-discover — it tests what the imitate file says. | Trust the imitate file for flow definitions. Test for correctness. |
 | "Boundary cases are the same for every field" | A name field, a price field, and a date field all have different boundaries. | Generate field-specific boundary values. Not generic ones. |
 | "Auto-heal will fix everything" | Auto-heal has a 3-attempt limit for good reason. Some fixes need human judgment. | Report STUCK flows honestly. Don't hide them. |
 | "The dashboard is just nice-to-have" | The dashboard is the artifact the user shows their team. Make it accurate and complete. | Fill every chart with real data. No placeholder values. |
@@ -835,7 +835,7 @@ RED FLAGS:
 
 ## Rules
 
-1. **Record-driven, always** — every tested flow must come from a record file
+1. **Imitate-driven, always** — every tested flow must come from a imitate file
 2. **6 dimensions, no shortcuts** — every flow gets all 6 dimensions unless tool unavailability forces a SKIP
 3. **Execute, don't estimate** — run every test; "probably passes" is not a result
 4. **Generate repeatable files** — test files must be independently runnable after indulge completes

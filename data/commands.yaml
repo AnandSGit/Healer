@@ -195,7 +195,7 @@ healer:
     research, plan, execute, and verify any project in any language on
     any platform. The umbrella command that orchestrates the full healer
     suite (41 sub-commands, 26 flow presets, design intelligence,
-    10x recording & flow testing).
+    10x imitate & flow testing).
   what_it_does: |
     Detects project stack, runs assessment, identifies issues, researches
     fixes online, applies them, and verifies via tests. Supports modes:
@@ -1431,23 +1431,28 @@ catchup:
     - fix
   errors:
     - If no artifacts found → halts (catchup needs source-of-truth artifacts)
-record:
+imitate:
   category: recording
   purpose: |
-    Reverse-engineer an entire app — frontend, backend, DB, design — into
-    a single comprehensive requirements + flow document. The FIRST healer
-    command that reads code and PRODUCES requirements (reverse direction
-    of spec → implement → verify).
+    Reverse-engineer a specific layer (frontend, backend, server, db, ai) —
+    or the whole app — into a single 4-in-1 document combining Requirements
+    + Design + Spec + Implementation Plan. The FIRST healer command that
+    reads code and PRODUCES enough information to rebuild the layer from
+    scratch (reverse direction of spec → implement → verify).
   what_it_does: |
-    8-layer discovery (UI, routes, state, API, DB, infra, design, tests),
-    flow ID system, cross-reference matrix. 10x flags add: Mermaid
+    9-layer discovery with layer scoping via --layer (frontend|backend|
+    server|db|ai), flow ID system (adds AI-NNN and SRV-NNN), cross-layer
+    reference matrix, and 4-in-1 output per layer. 10x flags add: Mermaid
     diagrams, risk scoring, git timeline, impact analysis, dead code
-    detection, record diff, CLAUDE.md generation, OpenAPI generation.
+    detection, imitate diff, CLAUDE.md generation, OpenAPI generation.
   input:
-    syntax: /healer:record [--full | --risk | --impact <file> | --diff | --claude-md | ...]
+    syntax: /healer:imitate [--layer=<list>] [--full | --risk | --impact <file> | --diff | --claude-md | ...]
     args:
+      - name: --layer
+        desc: 'Comma-separated layers: frontend, backend, server, db, ai'
+        required: false
       - name: --full
-        desc: Enable all 18 flags
+        desc: Enable all 10x flags across all layers
         required: false
       - name: --risk
         desc: Risk scoring per flow
@@ -1456,30 +1461,33 @@ record:
         desc: Show flows affected by a file
         required: false
       - name: --diff
-        desc: Compare against previous record
+        desc: Compare against previous imitate
         required: false
       - name: --claude-md
         desc: Generate CLAUDE.md sections
         required: false
     valid:
+      - --layer=frontend
+      - --layer=backend,db
       - --full --claude-md
       - --risk
       - --impact src/payment.ts
     invalid: []
   example:
-    command: /healer:record --full --claude-md
+    command: /healer:imitate --layer=frontend --full
     trace:
-      - 'Layer 1 (UI): scans pages, components, identifies user flows'
-      - 'Layer 2-7: routes, state, API, DB, infra, design'
-      - 'Layer 8 (tests): maps existing test coverage to flows'
-      - Generates Mermaid diagrams for each flow
-      - 'Risk scores: payment flow = HIGH, profile edit = LOW'
-      - Writes record.md + CLAUDE.md sections
+      - 'Scope parsed: frontend only, all 10x features enabled'
+      - Scans components, pages, state stores, styles, design tokens
+      - Extracts CP-NNN component patterns, FF-NNN user journeys
+      - Builds 4-in-1 output (Requirements, Design, Spec, Plan) for frontend
+      - Writes {App}_Imitate_{MMDDYYYY}.md with layer-scoped content
     why_this_example: |
-      --full --claude-md is the canonical onboarding use case; demonstrates
-      every recording capability and produces the most valuable artifact.
-  input_purpose: Flags select which 10x dimensions to enable. Without flags, base 8-layer recording runs.
-    --full enables everything; specific flags (--risk, --diff, --claude-md) enable targeted analyses.
+      Per-layer imitate with --full is the canonical use case — produces a
+      document that a developer can follow to rebuild the entire frontend
+      from scratch in a new stack.
+  input_purpose: |
+    --layer controls which layers are scanned and emitted. --full enables all
+    10x features. Without flags, all 5 layers are imitated with base features.
   next:
     - indulge
     - verify
@@ -1494,13 +1502,13 @@ record:
 indulge:
   category: recording
   purpose: |
-    Record-driven exhaustive flow testing engine — parses /healer:record
+    Imitate-driven exhaustive flow testing engine — parses /healer:imitate
     output, systematically tests EVERY discovered flow across 6 dimensions
     (happy path, negative input, boundary cases, permission/auth, state
     violations, data integrity), generates repeatable test files, and
     produces detailed reports.
   what_it_does: |
-    Reads record.md, generates test files for every flow × 6 dimensions.
+    Reads the imitate output, generates test files for every flow × 6 dimensions.
     10x flags add: visual regression, accessibility, security, performance,
     regression analysis, CI generation, auto-heal, HTML dashboard, contract
     testing.
@@ -1526,7 +1534,7 @@ indulge:
   example:
     command: /healer:indulge --full --dashboard
     trace:
-      - Reads record.md, finds 47 flows
+      - Reads the latest imitate document, finds 47 flows
       - Generates 47 × 6 = 282 test cases
       - Runs them; 264 pass, 18 fail
       - Writes HTML dashboard to indulge-dashboard.html
@@ -1535,7 +1543,7 @@ indulge:
       --full --dashboard is the canonical comprehensive QA use case;
       exercises all 6 dimensions and produces visible reporting.
   input_purpose: Flags select which testing dimensions and reports to enable. Without flags, base 6-dimension
-    testing runs against record.md. --full + --dashboard is the canonical comprehensive QA configuration.
+    testing runs against the latest imitate document. --full + --dashboard is the canonical comprehensive QA configuration.
   next:
     - fix
     - test
@@ -1543,10 +1551,10 @@ indulge:
     - report
     - coverage
   related:
-    - record
+    - imitate
     - test
   errors:
-    - If no record.md → halts (recommend /healer:record first)
+    - If no imitate document found → halts (recommend /healer:imitate first)
 debug:
   category: debug
   purpose: |

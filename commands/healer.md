@@ -61,8 +61,8 @@ Specialized modes for targeted work. Each auto-detects the stack using the same 
 /healer:flow [preset|chain]          # Flow orchestrator — chain commands into pipelines
 /healer:help [topic|command]         # Interactive help — commands, flows, recipes, gates, examples
 
-# Recording & Flow Testing commands (v7 — reverse engineering + systematic testing)
-/healer:record [module|--flags]      # Reverse-engineer app into requirements + flow document (10x: Mermaid, risk, timeline, impact, diff, CLAUDE.md gen)
+# Imitate & Flow Testing commands (v8 — layer-scoped reverse engineering + systematic testing)
+/healer:imitate [--layer=<list>|--flags]  # Reverse-engineer scoped layer(s) into 4-in-1 doc: Requirements + Design + Spec + Implementation Plan (layers: frontend|backend|server|db|ai)
 /healer:indulge [flow IDs|--flags]   # Systematic flow-by-flow testing (10x: visual regression, a11y, security, perf, auto-heal, dashboard)
 
 # Design Intelligence commands (v6 — integrated from UI-UX-Pro-Max)

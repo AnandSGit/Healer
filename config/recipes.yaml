@@ -432,21 +432,21 @@ flows:
         gate: interactive
 
   # ─────────────────────────────────────────────────
-  # RECORDING & FLOW TESTING (v7 — record + indulge)
+  # IMITATE & FLOW TESTING (v8 — imitate + indulge)
   # ─────────────────────────────────────────────────
 
-  record-test:
-    description: "Record all flows then test every one"
+  imitate-test:
+    description: "Imitate all flows then test every one"
     steps:
-      - command: record
+      - command: imitate
         gate: auto
       - command: indulge
         gate: must-pass
 
-  record-verify:
-    description: "Record, test flows, then verify requirements"
+  imitate-verify:
+    description: "Imitate, test flows, then verify requirements"
     steps:
-      - command: record
+      - command: imitate
         gate: auto
       - command: indulge
         gate: auto
@@ -456,9 +456,9 @@ flows:
         gate: interactive
 
   full-qa:
-    description: "Complete QA: record, indulge, coverage, report"
+    description: "Complete QA: imitate, indulge, coverage, report"
     steps:
-      - command: record
+      - command: imitate
         gate: auto
       - command: indulge
         gate: must-pass
@@ -468,17 +468,17 @@ flows:
         gate: auto
 
   onboard:
-    description: "Onboarding: understand the app (read-only recording)"
+    description: "Onboarding: understand the app (read-only imitation)"
     steps:
-      - command: record
+      - command: imitate
         gate: auto
       - command: report
         gate: auto
 
-  record-full:
-    description: "Full 10x recording + testing with all features"
+  imitate-full:
+    description: "Full 10x imitation + testing with all features"
     steps:
-      - command: record
+      - command: imitate
         args: "--full"
         gate: auto
       - command: indulge
@@ -487,10 +487,10 @@ flows:
       - command: push
         gate: interactive
 
-  record-secure:
-    description: "Security-focused recording and testing"
+  imitate-secure:
+    description: "Security-focused imitation and testing"
     steps:
-      - command: record
+      - command: imitate
         args: "--risk"
         gate: auto
       - command: indulge
@@ -501,11 +501,11 @@ flows:
       - command: report
         gate: auto
 
-  record-visual:
-    description: "Visual design audit from code"
+  imitate-visual:
+    description: "Visual design audit from code (frontend layer only)"
     steps:
-      - command: record
-        args: "--design-only"
+      - command: imitate
+        args: "--layer=frontend"
         gate: auto
       - command: indulge
         args: "--visual --a11y"
@@ -515,19 +515,19 @@ flows:
       - command: report
         gate: auto
 
-  record-onboard:
+  imitate-onboard:
     description: "Full onboarding with CLAUDE.md generation"
     steps:
-      - command: record
+      - command: imitate
         args: "--full --claude-md"
         gate: auto
       - command: report
         gate: auto
 
-  record-regression:
+  imitate-regression:
     description: "Regression detection between runs"
     steps:
-      - command: record
+      - command: imitate
         args: "--diff"
         gate: auto
       - command: indulge

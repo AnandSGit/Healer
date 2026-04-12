@@ -833,57 +833,57 @@ catchup:
       - verify
       - audit
     on_failure: test must-pass → catchup introduced regression; revert and re-plan
-record-test:
-  purpose: Record flows + test them — record → indulge (must-pass). Use for app reverse-engineering followed
+imitate-test:
+  purpose: Imitate flows + test them — imitate → indulge (must-pass). Use for app reverse-engineering followed
     by exhaustive flow testing.
-  what_it_does: Records the app into flows, then tests every flow across 6 dimensions. Indulge is must-pass
+  what_it_does: Imitates the app into flows, then tests every flow across 6 dimensions. Indulge is must-pass
     — flow halts if any flow fails.
   input:
-    syntax: /healer:flow record-test
+    syntax: /healer:flow imitate-test
     args: []
     valid:
       - ''
     invalid: []
   steps:
-    - command: record
+    - command: imitate
       gate: auto
-      produces: record.md with all flows
+      produces: imitate document with all flows
     - command: indulge
       gate: must-pass
       produces: tests for every flow × 6 dimensions
   example:
-    command: /healer:flow record-test
+    command: /healer:flow imitate-test
     trace:
-      - 'record: 8-layer discovery → 47 flows mapped'
+      - 'imitate: 8-layer discovery → 47 flows mapped'
       - 'indulge: 47 × 6 = 282 test cases generated and run'
       - must-pass halts if any test fails
-    why_this_example: Standard record-and-test pattern — establishes coverage where there was none.
+    why_this_example: Standard imitate-and-test pattern — establishes coverage where there was none.
   input_purpose: No arguments — operates on the current codebase comprehensively.
   after:
     next:
       - push
       - fix
     sister_presets:
-      - record-full
+      - imitate-full
       - full-qa
     on_failure: indulge must-pass → tests fail; fix flows or accept temporary divergence
-record-full:
-  purpose: Full 10x recording + testing — record --full → indulge --full (must-pass) → push. Use for comprehensive
+imitate-full:
+  purpose: Full 10x imitation + testing — imitate --full → indulge --full (must-pass) → push. Use for comprehensive
     app analysis with all bells and whistles.
-  what_it_does: Enables every record flag (Mermaid diagrams, risk scoring, git timeline, impact analysis,
+  what_it_does: Enables every imitate flag (Mermaid diagrams, risk scoring, git timeline, impact analysis,
     dead code, diff, CLAUDE.md, OpenAPI). Then full indulge (visual, a11y, security, perf, contract).
     Then push.
   input:
-    syntax: /healer:flow record-full
+    syntax: /healer:flow imitate-full
     args: []
     valid:
       - ''
     invalid: []
   steps:
-    - command: record
+    - command: imitate
       gate: auto
       args: --full
-      produces: comprehensive record + CLAUDE.md + Mermaid + risk scores
+      produces: comprehensive imitate + CLAUDE.md + Mermaid + risk scores
     - command: indulge
       gate: must-pass
       args: --full
@@ -892,24 +892,24 @@ record-full:
       gate: interactive
       produces: commit + push
   example:
-    command: /healer:flow record-full
+    command: /healer:flow imitate-full
     trace:
-      - 'record --full: 47 flows, Mermaid diagrams, risk scores, OpenAPI spec'
+      - 'imitate --full: 47 flows, Mermaid diagrams, risk scores, OpenAPI spec'
       - 'indulge --full: 282 base + visual + a11y + security + perf tests'
       - 'push: ships the comprehensive analysis'
-    why_this_example: Maximum-rigor record-and-test for high-stakes codebases (financial, healthcare,
+    why_this_example: Maximum-rigor imitate-and-test for high-stakes codebases (financial, healthcare,
       security-critical).
   input_purpose: No arguments — all 10x flags pre-enabled in the flow.
   after:
     next: []
     sister_presets:
-      - record-test
+      - imitate-test
       - full-qa
     on_failure: indulge must-pass halts; comprehensive failure list to address
 full-qa:
-  purpose: Complete QA pipeline — record → indulge (must-pass) → coverage → report. Use as a comprehensive
+  purpose: Complete QA pipeline — imitate → indulge (must-pass) → coverage → report. Use as a comprehensive
     QA pass before major releases.
-  what_it_does: Records flows, tests them rigorously, measures coverage afterward, produces formal report.
+  what_it_does: Imitates flows, tests them rigorously, measures coverage afterward, produces formal report.
     End-to-end QA artifact generation.
   input:
     syntax: /healer:flow full-qa
@@ -918,9 +918,9 @@ full-qa:
       - ''
     invalid: []
   steps:
-    - command: record
+    - command: imitate
       gate: auto
-      produces: record.md
+      produces: imitate document
     - command: indulge
       gate: must-pass
       produces: test suite + results
@@ -933,7 +933,7 @@ full-qa:
   example:
     command: /healer:flow full-qa
     trace:
-      - 'record: maps all flows'
+      - 'imitate: maps all flows'
       - 'indulge: tests every flow × 6 dimensions'
       - 'coverage: cross-references coverage gaps with flow-tested areas'
       - 'report: aggregated QA artifact for stakeholder review'
@@ -944,13 +944,13 @@ full-qa:
       - ship
       - deploy
     sister_presets:
-      - record-test
+      - imitate-test
       - audit
     on_failure: indulge must-pass halts; address failures before release
 onboard:
-  purpose: Onboarding (read-only) — record → report. Use when joining a new project to understand it without
+  purpose: Onboarding (read-only) — imitate → report. Use when joining a new project to understand it without
     modifying anything.
-  what_it_does: Records the entire app into a flow document, then produces a health report. Both read-only
+  what_it_does: Imitates the entire app into a 4-in-1 document, then produces a health report. Both read-only
     — perfect for first-day onboarding.
   input:
     syntax: /healer:flow onboard
@@ -959,16 +959,16 @@ onboard:
       - ''
     invalid: []
   steps:
-    - command: record
+    - command: imitate
       gate: auto
-      produces: record.md (project map)
+      produces: imitate document (project map)
     - command: report
       gate: auto
       produces: health-report.md
   example:
     command: /healer:flow onboard
     trace:
-      - 'record: maps the project end-to-end (8 layers)'
+      - 'imitate: maps the project end-to-end (8 layers)'
       - 'report: shows current test/lint/build state'
     why_this_example: Day 1 on a new project — read-only onboarding without risk of accidental modification.
   input_purpose: No arguments — onboard scans whatever project is opened.
@@ -977,21 +977,21 @@ onboard:
       - analyze
       - audit
     sister_presets:
-      - record-onboard
+      - imitate-onboard
     on_failure: all auto — never halts; observations only
-record-secure:
-  purpose: Security-focused recording — record --risk → indulge --security → audit → report. Use for pre-deploy
+imitate-secure:
+  purpose: Security-focused imitation — imitate --risk → indulge --security → audit → report. Use for pre-deploy
     security validation.
-  what_it_does: Records with risk scoring per flow, runs security-dimension testing on every flow, runs
+  what_it_does: Imitates with risk scoring per flow, runs security-dimension testing on every flow, runs
     full audit, produces report.
   input:
-    syntax: /healer:flow record-secure
+    syntax: /healer:flow imitate-secure
     args: []
     valid:
       - ''
     invalid: []
   steps:
-    - command: record
+    - command: imitate
       gate: auto
       args: --risk
       produces: flows + risk scores
@@ -1006,9 +1006,9 @@ record-secure:
       gate: auto
       produces: security-focused health report
   example:
-    command: /healer:flow record-secure
+    command: /healer:flow imitate-secure
     trace:
-      - 'record --risk: 47 flows, top 5 ranked HIGH (auth, payments, admin)'
+      - 'imitate --risk: 47 flows, top 5 ranked HIGH (auth, payments, admin)'
       - 'indulge --security: SQLi/XSS/CSRF tests for every flow'
       - 'audit: dependency CVEs + OWASP scan'
       - 'report: prioritized security findings'
@@ -1021,21 +1021,21 @@ record-secure:
     sister_presets:
       - audit
     on_failure: all auto; findings appear in the report regardless
-record-visual:
-  purpose: Visual audit — record --design-only → indulge --visual --a11y → design-review → report. Use
+imitate-visual:
+  purpose: Visual audit — imitate --layer=frontend → indulge --visual --a11y → design-review → report. Use
     for UI quality validation across the entire app.
-  what_it_does: Records design-relevant flows, runs visual regression + accessibility tests, runs design
+  what_it_does: Imitates design-relevant flows, runs visual regression + accessibility tests, runs design
     review on each, produces report.
   input:
-    syntax: /healer:flow record-visual
+    syntax: /healer:flow imitate-visual
     args: []
     valid:
       - ''
     invalid: []
   steps:
-    - command: record
+    - command: imitate
       gate: auto
-      args: --design-only
+      args: --layer=frontend
       produces: design-relevant flow map
     - command: indulge
       gate: auto
@@ -1048,9 +1048,9 @@ record-visual:
       gate: auto
       produces: visual quality report
   example:
-    command: /healer:flow record-visual
+    command: /healer:flow imitate-visual
     trace:
-      - 'record --design-only: 23 UI flows mapped'
+      - 'imitate --layer=frontend: 23 UI flows mapped'
       - 'indulge --visual --a11y: regression + axe-core tests for each'
       - 'design-review: rates each across 7 dimensions, detects AI slop'
       - 'report: prioritized visual issues'
@@ -1064,29 +1064,29 @@ record-visual:
     sister_presets:
       - visual
     on_failure: all auto; issues appear in the report
-record-onboard:
-  purpose: Full onboarding + CLAUDE.md generation — record --full --claude-md → report. Use for comprehensive
+imitate-onboard:
+  purpose: Full onboarding + CLAUDE.md generation — imitate --full --claude-md → report. Use for comprehensive
     new-project onboarding with persistent context.
-  what_it_does: Generates the most comprehensive record (all 18 flags) AND writes CLAUDE.md sections with
+  what_it_does: Generates the most comprehensive imitate (all 18 flags) AND writes CLAUDE.md sections with
     project context for future sessions.
   input:
-    syntax: /healer:flow record-onboard
+    syntax: /healer:flow imitate-onboard
     args: []
     valid:
       - ''
     invalid: []
   steps:
-    - command: record
+    - command: imitate
       gate: auto
       args: --full --claude-md
-      produces: record.md + CLAUDE.md additions
+      produces: imitate document + CLAUDE.md additions
     - command: report
       gate: auto
       produces: health report
   example:
-    command: /healer:flow record-onboard
+    command: /healer:flow imitate-onboard
     trace:
-      - 'record --full --claude-md: comprehensive record + CLAUDE.md context block'
+      - 'imitate --full --claude-md: comprehensive imitate + CLAUDE.md context block'
       - 'report: current health snapshot'
     why_this_example: Onboarding-with-memory — future Claude Code sessions inherit the project understanding
       via CLAUDE.md.
@@ -1097,22 +1097,22 @@ record-onboard:
     sister_presets:
       - onboard
     on_failure: all auto
-record-regression:
-  purpose: Regression detection — record --diff → indulge --regression → report. Use to detect what broke
+imitate-regression:
+  purpose: Regression detection — imitate --diff → indulge --regression → report. Use to detect what broke
     between two commits or releases.
-  what_it_does: Records the current app state, diffs against the previous record, runs regression-specific
+  what_it_does: Imitates the current app state, diffs against the previous imitate, runs regression-specific
     tests on changed flows, reports.
   input:
-    syntax: /healer:flow record-regression
+    syntax: /healer:flow imitate-regression
     args: []
     valid:
       - ''
     invalid: []
   steps:
-    - command: record
+    - command: imitate
       gate: auto
       args: --diff
-      produces: diff vs previous record
+      produces: diff vs previous imitate
     - command: indulge
       gate: auto
       args: --regression
@@ -1121,16 +1121,16 @@ record-regression:
       gate: auto
       produces: regression report
   example:
-    command: /healer:flow record-regression
+    command: /healer:flow imitate-regression
     trace:
-      - 'record --diff: 5 flows changed since last record'
+      - 'imitate --diff: 5 flows changed since last imitate'
       - 'indulge --regression: regression tests on those 5 flows'
       - 'report: regressions found / clean'
     why_this_example: Targeted regression check — fast because only changed flows are tested.
-  input_purpose: No arguments — diff is computed against the previous record.md automatically.
+  input_purpose: No arguments — diff is computed against the previous imitate document automatically.
   after:
     next:
       - fix
     sister_presets:
-      - record-test
+      - imitate-test
     on_failure: all auto; regressions appear in report
