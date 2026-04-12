@@ -43,7 +43,7 @@ Display:
 HEALER — Help
 ═══════════════════════════════════════════════════════════
 Universal Autonomous Codebase Health & Development Engine
-v6.2 — 39 commands | 17 flow presets | 27+ recipes
+v7.0 — 41 commands | 26 flow presets | 36+ recipes
       Shared enforcement layer for research, verification & fixes
       Integrated design intelligence: 161 palettes, 57 fonts, 99 UX rules
 
@@ -54,6 +54,7 @@ CATEGORIES
   Design Intel (8)    brand, logo, cip, banner, icon, slides, design-system, design-review
   Implementation (4)  implement, tdd, refactor, optimize
   Quality (7)         test, coverage, review, audit, conform, verify, catchup
+  Recording (2)       record, indulge
   Debug & Fix (2)     debug, fix
   Health (3)          diagnose, report, analyze
   Shipping (4)        push, ship, deploy, docs
@@ -151,6 +152,11 @@ DESIGN INTELLIGENCE (v6 — integrated from UI-UX-Pro-Max)
         50+ UI styles, 14 stack-specific guideline files
   Sync: SessionStart hook auto-syncs from UI-UX-Pro-Max upstream
 
+RECORDING & FLOW TESTING (v7 — reverse engineering + systematic testing)
+─────────────────────────────────────────────────────────
+  /healer:record           {description}
+  /healer:indulge          {description}
+
 SHIPPING
 ─────────────────────────────────────────────────────────
   /healer:push             {description}
@@ -176,7 +182,8 @@ core: [healer, flow]
 ideation: [validate, brainstorm, research, design, architect, spec, plan, strategy]
 design-intel: [brand, logo, cip, banner, icon, slides, design-system, design-review]
 implementation: [implement, tdd, refactor, optimize]
-quality: [test, coverage, review, audit, conform]
+quality: [test, coverage, review, audit, conform, verify, catchup]
+recording: [record, indulge]
 debug: [debug, fix]
 health: [diagnose, report, analyze]
 shipping: [push, ship, deploy, docs]
@@ -360,6 +367,25 @@ DESIGN INTELLIGENCE
   /healer:slides pitch deck              HTML presentation
   /healer:flow visual                    Brand → design system → review
   /healer:flow identity                  Brand → logo → CIP → system
+
+RECORDING & FLOW TESTING
+  /healer:record                          Reverse-engineer entire app into flow document
+  /healer:record --full --claude-md       Full recording + CLAUDE.md (18 flags, 21 sections)
+  /healer:record --risk                   Record with risk scoring per flow
+  /healer:record --impact src/payment.ts  Show all flows affected by this file
+  /healer:record --diff                   Compare against previous recording
+  /healer:record --user-stories           Generate user stories from flows
+  /healer:record --services --deps        Service map + dependency graph
+  /healer:record --validate               Check if existing record is stale
+  /healer:indulge                         Test every recorded flow (6 dimensions)
+  /healer:indulge --full --dashboard      Full testing + HTML dashboard (22 flags)
+  /healer:indulge --security --contract   Security + API contract testing
+  /healer:indulge --flake-check --trace   Flakiness detection + trace capture
+  /healer:indulge --fixtures              Generate mock fixtures alongside tests
+  /healer:indulge --auto-heal             Auto-fix failing flows
+  /healer:flow record-test                Record → indulge pipeline
+  /healer:flow record-full                Full 10x recording + testing
+  /healer:flow record-onboard             Onboard: record --full --claude-md → report
 
 ADVANCED
   /healer --check                         Assessment only (no changes)
@@ -585,7 +611,9 @@ icon: [implement, push]
 slides: [push, ship]
 design-system: [design, design-review, conform, implement]
 design-review: [design, implement, conform, fix]
-conform: [implement, fix, push]
+conform: [verify, implement, fix, push]
+record: [indulge, verify, test, report, analyze]
+indulge: [fix, test, push, report, coverage]
 flow: []
 help: []
 healer: []
@@ -600,7 +628,8 @@ core: [healer, flow]
 ideation: [validate, brainstorm, research, design, architect, spec, plan, strategy]
 design-intel: [brand, logo, cip, banner, icon, slides, design-system, design-review]
 implementation: [implement, tdd, refactor, optimize]
-quality: [test, coverage, review, audit, conform]
+quality: [test, coverage, review, audit, conform, verify, catchup]
+recording: [record, indulge]
 debug: [debug, fix]
 health: [diagnose, report, analyze]
 shipping: [push, ship, deploy, docs]

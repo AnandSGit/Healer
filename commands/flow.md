@@ -1,5 +1,5 @@
 ---
-description: "Flow orchestrator — chains multiple healer sub-commands into pipelines with gate controls, 14 built-in presets, custom YAML recipes, and smart next-step suggestions. The conductor of the healer orchestra."
+description: "Flow orchestrator — chains multiple healer sub-commands into pipelines with gate controls, 26 built-in presets, custom YAML recipes, and smart next-step suggestions. The conductor of the healer orchestra."
 ---
 
 **ENFORCEMENT: Read and apply all protocols from `${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**
@@ -33,6 +33,14 @@ The user provides: $ARGUMENTS
 /healer:flow full-verify      # Full verification gate: conform !→ verify !→ test !→ review → ship
 /healer:flow pre-ship         # Pre-ship gate: verify !→ review → ship
 /healer:flow catchup          # Gap analysis + fix: catchup → test → review
+/healer:flow record-test      # Record flows + test them: record → indulge !→
+/healer:flow record-full      # Full 10x recording + testing: record --full → indulge --full !→ push
+/healer:flow full-qa          # Complete QA: record → indulge !→ coverage → report
+/healer:flow onboard          # Onboarding (read-only): record → report
+/healer:flow record-secure    # Security-focused: record --risk → indulge --security → audit → report
+/healer:flow record-visual    # Visual audit: record --design-only → indulge --visual --a11y → design-review → report
+/healer:flow record-onboard   # Full onboarding + CLAUDE.md: record --full --claude-md → report
+/healer:flow record-regression # Regression detection: record --diff → indulge --regression → report
 ```
 
 ### Inline Custom Flow
@@ -180,6 +188,8 @@ design-review → design, implement, conform, fix
 conform       → verify, implement, fix, push
 verify        → fix, implement, test, push, ship
 catchup       → test, review, implement, verify, deploy
+record        → indulge, verify, test, report, analyze
+indulge       → fix, test, push, report, coverage
 ```
 
 When `/healer` is called with NO arguments and state exists:

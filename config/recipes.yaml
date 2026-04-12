@@ -430,3 +430,108 @@ flows:
         gate: interactive
       - command: push
         gate: interactive
+
+  # ─────────────────────────────────────────────────
+  # RECORDING & FLOW TESTING (v7 — record + indulge)
+  # ─────────────────────────────────────────────────
+
+  record-test:
+    description: "Record all flows then test every one"
+    steps:
+      - command: record
+        gate: auto
+      - command: indulge
+        gate: must-pass
+
+  record-verify:
+    description: "Record, test flows, then verify requirements"
+    steps:
+      - command: record
+        gate: auto
+      - command: indulge
+        gate: auto
+      - command: verify
+        gate: must-pass
+      - command: push
+        gate: interactive
+
+  full-qa:
+    description: "Complete QA: record, indulge, coverage, report"
+    steps:
+      - command: record
+        gate: auto
+      - command: indulge
+        gate: must-pass
+      - command: coverage
+        gate: auto
+      - command: report
+        gate: auto
+
+  onboard:
+    description: "Onboarding: understand the app (read-only recording)"
+    steps:
+      - command: record
+        gate: auto
+      - command: report
+        gate: auto
+
+  record-full:
+    description: "Full 10x recording + testing with all features"
+    steps:
+      - command: record
+        args: "--full"
+        gate: auto
+      - command: indulge
+        args: "--full"
+        gate: must-pass
+      - command: push
+        gate: interactive
+
+  record-secure:
+    description: "Security-focused recording and testing"
+    steps:
+      - command: record
+        args: "--risk"
+        gate: auto
+      - command: indulge
+        args: "--security --contract"
+        gate: must-pass
+      - command: audit
+        gate: auto
+      - command: report
+        gate: auto
+
+  record-visual:
+    description: "Visual design audit from code"
+    steps:
+      - command: record
+        args: "--design-only"
+        gate: auto
+      - command: indulge
+        args: "--visual --a11y"
+        gate: auto
+      - command: design-review
+        gate: interactive
+      - command: report
+        gate: auto
+
+  record-onboard:
+    description: "Full onboarding with CLAUDE.md generation"
+    steps:
+      - command: record
+        args: "--full --claude-md"
+        gate: auto
+      - command: report
+        gate: auto
+
+  record-regression:
+    description: "Regression detection between runs"
+    steps:
+      - command: record
+        args: "--diff"
+        gate: auto
+      - command: indulge
+        args: "--regression"
+        gate: auto
+      - command: report
+        gate: auto

@@ -1,5 +1,5 @@
 ---
-description: "Full autonomous codebase engine — discover, understand, assess, research, plan, execute, and verify any project in any language on any platform. 38 sub-commands, 14 flow presets, design intelligence."
+description: "Full autonomous codebase engine — discover, understand, assess, research, plan, execute, and verify any project in any language on any platform. 41 sub-commands, 26 flow presets, design intelligence, 10x recording & flow testing."
 ---
 
 # Healer v6 — Universal Autonomous Codebase Health & Development Engine
@@ -58,6 +58,10 @@ Specialized modes for targeted work. Each auto-detects the stack using the same 
 /healer:strategy [plan]              # CEO-level strategic review — scope, assumptions, 10x thinking
 /healer:flow [preset|chain]          # Flow orchestrator — chain commands into pipelines
 /healer:help [topic|command]         # Interactive help — commands, flows, recipes, gates, examples
+
+# Recording & Flow Testing commands (v7 — reverse engineering + systematic testing)
+/healer:record [module|--flags]      # Reverse-engineer app into requirements + flow document (10x: Mermaid, risk, timeline, impact, diff, CLAUDE.md gen)
+/healer:indulge [flow IDs|--flags]   # Systematic flow-by-flow testing (10x: visual regression, a11y, security, perf, auto-heal, dashboard)
 
 # Design Intelligence commands (v6 — integrated from UI-UX-Pro-Max)
 /healer:brand [product]              # Brand voice, visual identity, messaging framework
