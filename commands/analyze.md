@@ -2,6 +2,8 @@
 description: "Analyze codebase health — patterns, tech debt, dependencies, and quality compared against industry best practices from online sources."
 ---
 
+<!-- Help metadata: data/commands.yaml -->
+
 # Healer: Analyze
 
 **ENFORCEMENT: Read and apply all protocols from `${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**

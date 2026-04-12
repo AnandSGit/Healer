@@ -10,8 +10,8 @@ CLAUDE_COMMANDS="$HOME/.claude/commands"
 HEALER_CONFIG="$HOME/.healer"
 
 echo "═══════════════════════════════════════════════════"
-echo "  Healer v7 — Universal Development Lifecycle Engine"
-echo "  with Design Intelligence + 10x Recording & Flow Testing"
+echo "  Healer v7.1 — Universal Development Lifecycle Engine"
+echo "  with Postfix \`?\` Help + Self-Validating Catalog"
 echo "  41 commands | 26 flow presets | 36+ recipes"
 echo "  161 palettes | 57 fonts | 99 UX guidelines"
 echo "═══════════════════════════════════════════════════"
@@ -125,6 +125,35 @@ echo "  ✅ State directories created"
 echo "Installing documentation..."
 cp "$SCRIPT_DIR/docs/healer-user-guide.html" "$HEALER_CONFIG/" 2>/dev/null || true
 echo "  ✅ Documentation installed"
+
+# ─── Step 4: Install Python dependencies for help catalog ───
+echo "Installing help catalog dependencies (PyYAML + jsonschema)..."
+if python3 -c "import yaml, jsonschema" 2>/dev/null; then
+  echo "  ✅ Dependencies already present"
+else
+  pip3 install --quiet --user pyyaml jsonschema 2>&1 | tail -3 || {
+    echo "  ⚠️  Failed to install help catalog dependencies."
+    echo "      The `?` postfix help system requires PyYAML and jsonschema."
+    echo "      Install manually: pip3 install --user pyyaml jsonschema"
+  }
+  if python3 -c "import yaml, jsonschema" 2>/dev/null; then
+    echo "  ✅ Dependencies installed"
+  fi
+fi
+
+# ─── Step 5: Build help index ───
+echo "Building help catalog index..."
+if bash "$SCRIPT_DIR/scripts/build-help-index.sh" >/dev/null 2>&1; then
+  INDEX_SIZE=$(wc -c < "$SCRIPT_DIR/data/help-index.json" 2>/dev/null | tr -d ' ')
+  if [ -n "$INDEX_SIZE" ]; then
+    INDEX_KB=$((INDEX_SIZE / 1024))
+    echo "  ✅ Help index built ($INDEX_KB KB)"
+    echo "  ✨ Try: /healer:flow ?  (or any /healer:<command> ?)"
+  fi
+else
+  echo "  ⚠️  Help index build failed — `?` postfix help may be slow."
+  echo "      Run manually: bash $SCRIPT_DIR/scripts/build-help-index.sh"
+fi
 
 # Count plugin assets (accessed via ${CLAUDE_PLUGIN_ROOT})
 CSV_COUNT=$(find "$SCRIPT_DIR/data" -name "*.csv" 2>/dev/null | wc -l | tr -d ' ')

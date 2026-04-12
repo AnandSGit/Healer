@@ -2,6 +2,8 @@
 description: "CEO-level strategic review -- evaluates plans and designs for scope fitness, dangerous assumptions, 10x thinking, competitor landscape, and vitamin-vs-painkiller analysis. Use after brainstorming, before implementation."
 ---
 
+<!-- Help metadata: data/commands.yaml -->
+
 # Healer: Strategy
 
 **ENFORCEMENT: Read and apply all protocols from `${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**

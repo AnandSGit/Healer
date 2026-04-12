@@ -2,6 +2,8 @@
 description: "Research-augmented performance investigation — 10-phase structured workflow with baselines, profiling, hypothesis testing, controlled experiments, and evidence-backed optimization. Stores baseline artifacts for tracking over time."
 ---
 
+<!-- Help metadata: data/commands.yaml -->
+
 # Healer: Optimize
 
 **ENFORCEMENT: Read and apply all protocols from `${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**

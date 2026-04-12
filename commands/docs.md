@@ -2,6 +2,8 @@
 description: "Research-augmented documentation generation — auto-generates README, API docs, architecture docs, component docs, and setup guides by analyzing code and comparing against best-in-class open source documentation."
 ---
 
+<!-- Help metadata: data/commands.yaml -->
+
 # Healer: Docs
 
 **ENFORCEMENT: Read and apply all protocols from `${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**

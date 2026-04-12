@@ -2,6 +2,8 @@
 description: "Research-augmented security and quality audit — scans for OWASP top 10 vulnerabilities, accessibility issues, dependency vulnerabilities, and license conflicts using CVE databases and public advisories."
 ---
 
+<!-- Help metadata: data/commands.yaml -->
+
 # Healer: Audit
 
 **ENFORCEMENT: Read and apply all protocols from `${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**

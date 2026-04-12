@@ -1,0 +1,1136 @@
+# Healer Flow Preset Catalog — Source of Truth for `/healer:flow ?`
+# ───────────────────────────────────────────────────────────────────
+# Schema: data/schema/flow.schema.json
+# Built-in presets only. User-local recipes live in ~/.healer/recipes.yaml
+# and are resolved at runtime by the interceptor.
+
+feature:
+  purpose: |
+    Full feature development lifecycle — takes an idea from exploration
+    through shipping, with interactive checkpoints at critical decision
+    points. Use this when building a new feature from scratch and you want
+    research-augmented code with review gates.
+  what_it_does: |
+    Chains 6 sub-commands (brainstorm → plan → implement → test → review → ship)
+    with gates: brainstorm/plan/review are interactive (you approve before
+    moving on), implement is auto-continue, test and ship are must-pass
+    (halt the flow on failure).
+  input:
+    syntax: /healer:flow feature [topic]
+    args:
+      - name: topic
+        desc: Short noun-phrase describing the feature (5–10 words)
+        required: false
+    valid:
+      - user authentication with OAuth2
+      - admin analytics dashboard
+      - payment processing via Stripe
+    invalid:
+      - text: auth
+        why: too vague — brainstorm will loop on clarification
+      - text: build something cool
+        why: no domain context — cannot seed research
+  steps:
+    - command: brainstorm
+      gate: interactive
+      produces: ~/.healer/brainstorms/<topic>.md
+    - command: plan
+      gate: interactive
+      produces: docs/plans/<date>-<topic>.md
+    - command: implement
+      gate: auto
+      produces: code changes + research notes
+    - command: test
+      gate: must-pass
+      produces: passing test suite (enforced)
+    - command: review
+      gate: interactive
+      produces: review-notes.md
+    - command: ship
+      gate: must-pass
+      produces: merged PR + deployment
+  example:
+    command: /healer:flow feature user authentication with OAuth2
+    trace:
+      - 'Step 1 (brainstorm): asks Socratic questions about provider choice, MFA, token storage'
+      - 'Step 2 (plan): converts requirements into 12–20 concrete tasks with file paths'
+      - 'Step 3 (implement): writes code task-by-task, researching OAuth2 RFC + library docs'
+      - 'Step 4 (test): runs suite; must-pass halts the flow if any test fails'
+      - 'Step 5 (review): checks diff against OWASP auth guidelines; interactive approval'
+      - 'Step 6 (ship): creates PR, waits for CI, merges, deploys; must-pass on CI/deploy'
+    why_this_example: |
+      OAuth2 authentication exercises all 6 steps with realistic scope — security
+      review is meaningful, must-pass gates are warranted, and the topic survives
+      end-to-end as branch name, PR title, and research seed.
+  input_purpose: |
+    The [topic] argument is load-bearing: it seeds brainstorm with focus,
+    becomes the plan title (stored in .healer/state.json), becomes the git
+    branch name, becomes the PR title at ship step, and shapes research
+    queries throughout. A specific topic = clean propagation; a vague topic
+    causes brainstorm to loop on clarification.
+  after:
+    next:
+      - report
+      - deploy
+    sister_presets:
+      - brand-to-prod
+      - tdd
+      - conform
+    on_failure: must-pass halt → run /healer:fix or /healer:debug, then /healer:flow to resume
+fix:
+  purpose: |
+    Diagnose and fix issues in a single pipeline — runs full diagnostic
+    health check, walks through systematic debugging, applies targeted
+    fixes, verifies via tests, then offers to push.
+  what_it_does: |
+    Chains 5 sub-commands (diagnose → debug → fix → test → push) with
+    auto gates between most steps, must-pass on test, and interactive on
+    push. Uses 'unit' as default fix args.
+  input:
+    syntax: /healer:flow fix [issue-description]
+    args:
+      - name: issue-description
+        desc: Optional context about what's broken
+        required: false
+    valid:
+      - login redirect loop after session expires
+      - flaky test in checkout module
+      - ''
+    invalid:
+      - text: broken
+        why: no actionable signal; fix has nothing to target
+  steps:
+    - command: diagnose
+      gate: auto
+      produces: health report
+    - command: debug
+      gate: auto
+      produces: hypothesis + reproduction
+    - command: fix
+      gate: auto
+      args: unit
+      produces: code fix + immediate verification
+    - command: test
+      gate: must-pass
+      produces: all tests passing
+    - command: push
+      gate: interactive
+      produces: commit + push to current branch
+  example:
+    command: /healer:flow fix flaky test in checkout module
+    trace:
+      - 'Step 1 (diagnose): runs all test suites, identifies checkout test as failing intermittently'
+      - 'Step 2 (debug): forms hypothesis (race condition on cart state), reproduces with --runs=10'
+      - 'Step 3 (fix unit): adds explicit await + state lock, verifies fix resolves the flake'
+      - 'Step 4 (test): runs full suite to ensure no regression; must-pass enforces clean state'
+      - 'Step 5 (push): asks for confirmation before committing the fix'
+    why_this_example: |
+      Flaky tests are the canonical fix-flow trigger — diagnose surfaces them,
+      debug isolates the cause, fix targets the specific code path, and
+      test must-pass guards against introducing new flakes.
+  input_purpose: |
+    The optional [issue-description] is forwarded to debug as context.
+    With no description, diagnose's output drives debug. The description
+    helps debug skip its hypothesis-generation loop when the user already
+    has a strong guess about what's broken.
+  after:
+    next:
+      - ship
+      - deploy
+    sister_presets:
+      - verify
+      - catchup
+    on_failure: test must-pass halt → fix didn't work or introduced regression; re-run /healer:debug
+ideate:
+  purpose: |
+    Full ideation pipeline from validation to plan — takes an idea through
+    demand validation, Socratic brainstorming, deep research, design,
+    strategic review, technical specification, and bite-sized planning.
+    The most thorough way to start something new.
+  what_it_does: |
+    Chains 7 sub-commands (validate → brainstorm → research → design →
+    strategy → spec → plan), all with interactive gates except research
+    (auto). Each step produces an artifact that the next step consumes.
+    Halt-and-resume friendly via .healer/state.json.
+  input:
+    syntax: /healer:flow ideate [topic]
+    args:
+      - name: topic
+        desc: Idea or problem to ideate on
+        required: false
+    valid:
+      - self-validating command help system
+      - B2B SaaS for restaurant inventory
+      - developer onboarding automation
+    invalid:
+      - text: make money
+        why: not an ideation seed; needs problem or product framing
+  steps:
+    - command: validate
+      gate: interactive
+      produces: demand validation report
+    - command: brainstorm
+      gate: interactive
+      produces: ~/.healer/brainstorms/<topic>.md
+    - command: research
+      gate: auto
+      produces: ~/.healer/research/<topic>.md
+    - command: design
+      gate: interactive
+      produces: docs/designs/<date>-<topic>.md
+    - command: strategy
+      gate: interactive
+      produces: scope/10x review notes
+    - command: spec
+      gate: interactive
+      produces: docs/specs/<date>-<topic>.md
+    - command: plan
+      gate: interactive
+      produces: docs/plans/<date>-<topic>.md
+  example:
+    command: /healer:flow ideate self-validating command help system
+    trace:
+      - 'Step 1 (validate): asks YC-style demand questions; for internal tooling, often skipped with justification'
+      - 'Step 2 (brainstorm): explores 3 architectural variants (per-command, shared layer, hook-based)'
+      - 'Step 3 (research): WebSearches kubectl explain, oclif help classes, Claude Code hooks'
+      - 'Step 4 (design): produces concrete file layout, schema, interceptor pseudocode'
+      - 'Step 5 (strategy): CEO-level scope review — 1x vs 10x, vitamin vs painkiller'
+      - 'Step 6 (spec): writes FRs, NFRs, acceptance tests, traceability matrix'
+      - 'Step 7 (plan): bite-sized task list with dependencies, effort estimates, AT mapping'
+    why_this_example: |
+      The self-validating help system is exactly the kind of meta-tooling
+      improvement where ideate's full rigor pays off — the strategy gate
+      in particular catches simplicity-bias and forces the right architectural
+      choice.
+  input_purpose: |
+    The [topic] flows through every step, becoming progressively more
+    concrete: validate frames it as a problem, brainstorm explores
+    approaches, research adds external evidence, design names files,
+    spec adds acceptance tests, plan adds tasks. Each artifact references
+    the upstream ones via the traceability protocol.
+  after:
+    next:
+      - implement
+      - tdd
+    sister_presets:
+      - research
+      - feature
+    on_failure: interactive gate declined → flow PAUSED, resumable via /healer:flow
+deploy:
+  purpose: Safe deployment pipeline — pre-deploy diagnostic gate, code review checkpoint, then ship to
+    production. Use when you want gate checks before shipping rather than blind deploy.
+  what_it_does: Chains 3 sub-commands (diagnose → review → ship) with diagnose as must-pass, review as
+    interactive, ship as must-pass. Halts on any failing test or unapproved review.
+  input:
+    syntax: /healer:flow deploy
+    args: []
+    valid:
+      - ''
+    invalid: []
+  steps:
+    - command: diagnose
+      gate: must-pass
+      produces: health report (must be green)
+    - command: review
+      gate: interactive
+      produces: review-notes.md (you approve)
+    - command: ship
+      gate: must-pass
+      produces: merged PR + production deploy
+  example:
+    command: /healer:flow deploy
+    trace:
+      - 'Step 1 (diagnose): runs all suites — must be green to proceed'
+      - 'Step 2 (review): inspects the diff; you approve before ship'
+      - 'Step 3 (ship): creates PR, merges, deploys, monitors for 5 min'
+    why_this_example: Deploy flow is the standard "I have changes ready, ship them safely" pattern; demonstrates
+      dual must-pass gating around an interactive checkpoint.
+  input_purpose: Deploy takes no arguments — it operates on the current branch state. The diagnose gate
+    ensures broken code does not deploy; the review gate ensures unverified code does not deploy.
+  after:
+    next: []
+    sister_presets:
+      - ship
+      - pre-ship
+    on_failure: must-pass halt → fix issue and restart, or use /healer:ship for a forced single-step deploy
+      with caution
+audit:
+  purpose: Comprehensive health audit — analyze patterns, scan security, measure coverage, generate a
+    formal report. Use for periodic codebase health checks or pre-release validation.
+  what_it_does: Chains 4 sub-commands (analyze → audit → coverage → report) all with auto gates. Each
+    step contributes a different lens; the final report aggregates findings.
+  input:
+    syntax: /healer:flow audit
+    args: []
+    valid:
+      - ''
+    invalid: []
+  steps:
+    - command: analyze
+      gate: auto
+      produces: patterns + tech debt report
+    - command: audit
+      gate: auto
+      produces: security + a11y + deps report
+    - command: coverage
+      gate: auto
+      produces: test coverage + gap list
+    - command: report
+      gate: auto
+      produces: aggregated health report
+  example:
+    command: /healer:flow audit
+    trace:
+      - 'analyze: identifies 3 god classes, 5 outdated deps'
+      - 'audit: finds 2 high CVEs in transitive deps, 1 SQLi pattern'
+      - 'coverage: 67% line, 42% branch — 4 untested critical paths'
+      - 'report: generates health-report.html with overall grade B-'
+    why_this_example: Quarterly audit pattern — exposes the multi-lens approach without modifying any
+      code (read-only by design).
+  input_purpose: Audit takes no arguments — it scans the entire codebase. For scoped audits, run individual
+    sub-commands with arguments.
+  after:
+    next:
+      - fix
+      - refactor
+    sister_presets:
+      - morning
+    on_failure: all auto gates — never halts; failures appear in the report
+morning:
+  purpose: Quick morning health check — runs diagnose and produces a health report. Use as a daily startup
+    ritual to catch regressions early.
+  what_it_does: Chains 2 sub-commands (diagnose → report) with auto gates. ~30 seconds end-to-end.
+  input:
+    syntax: /healer:flow morning
+    args: []
+    valid:
+      - ''
+    invalid: []
+  steps:
+    - command: diagnose
+      gate: auto
+      produces: fast health snapshot
+    - command: report
+      gate: auto
+      produces: health-report.md with grade
+  example:
+    command: /healer:flow morning
+    trace:
+      - 'diagnose: tests pass, 1 lint warning, types clean'
+      - 'report: writes health-report.md with grade A-'
+    why_this_example: Morning ritual — fast, read-only, reveals overnight regressions before they compound.
+  input_purpose: No arguments — designed for zero-friction daily use.
+  after:
+    next:
+      - fix
+      - deploy
+    sister_presets:
+      - audit
+    on_failure: never halts; report contains any failures
+refactor:
+  purpose: Research-backed code improvement — analyze first, plan refactor, execute, test, review, push.
+    Use when tech debt has accumulated and you want a structured cleanup.
+  what_it_does: Chains 6 sub-commands (analyze → plan → refactor → test → review → push) with mixed gates.
+    Test is must-pass to prevent regression; plan/review/push are interactive.
+  input:
+    syntax: /healer:flow refactor [target]
+    args:
+      - name: target
+        desc: File or module to focus on
+        required: false
+    valid:
+      - src/payments/
+      - the auth middleware
+    invalid:
+      - text: all the code
+        why: unbounded — refactor needs scoped targets to verify
+  steps:
+    - command: analyze
+      gate: auto
+      produces: patterns + tech debt report
+    - command: plan
+      gate: interactive
+      produces: refactor task list
+    - command: refactor
+      gate: auto
+      produces: code improvements
+    - command: test
+      gate: must-pass
+      produces: all tests passing
+    - command: review
+      gate: interactive
+      produces: review-notes.md
+    - command: push
+      gate: interactive
+      produces: commit + push
+  example:
+    command: /healer:flow refactor src/payments/
+    trace:
+      - 'analyze: surfaces god class, deep nesting, missing types'
+      - 'plan: 8 refactor tasks ordered by dependency'
+      - 'refactor: executes tasks, applies clean code patterns'
+      - 'test: must-pass — proves no regression'
+      - 'review + push: standard finish'
+    why_this_example: Payment refactor is the canonical bounded-scope cleanup; demonstrates analyze-driven
+      planning.
+  input_purpose: '[target] scopes the refactor. Required for verifiability — refactoring code without
+    test coverage in scope is unsafe.'
+  after:
+    next:
+      - ship
+      - deploy
+    sister_presets:
+      - feature
+      - tdd
+    on_failure: test must-pass → halt; refactor introduced regression, revert and re-plan
+tdd:
+  purpose: Test-driven development flow — plan → tdd → coverage → review → push. Use when implementing
+    new features and you want test-first discipline.
+  what_it_does: Chains 5 sub-commands. Plan is interactive (you approve scope), tdd executes the Red-Green-Refactor
+    loop, coverage checks gaps, review/push finish.
+  input:
+    syntax: /healer:flow tdd [feature]
+    args:
+      - name: feature
+        desc: Feature to TDD
+        required: false
+    valid:
+      - shopping cart logic
+      - user role permissions
+    invalid: []
+  steps:
+    - command: plan
+      gate: interactive
+      produces: task list
+    - command: tdd
+      gate: auto
+      produces: tests + implementation per task
+    - command: coverage
+      gate: auto
+      produces: coverage gap list
+    - command: review
+      gate: interactive
+      produces: review-notes.md
+    - command: push
+      gate: interactive
+      produces: commit + push
+  example:
+    command: /healer:flow tdd shopping cart logic
+    trace:
+      - 'plan: 6 tasks (add, remove, update, total, persist, sync)'
+      - 'tdd: red-green-refactor cycle for each task'
+      - 'coverage: 95% line, 88% branch — 1 edge case missing'
+      - 'review + push: standard finish'
+    why_this_example: Shopping cart has clear unit-testable behaviors; TDD shines when behaviors are well-defined.
+  input_purpose: '[feature] anchors the TDD work. Required for meaningful planning — TDD on a vague feature
+    loops on test design.'
+  after:
+    next:
+      - ship
+      - deploy
+    sister_presets:
+      - feature
+    on_failure: all gates allow halt-and-resume; loop continues from last task
+research:
+  purpose: Deep research to specification — research → brainstorm → design → spec. Use when entering an
+    unknown technical area and you need from-scratch understanding before designing.
+  what_it_does: Chains 4 sub-commands. Research auto-runs (gathers external knowledge), then brainstorm/design
+    are interactive (you steer), spec auto-finalizes.
+  input:
+    syntax: /healer:flow research [topic]
+    args:
+      - name: topic
+        desc: Subject to research and design
+        required: false
+    valid:
+      - WebSocket scaling at 100k
+      - event sourcing for orders
+    invalid: []
+  steps:
+    - command: research
+      gate: auto
+      produces: ~/.healer/research/<topic>.md
+    - command: brainstorm
+      gate: interactive
+      produces: ~/.healer/brainstorms/<topic>.md
+    - command: design
+      gate: interactive
+      produces: docs/designs/<date>-<topic>.md
+    - command: spec
+      gate: auto
+      produces: docs/specs/<date>-<topic>.md
+  example:
+    command: /healer:flow research event sourcing for orders
+    trace:
+      - 'research: gathers Martin Fowler, EventStore, Kafka patterns'
+      - 'brainstorm: explores 3 approaches with research as input'
+      - 'design: produces concrete event schema + projection design'
+      - 'spec: writes acceptance tests for event handlers'
+    why_this_example: Event sourcing is exactly the kind of unfamiliar territory where research-first
+      pays off; demonstrates external knowledge → internal design.
+  input_purpose: '[topic] flows through all 4 steps as the subject of investigation. Each step refines
+    understanding from external knowledge to internal spec.'
+  after:
+    next:
+      - plan
+      - implement
+    sister_presets:
+      - ideate
+      - feature
+    on_failure: interactive gates allow halt-and-resume
+visual:
+  purpose: Visual design pipeline with brand awareness — brand → design-system → design → design-review.
+    Use for new product visual identity establishment.
+  what_it_does: Chains 4 design-intel sub-commands; first 3 are interactive (you steer), final review
+    is auto.
+  input:
+    syntax: /healer:flow visual [project]
+    args:
+      - name: project
+        desc: Project to design for
+        required: false
+    valid:
+      - HearthHut web app
+      - mobile fitness tracker
+    invalid: []
+  steps:
+    - command: brand
+      gate: interactive
+      produces: brand-guidelines.md
+    - command: design-system
+      gate: interactive
+      produces: DESIGN.md + HTML previews
+    - command: design
+      gate: interactive
+      produces: feature designs aligned with system
+    - command: design-review
+      gate: auto
+      produces: scored design-review report
+  example:
+    command: /healer:flow visual HearthHut web app
+    trace:
+      - 'brand: warm community voice + matte orange/sage palette'
+      - 'design-system: typography + spacing + components from brand'
+      - 'design: applies system to 3 priority pages'
+      - 'design-review: rates each page across 7 dimensions'
+    why_this_example: New product visual establishment — brand decisions cascade through every step, demonstrating
+      brand-aware design.
+  input_purpose: '[project] anchors brand decisions. Different projects under same company often need
+    separate visual flows.'
+  after:
+    next:
+      - implement
+    sister_presets:
+      - identity
+      - brand-to-prod
+    on_failure: interactive gates allow halt-and-resume
+identity:
+  purpose: Brand identity pipeline — brand voice → logo → CIP → design system. Use for full corporate
+    identity establishment.
+  what_it_does: 'Chains 4 sub-commands all interactive. Each builds on the previous: brand defines voice,
+    logo embodies it, CIP scales it, design system codifies it.'
+  input:
+    syntax: /healer:flow identity [brand]
+    args:
+      - name: brand
+        desc: Brand or company name
+        required: false
+    valid:
+      - HearthHut
+      - fintech startup, B2B
+    invalid: []
+  steps:
+    - command: brand
+      gate: interactive
+      produces: brand-guidelines.md
+    - command: logo
+      gate: interactive
+      produces: logo-brief.md
+    - command: cip
+      gate: interactive
+      produces: 50+ deliverable checklist + style-guide.md
+    - command: design-system
+      gate: interactive
+      produces: DESIGN.md + previews
+  example:
+    command: /healer:flow identity HearthHut
+    trace:
+      - 'brand: voice + palette + typography direction'
+      - 'logo: wordmark + mark with color psychology'
+      - 'cip: business cards, letterhead, social, slides templates'
+      - 'design-system: codified tokens + components for product'
+    why_this_example: Full identity establishment for a new brand — the canonical path from voice to product
+      UI.
+  input_purpose: '[brand] is the central identity. All four sub-commands reference it; consistency is
+    what makes the identity coherent.'
+  after:
+    next:
+      - implement
+    sister_presets:
+      - visual
+      - brand-to-prod
+    on_failure: interactive gates allow halt-and-resume
+brand-to-prod:
+  purpose: Full brand-aware feature development — brand → design-system → design → implement → test →
+    review → ship. Use for new product launch where brand and product must ship together.
+  what_it_does: Chains 7 sub-commands. The first 3 establish design fidelity; the next 4 ship the feature
+    with that fidelity baked in.
+  input:
+    syntax: /healer:flow brand-to-prod [feature]
+    args:
+      - name: feature
+        desc: Feature to build with brand-awareness
+        required: false
+    valid:
+      - onboarding flow for HearthHut
+      - pricing page
+    invalid: []
+  steps:
+    - command: brand
+      gate: interactive
+      produces: brand-guidelines.md
+    - command: design-system
+      gate: interactive
+      produces: DESIGN.md
+    - command: design
+      gate: interactive
+      produces: feature design
+    - command: implement
+      gate: auto
+      produces: code
+    - command: test
+      gate: must-pass
+      produces: passing tests
+    - command: review
+      gate: interactive
+      produces: review-notes.md
+    - command: ship
+      gate: must-pass
+      produces: merged PR + production
+  example:
+    command: /healer:flow brand-to-prod onboarding flow for HearthHut
+    trace:
+      - 'brand → design-system → design: brand fidelity established'
+      - 'implement: builds onboarding with brand colors and components'
+      - 'test: must-pass — including visual regression'
+      - 'review + ship: ships brand-aware onboarding to production'
+    why_this_example: New product launches benefit from brand-aware ship paths; demonstrates fidelity
+      propagation from voice to live product.
+  input_purpose: '[feature] is the launchable unit. Brand decisions made in this flow apply globally;
+    same brand reused for next feature.'
+  after:
+    next:
+      - report
+    sister_presets:
+      - feature
+      - visual
+    on_failure: must-pass halts on test or ship; brand decisions persist
+conform:
+  purpose: Design conformance gate around implementation — conform → implement → conform → test → push.
+    Use for UI work where pixel-perfect design fidelity is required.
+  what_it_does: Conform-checks the design BEFORE implementation, executes implementation, conform-checks
+    AFTER. Test gate must-pass prevents shipping visual regressions.
+  input:
+    syntax: /healer:flow conform [feature]
+    args:
+      - name: feature
+        desc: Feature to build with conformance gates
+        required: false
+    valid:
+      - landing page redesign
+      - pricing component update
+    invalid: []
+  steps:
+    - command: conform
+      gate: must-pass
+      produces: pre-impl design conformance report
+    - command: implement
+      gate: auto
+      produces: code matching the spec
+    - command: conform
+      gate: must-pass
+      produces: post-impl conformance verified
+    - command: test
+      gate: must-pass
+      produces: tests passing
+    - command: push
+      gate: interactive
+      produces: commit + push
+  example:
+    command: /healer:flow conform landing page redesign
+    trace:
+      - 'conform (pre): verifies DESIGN.md spec is well-formed'
+      - 'implement: builds per spec'
+      - 'conform (post): pixel-perfect check vs spec — must-pass'
+      - 'test + push: standard finish'
+    why_this_example: Landing pages have detailed design specs; conform around implementation prevents
+      drift from shipping.
+  input_purpose: '[feature] is the UI to build. Conform gates only make sense with a corresponding DESIGN.md
+    spec; flow halts if no spec exists.'
+  after:
+    next:
+      - ship
+      - deploy
+    sister_presets:
+      - brand-to-prod
+      - full-verify
+    on_failure: must-pass halts → fix conformance, do not push drift to production
+verify:
+  purpose: Requirement verification + autonomous fix — verify (must-pass) → push. Use as a final pre-ship
+    gate to ensure all spec requirements are demonstrably working.
+  what_it_does: /healer:verify reads all upstream artifacts, traces requirements through code, dispatches
+    fixes via sub-commands, loops until 100% coverage. Push only after verify is green.
+  input:
+    syntax: /healer:flow verify [scope]
+    args:
+      - name: scope
+        desc: Optional artifact or feature
+        required: false
+    valid:
+      - OAuth2 login
+      - ''
+    invalid: []
+  steps:
+    - command: verify
+      gate: must-pass
+      produces: requirement traceability + 9-dim verification
+    - command: push
+      gate: interactive
+      produces: commit + push
+  example:
+    command: /healer:flow verify OAuth2 login
+    trace:
+      - 'verify: traces 15 requirements; finds 1 missing; dispatches /healer:implement; loops; converges
+        at 15/15'
+      - 'push: standard finish'
+    why_this_example: Verify-then-push is the minimal pre-ship rigor; demonstrates the autonomous fix-loop.
+  input_purpose: '[scope] focuses verification. With no scope, all artifacts are verified.'
+  after:
+    next:
+      - ship
+      - deploy
+    sister_presets:
+      - pre-ship
+      - full-verify
+    on_failure: verify must-pass halts; loop didn't converge in 5 iterations
+full-verify:
+  purpose: Visual + behavioral verification before shipping — conform (must-pass) → verify (must-pass)
+    → test (must-pass) → review → ship. Use for the most rigorous pre-production gate.
+  what_it_does: 'Triple-must-pass gate: conform validates visual fidelity, verify validates behavioral
+    requirements, test validates the test suite. Then review (interactive) and ship (must-pass).'
+  input:
+    syntax: /healer:flow full-verify
+    args: []
+    valid:
+      - ''
+    invalid: []
+  steps:
+    - command: conform
+      gate: must-pass
+      produces: visual conformance report
+    - command: verify
+      gate: must-pass
+      produces: requirement traceability
+    - command: test
+      gate: must-pass
+      produces: all tests passing
+    - command: review
+      gate: interactive
+      produces: review-notes.md
+    - command: ship
+      gate: must-pass
+      produces: merged PR + production deploy
+  example:
+    command: /healer:flow full-verify
+    trace:
+      - 'conform: visual fidelity check vs DESIGN.md — passes'
+      - 'verify: 15/15 requirements traceable and working — passes'
+      - 'test: full suite green'
+      - 'review + ship: standard finish'
+    why_this_example: Pre-launch rigor — three independent verification dimensions before production.
+      Most rigorous gate possible.
+  input_purpose: No arguments — full-verify operates on the entire spec/design/test surface.
+  after:
+    next: []
+    sister_presets:
+      - pre-ship
+      - verify
+    on_failure: any must-pass halt → fix specific gate failure, do not bypass
+pre-ship:
+  purpose: Pre-ship gate to production — verify → review → ship. Use when you want one structured pre-flight
+    before deploying.
+  what_it_does: Shorter than full-verify. Verify is must-pass, review is interactive, ship is must-pass.
+  input:
+    syntax: /healer:flow pre-ship
+    args: []
+    valid:
+      - ''
+    invalid: []
+  steps:
+    - command: verify
+      gate: must-pass
+      produces: requirement traceability
+    - command: review
+      gate: interactive
+      produces: review-notes.md
+    - command: ship
+      gate: must-pass
+      produces: merged + deployed
+  example:
+    command: /healer:flow pre-ship
+    trace:
+      - 'verify: requirements all traceable and working'
+      - 'review: code review checkpoint'
+      - 'ship: PR + merge + deploy'
+    why_this_example: Standard pre-ship pattern — lighter than full-verify, more rigorous than just /healer:ship.
+  input_purpose: No arguments — operates on current branch state.
+  after:
+    next: []
+    sister_presets:
+      - verify
+      - full-verify
+    on_failure: must-pass halts on verify or ship
+catchup:
+  purpose: Gap analysis + auto-fix — catchup → test → review. Use when artifacts have drifted from implementation
+    and you want to close the gaps.
+  what_it_does: Catchup reads all artifacts, identifies gaps, fixes them in severity order. Test must-pass
+    enforces no regression. Review is interactive.
+  input:
+    syntax: /healer:flow catchup [filter]
+    args:
+      - name: filter
+        desc: Severity filter for catchup (high|medium|low|all)
+        required: false
+    valid:
+      - high
+      - all
+    invalid: []
+  steps:
+    - command: catchup
+      gate: auto
+      produces: gap report + fixes applied
+    - command: test
+      gate: must-pass
+      produces: all tests passing
+    - command: review
+      gate: interactive
+      produces: review-notes.md
+  example:
+    command: /healer:flow catchup high
+    trace:
+      - 'catchup: 7 high-severity gaps — fixes each'
+      - 'test: must-pass — proves fixes work without regression'
+      - 'review: confirm before push'
+    why_this_example: Periodic catchup to address artifact drift; high filter is the typical incremental
+      use.
+  input_purpose: '[filter] limits scope. Without filter, catchup attempts all gaps which can be a long-running
+    operation.'
+  after:
+    next:
+      - push
+      - ship
+    sister_presets:
+      - verify
+      - audit
+    on_failure: test must-pass → catchup introduced regression; revert and re-plan
+record-test:
+  purpose: Record flows + test them — record → indulge (must-pass). Use for app reverse-engineering followed
+    by exhaustive flow testing.
+  what_it_does: Records the app into flows, then tests every flow across 6 dimensions. Indulge is must-pass
+    — flow halts if any flow fails.
+  input:
+    syntax: /healer:flow record-test
+    args: []
+    valid:
+      - ''
+    invalid: []
+  steps:
+    - command: record
+      gate: auto
+      produces: record.md with all flows
+    - command: indulge
+      gate: must-pass
+      produces: tests for every flow × 6 dimensions
+  example:
+    command: /healer:flow record-test
+    trace:
+      - 'record: 8-layer discovery → 47 flows mapped'
+      - 'indulge: 47 × 6 = 282 test cases generated and run'
+      - must-pass halts if any test fails
+    why_this_example: Standard record-and-test pattern — establishes coverage where there was none.
+  input_purpose: No arguments — operates on the current codebase comprehensively.
+  after:
+    next:
+      - push
+      - fix
+    sister_presets:
+      - record-full
+      - full-qa
+    on_failure: indulge must-pass → tests fail; fix flows or accept temporary divergence
+record-full:
+  purpose: Full 10x recording + testing — record --full → indulge --full (must-pass) → push. Use for comprehensive
+    app analysis with all bells and whistles.
+  what_it_does: Enables every record flag (Mermaid diagrams, risk scoring, git timeline, impact analysis,
+    dead code, diff, CLAUDE.md, OpenAPI). Then full indulge (visual, a11y, security, perf, contract).
+    Then push.
+  input:
+    syntax: /healer:flow record-full
+    args: []
+    valid:
+      - ''
+    invalid: []
+  steps:
+    - command: record
+      gate: auto
+      args: --full
+      produces: comprehensive record + CLAUDE.md + Mermaid + risk scores
+    - command: indulge
+      gate: must-pass
+      args: --full
+      produces: comprehensive test suite + dashboard
+    - command: push
+      gate: interactive
+      produces: commit + push
+  example:
+    command: /healer:flow record-full
+    trace:
+      - 'record --full: 47 flows, Mermaid diagrams, risk scores, OpenAPI spec'
+      - 'indulge --full: 282 base + visual + a11y + security + perf tests'
+      - 'push: ships the comprehensive analysis'
+    why_this_example: Maximum-rigor record-and-test for high-stakes codebases (financial, healthcare,
+      security-critical).
+  input_purpose: No arguments — all 10x flags pre-enabled in the flow.
+  after:
+    next: []
+    sister_presets:
+      - record-test
+      - full-qa
+    on_failure: indulge must-pass halts; comprehensive failure list to address
+full-qa:
+  purpose: Complete QA pipeline — record → indulge (must-pass) → coverage → report. Use as a comprehensive
+    QA pass before major releases.
+  what_it_does: Records flows, tests them rigorously, measures coverage afterward, produces formal report.
+    End-to-end QA artifact generation.
+  input:
+    syntax: /healer:flow full-qa
+    args: []
+    valid:
+      - ''
+    invalid: []
+  steps:
+    - command: record
+      gate: auto
+      produces: record.md
+    - command: indulge
+      gate: must-pass
+      produces: test suite + results
+    - command: coverage
+      gate: auto
+      produces: coverage report
+    - command: report
+      gate: auto
+      produces: aggregated QA report
+  example:
+    command: /healer:flow full-qa
+    trace:
+      - 'record: maps all flows'
+      - 'indulge: tests every flow × 6 dimensions'
+      - 'coverage: cross-references coverage gaps with flow-tested areas'
+      - 'report: aggregated QA artifact for stakeholder review'
+    why_this_example: Pre-release QA — comprehensive enough to satisfy compliance/audit requirements.
+  input_purpose: No arguments — full codebase QA.
+  after:
+    next:
+      - ship
+      - deploy
+    sister_presets:
+      - record-test
+      - audit
+    on_failure: indulge must-pass halts; address failures before release
+onboard:
+  purpose: Onboarding (read-only) — record → report. Use when joining a new project to understand it without
+    modifying anything.
+  what_it_does: Records the entire app into a flow document, then produces a health report. Both read-only
+    — perfect for first-day onboarding.
+  input:
+    syntax: /healer:flow onboard
+    args: []
+    valid:
+      - ''
+    invalid: []
+  steps:
+    - command: record
+      gate: auto
+      produces: record.md (project map)
+    - command: report
+      gate: auto
+      produces: health-report.md
+  example:
+    command: /healer:flow onboard
+    trace:
+      - 'record: maps the project end-to-end (8 layers)'
+      - 'report: shows current test/lint/build state'
+    why_this_example: Day 1 on a new project — read-only onboarding without risk of accidental modification.
+  input_purpose: No arguments — onboard scans whatever project is opened.
+  after:
+    next:
+      - analyze
+      - audit
+    sister_presets:
+      - record-onboard
+    on_failure: all auto — never halts; observations only
+record-secure:
+  purpose: Security-focused recording — record --risk → indulge --security → audit → report. Use for pre-deploy
+    security validation.
+  what_it_does: Records with risk scoring per flow, runs security-dimension testing on every flow, runs
+    full audit, produces report.
+  input:
+    syntax: /healer:flow record-secure
+    args: []
+    valid:
+      - ''
+    invalid: []
+  steps:
+    - command: record
+      gate: auto
+      args: --risk
+      produces: flows + risk scores
+    - command: indulge
+      gate: auto
+      args: --security
+      produces: security tests for every flow
+    - command: audit
+      gate: auto
+      produces: OWASP + deps + a11y findings
+    - command: report
+      gate: auto
+      produces: security-focused health report
+  example:
+    command: /healer:flow record-secure
+    trace:
+      - 'record --risk: 47 flows, top 5 ranked HIGH (auth, payments, admin)'
+      - 'indulge --security: SQLi/XSS/CSRF tests for every flow'
+      - 'audit: dependency CVEs + OWASP scan'
+      - 'report: prioritized security findings'
+    why_this_example: Pre-deploy security validation — comprehensive coverage of attack surfaces.
+  input_purpose: No arguments — runs full security analysis.
+  after:
+    next:
+      - fix
+      - audit
+    sister_presets:
+      - audit
+    on_failure: all auto; findings appear in the report regardless
+record-visual:
+  purpose: Visual audit — record --design-only → indulge --visual --a11y → design-review → report. Use
+    for UI quality validation across the entire app.
+  what_it_does: Records design-relevant flows, runs visual regression + accessibility tests, runs design
+    review on each, produces report.
+  input:
+    syntax: /healer:flow record-visual
+    args: []
+    valid:
+      - ''
+    invalid: []
+  steps:
+    - command: record
+      gate: auto
+      args: --design-only
+      produces: design-relevant flow map
+    - command: indulge
+      gate: auto
+      args: --visual --a11y
+      produces: visual regression + a11y tests
+    - command: design-review
+      gate: auto
+      produces: design quality review
+    - command: report
+      gate: auto
+      produces: visual quality report
+  example:
+    command: /healer:flow record-visual
+    trace:
+      - 'record --design-only: 23 UI flows mapped'
+      - 'indulge --visual --a11y: regression + axe-core tests for each'
+      - 'design-review: rates each across 7 dimensions, detects AI slop'
+      - 'report: prioritized visual issues'
+    why_this_example: UI-focused QA pass — exposes visual regressions and a11y issues that functional
+      tests miss.
+  input_purpose: No arguments — full visual audit.
+  after:
+    next:
+      - fix
+      - design
+    sister_presets:
+      - visual
+    on_failure: all auto; issues appear in the report
+record-onboard:
+  purpose: Full onboarding + CLAUDE.md generation — record --full --claude-md → report. Use for comprehensive
+    new-project onboarding with persistent context.
+  what_it_does: Generates the most comprehensive record (all 18 flags) AND writes CLAUDE.md sections with
+    project context for future sessions.
+  input:
+    syntax: /healer:flow record-onboard
+    args: []
+    valid:
+      - ''
+    invalid: []
+  steps:
+    - command: record
+      gate: auto
+      args: --full --claude-md
+      produces: record.md + CLAUDE.md additions
+    - command: report
+      gate: auto
+      produces: health report
+  example:
+    command: /healer:flow record-onboard
+    trace:
+      - 'record --full --claude-md: comprehensive record + CLAUDE.md context block'
+      - 'report: current health snapshot'
+    why_this_example: Onboarding-with-memory — future Claude Code sessions inherit the project understanding
+      via CLAUDE.md.
+  input_purpose: No arguments — generates the most comprehensive onboarding artifact.
+  after:
+    next:
+      - analyze
+    sister_presets:
+      - onboard
+    on_failure: all auto
+record-regression:
+  purpose: Regression detection — record --diff → indulge --regression → report. Use to detect what broke
+    between two commits or releases.
+  what_it_does: Records the current app state, diffs against the previous record, runs regression-specific
+    tests on changed flows, reports.
+  input:
+    syntax: /healer:flow record-regression
+    args: []
+    valid:
+      - ''
+    invalid: []
+  steps:
+    - command: record
+      gate: auto
+      args: --diff
+      produces: diff vs previous record
+    - command: indulge
+      gate: auto
+      args: --regression
+      produces: regression tests on changed flows
+    - command: report
+      gate: auto
+      produces: regression report
+  example:
+    command: /healer:flow record-regression
+    trace:
+      - 'record --diff: 5 flows changed since last record'
+      - 'indulge --regression: regression tests on those 5 flows'
+      - 'report: regressions found / clean'
+    why_this_example: Targeted regression check — fast because only changed flows are tested.
+  input_purpose: No arguments — diff is computed against the previous record.md automatically.
+  after:
+    next:
+      - fix
+    sister_presets:
+      - record-test
+    on_failure: all auto; regressions appear in report

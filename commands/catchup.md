@@ -2,6 +2,8 @@
 description: "Full-pipeline gap analysis and auto-fix — reads ALL project artifacts (brainstorms, designs, specs, plans, strategies, research), compares against implemented code, identifies every gap at every severity level, then fixes ALL of them. Zero gaps is the target."
 ---
 
+<!-- Help metadata: data/commands.yaml -->
+
 **ENFORCEMENT: Read and apply all protocols from `${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**
 
 # Healer: Catchup

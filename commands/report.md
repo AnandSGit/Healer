@@ -2,6 +2,8 @@
 description: "Comprehensive status report generator — runs all test suites and produces a formal health report with pass/fail counts, error summaries, and overall grade."
 ---
 
+<!-- Help metadata: data/commands.yaml -->
+
 # Healer: Report
 
 **ENFORCEMENT: Read and apply all protocols from `${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**

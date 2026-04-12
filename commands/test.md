@@ -2,6 +2,8 @@
 description: "Research-augmented test writing — searches for testing patterns, edge case strategies, and framework-specific test examples from GitHub and articles before writing comprehensive tests."
 ---
 
+<!-- Help metadata: data/commands.yaml -->
+
 # Healer: Test
 
 **ENFORCEMENT: Read and apply all protocols from `${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**

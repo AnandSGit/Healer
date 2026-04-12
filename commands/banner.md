@@ -2,6 +2,8 @@
 description: "Banner and social media design — 22 banner styles, 9+ social platforms, size specifications, style recommendations, and HTML/CSS banner generation for web and social media campaigns."
 ---
 
+<!-- Help metadata: data/commands.yaml -->
+
 **ENFORCEMENT: Read and apply all protocols from `${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**
 
 # Healer: Banner

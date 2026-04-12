@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/AnandSGit/Healer/schema/command.schema.json",
+  "title": "Healer Command Catalog Entry",
+  "description": "Schema for entries in data/commands.yaml — single source of truth for postfix `?` help",
+  "type": "object",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^[a-z][a-z0-9-]*$": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "category",
+        "purpose",
+        "what_it_does",
+        "input",
+        "example",
+        "input_purpose",
+        "next"
+      ],
+      "properties": {
+        "category": {
+          "description": "Functional grouping for help categorization",
+          "enum": [
+            "core",
+            "ideation",
+            "design-intel",
+            "implementation",
+            "quality",
+            "recording",
+            "debug",
+            "health",
+            "shipping",
+            "help"
+          ]
+        },
+        "purpose": {
+          "description": "One-paragraph statement of why this command exists",
+          "type": "string",
+          "minLength": 20,
+          "maxLength": 600
+        },
+        "what_it_does": {
+          "description": "Brief mechanical description (sub-commands, outputs)",
+          "type": "string",
+          "minLength": 20,
+          "maxLength": 800
+        },
+        "input": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["syntax", "args"],
+          "properties": {
+            "syntax": {
+              "type": "string",
+              "description": "Command syntax e.g. /healer:foo [topic] [--flag]"
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["name", "desc", "required"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "desc": { "type": "string" },
+                  "required": { "type": "boolean" },
+                  "type": { "type": "string" }
+                }
+              }
+            },
+            "valid": {
+              "type": "array",
+              "description": "Valid example inputs (strings only)",
+              "items": { "type": "string" }
+            },
+            "invalid": {
+              "type": "array",
+              "description": "Invalid examples with reasons",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["text", "why"],
+                "properties": {
+                  "text": { "type": "string" },
+                  "why": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["command", "trace", "why_this_example"],
+          "properties": {
+            "command": {
+              "type": "string",
+              "description": "Concrete example invocation"
+            },
+            "trace": {
+              "type": "array",
+              "description": "Step-by-step what happens",
+              "items": { "type": "string" },
+              "minItems": 2
+            },
+            "why_this_example": {
+              "type": "string",
+              "description": "Why this example illustrates the command well",
+              "minLength": 20
+            }
+          }
+        },
+        "input_purpose": {
+          "type": "string",
+          "description": "How the user's input flows through downstream steps",
+          "minLength": 20
+        },
+        "next": {
+          "type": "array",
+          "description": "Suggested next commands per the next-step graph",
+          "items": { "type": "string" }
+        },
+        "related": {
+          "type": "array",
+          "description": "Sibling commands in the same category",
+          "items": { "type": "string" }
+        },
+        "errors": {
+          "type": "array",
+          "description": "Common error/halt cases",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  }
+}

@@ -2,6 +2,8 @@
 description: "Research-augmented implementation planning — creates bite-sized task lists with dependency tracking, file mapping, requirement traceability, effort estimation, review checkpoints, verification protocol, and native task integration. Produces a reusable plan document with persistent memory."
 ---
 
+<!-- Help metadata: data/commands.yaml -->
+
 # Healer: Plan
 
 **ENFORCEMENT: Read and apply all protocols from `${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**

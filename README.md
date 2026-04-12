@@ -1,14 +1,22 @@
-# Healer v6
+# Healer v7.1
 
 **Universal Autonomous Codebase Health & Development Engine with Design Intelligence**
 
-32 commands | 32 flow recipes | Shared enforcement protocol | Integrated UI/UX design databases | Any project, any language, any platform
+41 commands | 26 flow presets | 36+ recipes | Postfix `?` discoverability | Self-validating command catalog | Shared enforcement protocol | Integrated UI/UX design databases | Any project, any language, any platform
 
 ---
 
 ## What is Healer?
 
 Healer is a comprehensive command suite for [Claude Code](https://claude.ai/code) that turns your AI assistant into a research-augmented development lifecycle engine. Every command searches for best practices, patterns, and proven solutions **before** acting.
+
+### What's New in v7.1: Postfix `?` Help + Self-Validating Catalog
+
+- **`?` postfix discoverability** — type `/healer:<command> ?` (or `--help`) on ANY healer command for an instant six-section drill-down (purpose, what it does, expected input, concrete example with trace, input purpose, after/related). Works on flow presets too: `/healer:flow feature ?`.
+- **Sub-50ms help latency** — pre-built `data/help-index.json` replaces the old slow path that scanned all 41 command files (~14k lines) per invocation.
+- **Self-validating command catalog** — `data/commands.yaml` and `data/flows.yaml` (JSON-Schema-validated) are the single source of truth. A PostToolUse hook auto-rebuilds the index on every catalog/command edit and detects drift loudly.
+- **One-source documentation** — README, HTML user guide, and help system all derive from the same YAML catalog (auto-generated marker sections, in progress).
+- See [docs/designs/2026-04-11-postfix-help-and-catalog.md](docs/designs/2026-04-11-postfix-help-and-catalog.md) for design rationale and [docs/plans/2026-04-11-postfix-help-and-catalog.md](docs/plans/2026-04-11-postfix-help-and-catalog.md) for the implementation plan.
 
 ### What's New in v6: Design Intelligence Integration
 
@@ -50,6 +58,19 @@ git clone https://github.com/AnandSGit/Healer.git
 cd Healer && ./install.sh
 ```
 
+### Discoverability — `?` and `--help`
+
+Append `?` (or `--help`) to any healer command for instant help:
+
+```bash
+/healer:flow ?              # Flow overview + all 26 presets
+/healer:flow feature ?      # Six-section drill-down for the feature preset
+/healer:brainstorm ?        # Drill-down for brainstorm command
+/healer:flow my-recipe ?    # Drill-down for a user recipe in ~/.healer/recipes.yaml
+```
+
+Resolution rules: `?` triggers help only as a standalone token. Topics containing `?` mid-string (e.g., `/healer:debug "why is this ?"`) pass through as literal input.
+
 ### Or install manually
 
 ```bash
@@ -73,65 +94,103 @@ cp docs/healer-user-guide.html ~/.healer/
 /healer:flow feature       # Full feature pipeline
 ```
 
-## Commands (26)
+## Commands
 
+> **Auto-generated from `data/commands.yaml`.** Do not edit content between the marker comments — it's overwritten by `scripts/generate_readme.py` (run automatically via the help-catalog hook on every YAML edit).
+
+<!-- HEALER:COMMANDS:START -->
 ### Core
-| Command | Description |
-|---------|-------------|
-| `/healer` | Full 7-phase autonomous heal (discover → understand → assess → research → plan → execute → report) |
-| `/healer:flow` | Chain multiple commands into pipelines with gate controls |
 
-### Ideation & Design
 | Command | Description |
 |---------|-------------|
-| `/healer:brainstorm` | Socratic dialogue + research-augmented idea exploration |
-| `/healer:research` | Deep multi-source research on any topic |
-| `/healer:design` | Feature/API/UX design with real-world references |
-| `/healer:architect` | System architecture informed by postmortems |
-| `/healer:spec` | Technical specifications cross-referenced with public RFCs |
-| `/healer:plan` | Bite-sized task lists with dependency tracking |
+| `/healer:flow` | Flow orchestrator — chains multiple healer sub-commands into pipelines |
+| `/healer` | Full autonomous codebase engine — discover, understand, assess, |
+
+### Ideation & Strategy
+
+| Command | Description |
+|---------|-------------|
+| `/healer:architect` | Research-augmented system architecture — service boundaries, |
+| `/healer:brainstorm` | Interactive Socratic brainstorming — explores requirements through |
+| `/healer:design` | Research-augmented feature design — APIs, data models, UX flows, |
+| `/healer:plan` | Research-augmented implementation planning — creates bite-sized task |
+| `/healer:research` | Deep research on a topic, technology, market, or approach — fetches |
+| `/healer:spec` | Write detailed technical specifications — with acceptance tests, API |
+| `/healer:strategy` | CEO-level strategic review — evaluates plans and designs for scope |
+| `/healer:validate` | Demand validation diagnostic — challenges whether the idea is worth |
+
+### Design Intelligence
+
+| Command | Description |
+|---------|-------------|
+| `/healer:banner` | Banner and social media design — 22 banner styles, 9+ social platforms, |
+| `/healer:brand` | Brand framework generator — creates brand voice, visual identity |
+| `/healer:cip` | Corporate Identity Program — 50+ deliverables checklist, mockup |
+| `/healer:design-review` | Visual and UX quality review — rates 7 design dimensions (0-10), |
+| `/healer:design-system` | Design system generator — creates complete visual identity from |
+| `/healer:icon` | Icon system design — 15 icon styles, SVG generation guidance, icon |
+| `/healer:logo` | Logo design guidance — 55+ logo styles, color psychology, industry |
+| `/healer:slides` | Presentation design — HTML slide decks with Chart.js data |
 
 ### Implementation
+
 | Command | Description |
 |---------|-------------|
-| `/healer:implement` | Research-augmented feature building |
-| `/healer:tdd` | Test-driven development (Red-Green-Refactor) |
-| `/healer:refactor` | Clean code refactoring with Fowler pattern citations |
-| `/healer:optimize` | 10-phase performance investigation with baselines |
+| `/healer:implement` | Research-augmented implementation — builds features by searching |
+| `/healer:optimize` | Research-augmented performance investigation — 10-phase structured |
+| `/healer:refactor` | Research-augmented refactoring — improves code structure, readability, |
+| `/healer:tdd` | Test-driven development — write failing tests first, then implement |
 
 ### Testing & Quality
+
 | Command | Description |
 |---------|-------------|
-| `/healer:test` | Research-augmented test writing |
-| `/healer:coverage` | Test coverage analysis with risk prioritization |
-| `/healer:review` | Code review validated against best practices |
-| `/healer:audit` | OWASP + CVE + accessibility + license audit |
+| `/healer:audit` | Research-augmented security and quality audit — scans for OWASP top |
+| `/healer:catchup` | Full-pipeline gap analysis and auto-fix — reads ALL project artifacts |
+| `/healer:conform` | Design conformance gate — reads approved design docs before and after |
+| `/healer:coverage` | Test coverage analysis — identifies untested critical paths, measures |
+| `/healer:review` | Research-augmented code review — reviews recent changes for bugs, |
+| `/healer:test` | Research-augmented test writing — searches for testing patterns, |
+| `/healer:verify` | Requirement-driven autonomous verification engine — reads all specs, |
 
 ### Debugging & Fixing
+
 | Command | Description |
 |---------|-------------|
-| `/healer:debug` | Hypothesis-driven systematic debugging |
-| `/healer:fix` | Targeted test suite fix with max 5 iterations |
+| `/healer:debug` | Systematic debugging — structured troubleshooting with reproducible |
+| `/healer:fix` | Research-augmented targeted fix — runs a specific test suite, |
 
 ### Health & Reporting
+
 | Command | Description |
 |---------|-------------|
-| `/healer:diagnose` | Read-only health check with severity classification |
-| `/healer:report` | Formal A-F health status report |
-| `/healer:analyze` | Codebase health vs industry standards |
+| `/healer:analyze` | Analyze codebase health — patterns, tech debt, dependencies, and |
+| `/healer:diagnose` | Read-only health check — runs all test suites sequentially, compares |
+| `/healer:report` | Comprehensive status report generator — runs all test suites and |
+
+### Recording & Flow Testing
+
+| Command | Description |
+|---------|-------------|
+| `/healer:indulge` | Record-driven exhaustive flow testing engine — parses /healer:record |
+| `/healer:record` | Reverse-engineer an entire app — frontend, backend, DB, design — into |
 
 ### Shipping
+
 | Command | Description |
 |---------|-------------|
-| `/healer:push` | Conventional commit with emoji + push |
-| `/healer:ship` | Full PR workflow with auto-reviewer loop |
-| `/healer:deploy` | Gate-checked deployment with smoke tests |
-| `/healer:docs` | Documentation generation (Divio framework) |
+| `/healer:deploy` | Research-augmented production deployment — runs all test suites as a |
+| `/healer:docs` | Research-augmented documentation generation — auto-generates README, |
+| `/healer:push` | Research-augmented commit and push — stages changes, generates a |
+| `/healer:ship` | Complete PR workflow — branch, commit, push, create PR, wait for |
 
 ### Help
+
 | Command | Description |
 |---------|-------------|
-| `/healer:help` | Interactive help — list commands, flows, recipes, gates, examples |
+| `/healer:add-command` | Atomic scaffolder for new healer commands — interactively prompts |
+| `/healer:help` | Interactive help system — list commands, flows, recipes, gates, examples, |
+<!-- HEALER:COMMANDS:END -->
 
 ## Flow Orchestrator
 
@@ -152,18 +211,39 @@ Chain commands into pipelines with gate operators:
 | `?→` | INTERACTIVE | Ask user | Ask user |
 | `!→` | MUST-PASS | Continue | **HALT** |
 
-### Built-in Presets (8)
+### Built-in Presets
 
-| Preset | Pipeline |
-|--------|----------|
-| `feature` | brainstorm → plan → implement → test → review → ship |
-| `fix` | diagnose → debug → fix → test → push |
-| `deploy` | diagnose → review → ship |
-| `audit` | analyze → audit → coverage → report |
-| `morning` | diagnose → report |
-| `refactor` | analyze → plan → refactor → test → review → push |
-| `tdd` | plan → tdd → coverage → review → push |
-| `research` | research → brainstorm → design → spec |
+> **Auto-generated from `data/flows.yaml`.** Do not edit content between the marker comments.
+
+<!-- HEALER:FLOWS:START -->
+| Preset | Pipeline | Purpose |
+|--------|----------|---------|
+| `audit` | analyze → audit → coverage → report → | Comprehensive health audit — analyze patterns, scan security, measure coverag... |
+| `brand-to-prod` | brand ?→ design-system ?→ design ?→ implement → test !→ review ?→ ship !→ | Full brand-aware feature development — brand → design-system → design → imple... |
+| `catchup` | catchup → test !→ review ?→ | Gap analysis + auto-fix — catchup → test → review. Use when artifacts have dr... |
+| `conform` | conform !→ implement → conform !→ test !→ push ?→ | Design conformance gate around implementation — conform → implement → conform... |
+| `deploy` | diagnose !→ review ?→ ship !→ | Safe deployment pipeline — pre-deploy diagnostic gate, code review checkpoint... |
+| `feature` | brainstorm ?→ plan ?→ implement → test !→ review ?→ ship !→ | Full feature development lifecycle — takes an idea from exploration |
+| `fix` | diagnose → debug → fix → test !→ push ?→ | Diagnose and fix issues in a single pipeline — runs full diagnostic |
+| `full-qa` | record → indulge !→ coverage → report → | Complete QA pipeline — record → indulge (must-pass) → coverage → report. Use ... |
+| `full-verify` | conform !→ verify !→ test !→ review ?→ ship !→ | Visual + behavioral verification before shipping — conform (must-pass) → veri... |
+| `ideate` | validate ?→ brainstorm ?→ research → design ?→ strategy ?→ spec ?→ plan ?→ | Full ideation pipeline from validation to plan — takes an idea through |
+| `identity` | brand ?→ logo ?→ cip ?→ design-system ?→ | Brand identity pipeline — brand voice → logo → CIP → design system. Use for f... |
+| `morning` | diagnose → report → | Quick morning health check — runs diagnose and produces a health report. Use ... |
+| `onboard` | record → report → | Onboarding (read-only) — record → report. Use when joining a new project to u... |
+| `pre-ship` | verify !→ review ?→ ship !→ | Pre-ship gate to production — verify → review → ship. Use when you want one s... |
+| `record-full` | record → indulge !→ push ?→ | Full 10x recording + testing — record --full → indulge --full (must-pass) → p... |
+| `record-onboard` | record → report → | Full onboarding + CLAUDE.md generation — record --full --claude-md → report. ... |
+| `record-regression` | record → indulge → report → | Regression detection — record --diff → indulge --regression → report. Use to ... |
+| `record-secure` | record → indulge → audit → report → | Security-focused recording — record --risk → indulge --security → audit → rep... |
+| `record-test` | record → indulge !→ | Record flows + test them — record → indulge (must-pass). Use for app reverse-... |
+| `record-visual` | record → indulge → design-review → report → | Visual audit — record --design-only → indulge --visual --a11y → design-review... |
+| `refactor` | analyze → plan ?→ refactor → test !→ review ?→ push ?→ | Research-backed code improvement — analyze first, plan refactor, execute, tes... |
+| `research` | research → brainstorm ?→ design ?→ spec → | Deep research to specification — research → brainstorm → design → spec. Use w... |
+| `tdd` | plan ?→ tdd → coverage → review ?→ push ?→ | Test-driven development flow — plan → tdd → coverage → review → push. Use whe... |
+| `verify` | verify !→ push ?→ | Requirement verification + autonomous fix — verify (must-pass) → push. Use as... |
+| `visual` | brand ?→ design-system ?→ design ?→ design-review → | Visual design pipeline with brand awareness — brand → design-system → design ... |
+<!-- HEALER:FLOWS:END -->
 
 ### Custom Recipes (20+)
 

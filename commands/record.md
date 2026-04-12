@@ -2,6 +2,8 @@
 description: "Reverse-engineer an entire app — frontend, backend, DB, design — into a single comprehensive requirements + flow document. The FIRST healer command that reads code and PRODUCES requirements (reverse direction of spec -> implement -> verify). 8-layer discovery, flow ID system, cross-reference matrix, and 10x features (Mermaid diagrams, risk scoring, git timeline, impact analysis, dead code detection, record diff, CLAUDE.md generation, data lineage, security surface, complexity heatmap, OpenAPI generation)."
 ---
 
+<!-- Help metadata: data/commands.yaml -->
+
 # Healer: Record
 
 **ENFORCEMENT: Read and apply all protocols from `${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**

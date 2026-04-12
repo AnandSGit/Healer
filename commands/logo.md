@@ -2,6 +2,8 @@
 description: "Logo design guidance — 55+ logo styles, color psychology, industry conventions, AI generation prompts, and do/don't rules. Produces a logo brief, not the logo itself."
 ---
 
+<!-- Help metadata: data/commands.yaml -->
+
 **ENFORCEMENT: Read and apply all protocols from `${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**
 
 # Healer: Logo

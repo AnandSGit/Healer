@@ -2,6 +2,8 @@
 description: "Deep research on a topic, technology, market, or approach — fetches docs, repos, articles, competitor intel, and community insights. Saves artifacts for cross-session reuse. Modes: --technical, --product, --deep, --quick."
 ---
 
+<!-- Help metadata: data/commands.yaml -->
+
 # Healer: Research
 
 **ENFORCEMENT: Read and apply all protocols from `${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**

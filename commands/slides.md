@@ -2,6 +2,8 @@
 description: "Presentation design — HTML slide decks with Chart.js data visualization, copywriting formulas, slide strategies, layout patterns, and self-contained single-file presentations viewable in any browser."
 ---
 
+<!-- Help metadata: data/commands.yaml -->
+
 **ENFORCEMENT: Read and apply all protocols from `${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**
 
 # Healer: Slides

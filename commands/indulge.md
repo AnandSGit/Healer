@@ -2,6 +2,8 @@
 description: "Record-driven exhaustive flow testing engine — parses /healer:record output, systematically tests EVERY discovered flow across 6 dimensions (happy path, negative input, boundary cases, permission/auth, state violations, data integrity), generates repeatable test files, and produces detailed reports. Optional 10x features: visual regression, accessibility, security, performance, regression analysis, CI generation, auto-heal, HTML dashboard, and contract testing."
 ---
 
+<!-- Help metadata: data/commands.yaml -->
+
 # Healer: Indulge
 
 **ENFORCEMENT: Read and apply all protocols from `${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**

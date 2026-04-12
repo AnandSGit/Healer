@@ -2,6 +2,8 @@
 description: "Flow orchestrator — chains multiple healer sub-commands into pipelines with gate controls, 26 built-in presets, custom YAML recipes, and smart next-step suggestions. The conductor of the healer orchestra."
 ---
 
+<!-- Help metadata: data/commands.yaml -->
+
 **ENFORCEMENT: Read and apply all protocols from `${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**
 
 <HARD-GATE>MUST-PASS GATES (!→) ARE ABSOLUTE. If a step fails at a must-pass gate, the flow HALTS. Do not continue. Do not ask the user if they want to continue. HALT and report the failure. The user must explicitly restart or fix the issue.</HARD-GATE>

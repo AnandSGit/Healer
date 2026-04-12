@@ -2,6 +2,8 @@
 description: "Research-augmented commit and push — stages changes, generates a conventional commit message with emoji prefix, and pushes to the current branch."
 ---
 
+<!-- Help metadata: data/commands.yaml -->
+
 # Healer: Push
 
 **ENFORCEMENT: Read and apply all protocols from `${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**

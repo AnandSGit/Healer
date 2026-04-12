@@ -2,6 +2,8 @@
 description: "Icon system design — 15 icon styles, SVG generation guidance, icon library selection, accessibility requirements, and consistent icon system specifications for applications."
 ---
 
+<!-- Help metadata: data/commands.yaml -->
+
 **ENFORCEMENT: Read and apply all protocols from `${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**
 
 # Healer: Icon

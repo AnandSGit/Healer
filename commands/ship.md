@@ -2,6 +2,8 @@
 description: "Complete PR workflow — branch, commit, push, create PR, wait for auto-reviewers, resolve all comments in a loop, merge, deploy with rollback. End-to-end from code to production."
 ---
 
+<!-- Help metadata: data/commands.yaml -->
+
 # Healer: Ship
 
 **ENFORCEMENT: Read and apply all protocols from `${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**

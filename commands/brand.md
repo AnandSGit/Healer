@@ -2,6 +2,8 @@
 description: "Brand framework generator — creates brand voice, visual identity direction, messaging architecture, and asset guidelines. Produces brand-guidelines.md as the project's brand source of truth."
 ---
 
+<!-- Help metadata: data/commands.yaml -->
+
 # Healer: Brand
 
 **ENFORCEMENT: Read and apply all protocols from `${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**

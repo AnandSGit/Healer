@@ -2,6 +2,8 @@
 description: "Full autonomous codebase engine — discover, understand, assess, research, plan, execute, and verify any project in any language on any platform. 41 sub-commands, 26 flow presets, design intelligence, 10x recording & flow testing."
 ---
 
+<!-- Help metadata: data/commands.yaml -->
+
 # Healer v6 — Universal Autonomous Codebase Health & Development Engine
 
 **BEFORE PROCEEDING: Read and internalize `${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md`. All HARD-GATEs, verification protocols, and anti-rationalization rules apply to every phase below.**

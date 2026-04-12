@@ -2,6 +2,8 @@
 description: "Research-augmented implementation — builds features by searching GitHub/GitLab for reference implementations, idiomatic patterns, and library best practices before writing code."
 ---
 
+<!-- Help metadata: data/commands.yaml -->
+
 # Healer: Implement
 
 **ENFORCEMENT: Read and apply all protocols from `${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**

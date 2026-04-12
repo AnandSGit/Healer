@@ -2,6 +2,8 @@
 description: "Test coverage analysis — identifies untested critical paths, measures coverage gaps, and prioritizes what to test next based on risk and impact."
 ---
 
+<!-- Help metadata: data/commands.yaml -->
+
 # Healer: Coverage
 
 **ENFORCEMENT: Read and apply all protocols from `${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**

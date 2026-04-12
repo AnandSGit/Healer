@@ -2,6 +2,8 @@
 description: "Research-augmented feature design — APIs, data models, UX flows, visual design systems, and HTML previews inspired by public design systems, pattern libraries, and real-world examples."
 ---
 
+<!-- Help metadata: data/commands.yaml -->
+
 **ENFORCEMENT: Read and apply all protocols from `${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**
 
 # Healer: Design

@@ -2,6 +2,8 @@
 description: "Systematic debugging — structured troubleshooting with reproducible steps, hypothesis testing, and root cause isolation. Never guesses — always verifies."
 ---
 
+<!-- Help metadata: data/commands.yaml -->
+
 **ENFORCEMENT: Read and apply all protocols from `${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**
 
 # Healer: Debug

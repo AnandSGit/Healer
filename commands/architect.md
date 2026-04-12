@@ -2,6 +2,8 @@
 description: "Research-augmented system architecture — service boundaries, infrastructure, scalability patterns, cost estimation, failure mode analysis, and security architecture informed by public postmortems, tech blogs, and current documentation."
 ---
 
+<!-- Help metadata: data/commands.yaml -->
+
 # Healer: Architect
 
 **ENFORCEMENT: Read and apply all protocols from `${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**

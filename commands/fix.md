@@ -2,6 +2,8 @@
 description: "Research-augmented targeted fix — runs a specific test suite, analyzes failures, searches online for error messages and known issues, then fixes root causes with max 5 iterations."
 ---
 
+<!-- Help metadata: data/commands.yaml -->
+
 **ENFORCEMENT: Read and apply all protocols from `${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**
 
 # Healer: Fix

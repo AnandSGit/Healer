@@ -2,6 +2,8 @@
 description: "Test-driven development — write failing tests first, then implement the minimum code to pass them, then refactor. Red-Green-Refactor cycle."
 ---
 
+<!-- Help metadata: data/commands.yaml -->
+
 # Healer: TDD
 
 **ENFORCEMENT: Read and apply all protocols from `${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**

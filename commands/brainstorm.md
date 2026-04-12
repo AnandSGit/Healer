@@ -2,6 +2,8 @@
 description: "Interactive Socratic brainstorming — explores requirements through structured dialogue FIRST, then researches online for inspiration, competing approaches, and real-world lessons. Combines interactive discovery with research-augmented proposals. Persists decisions to ~/.healer/brainstorms/ for cross-session continuity."
 ---
 
+<!-- Help metadata: data/commands.yaml -->
+
 # Healer: Brainstorm
 
 **ENFORCEMENT: Read and apply all protocols from `${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**

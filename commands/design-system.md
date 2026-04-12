@@ -2,6 +2,8 @@
 description: "Design system generator — creates complete visual identity from scratch: color palettes, typography scales, spacing systems, component patterns, and interactive HTML previews. Produces DESIGN.md as the project's design source of truth."
 ---
 
+<!-- Help metadata: data/commands.yaml -->
+
 # Healer: Design System
 
 **ENFORCEMENT: Read and apply all protocols from `${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**

@@ -2,6 +2,8 @@
 description: "Visual and UX quality review — rates 7 design dimensions (0-10), detects AI slop patterns, checks design system alignment, responsive behavior, and accessibility compliance. Use after design or before shipping UI features."
 ---
 
+<!-- Help metadata: data/commands.yaml -->
+
 # Healer: Design Review
 
 **ENFORCEMENT: Read and apply all protocols from `${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**

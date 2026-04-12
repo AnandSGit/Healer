@@ -2,6 +2,8 @@
 description: "Interactive help system — list commands, flows, recipes, gates, examples, and get detailed help for any healer sub-command"
 ---
 
+<!-- Help metadata: data/commands.yaml -->
+
 **ENFORCEMENT: Read and apply all protocols from `${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md` before proceeding.**
 
 # Healer: Help
@@ -68,9 +70,18 @@ QUICK START
   /healer:help commands            List all commands
   /healer:help <command>           Detail for any command
 
+POSTFIX HELP — `?` and `--help`  (NEW in v7.1)
+──────────────────────────────────────────────────
+  /healer:<command> ?              Instant six-section drill-down
+  /healer:<command> --help         Same as `?` (alias)
+  /healer:flow ?                   Flow overview + preset table
+  /healer:flow <preset> ?          Drill-down for a specific preset
+
+  Tip: `?` works on every healer command. Try /healer:flow feature ?
+
 MORE HELP
 ──────────────────────────────────────────────────
-  /healer:help commands            All 39 commands
+  /healer:help commands            All 41 commands
   /healer:help flows               Built-in flow presets
   /healer:help recipes             Custom recipe pipelines
   /healer:help gates               Gate operator reference

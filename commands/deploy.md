@@ -2,6 +2,8 @@
 description: "Research-augmented production deployment — runs all test suites as a gate check, deploys to the detected platform, and runs post-deploy smoke tests."
 ---
 
+<!-- Help metadata: data/commands.yaml -->
+
 # Healer: Deploy
 
 **ENFORCEMENT: Read and apply all protocols from `${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**

@@ -2,6 +2,8 @@
 description: "Design conformance gate — reads approved design docs before and after implementation, enforces pixel-perfect spec compliance, prevents drift between design artifacts and code. Run before /healer:push to catch visual regressions."
 ---
 
+<!-- Help metadata: data/commands.yaml -->
+
 # Healer: Conform
 
 **ENFORCEMENT: Read and apply all protocols from `${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**

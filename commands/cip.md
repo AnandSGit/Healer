@@ -2,6 +2,8 @@
 description: "Corporate Identity Program — 50+ deliverables checklist, mockup generation guidance, style guide creation, and brand consistency enforcement across all touchpoints."
 ---
 
+<!-- Help metadata: data/commands.yaml -->
+
 **ENFORCEMENT: Read and apply all protocols from `${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**
 
 # Healer: CIP (Corporate Identity Program)

@@ -2,6 +2,8 @@
 description: "Write detailed technical specifications — with acceptance tests, API contracts, error catalogs, traceability matrices, and non-functional requirements. Cross-referenced with public RFCs, ADRs, prior healer artifacts, and current library docs via Context7."
 ---
 
+<!-- Help metadata: data/commands.yaml -->
+
 # Healer: Spec
 
 **ENFORCEMENT: Read and apply all protocols from `${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**

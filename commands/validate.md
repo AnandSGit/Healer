@@ -2,6 +2,8 @@
 description: "Demand validation diagnostic — challenges whether the idea is worth building using YC-style forcing questions, The Mom Test principles, lean startup validation, and anti-sycophancy rules. Use BEFORE brainstorming."
 ---
 
+<!-- Help metadata: data/commands.yaml -->
+
 # Healer: Validate
 
 **ENFORCEMENT: Read and apply all protocols from `${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**

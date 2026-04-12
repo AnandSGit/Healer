@@ -2,6 +2,8 @@
 description: "Read-only health check — runs all test suites sequentially, compares error patterns against known framework bugs online, and outputs a structured health report. Never modifies any files."
 ---
 
+<!-- Help metadata: data/commands.yaml -->
+
 **ENFORCEMENT: Read and apply all protocols from `${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**
 
 # Healer: Diagnose

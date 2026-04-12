@@ -2,6 +2,8 @@
 description: "Research-augmented refactoring — improves code structure, readability, and maintainability using clean code patterns and examples from top open source projects."
 ---
 
+<!-- Help metadata: data/commands.yaml -->
+
 # Healer: Refactor
 
 **ENFORCEMENT: Read and apply all protocols from `${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**

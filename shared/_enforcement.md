@@ -1,6 +1,106 @@
-# Healer Enforcement Protocol v1.0
+# Healer Enforcement Protocol v1.1
 
 **This file is the shared enforcement layer for ALL Healer commands.** Every Healer skill MUST follow these protocols. They are non-negotiable.
+
+---
+
+## HARD-GATE: Postfix `?` / `--help` Interceptor
+
+<HARD-GATE>
+THIS CHECK RUNS BEFORE ANY OTHER PROTOCOL IN THIS FILE.
+If the user typed `?` or `--help` as the command argument, render help
+from `data/help-index.json` and HALT — do not execute the command's
+procedure, do not run research, do not do anything else.
+</HARD-GATE>
+
+### When to Trigger
+
+`$ARGUMENTS` triggers the help interceptor if it matches ANY of:
+
+```
+^\s*\?\s*$              # exactly "?"
+^--help\s*$             # exactly "--help"
+^\s*\?\s+\S             # "? <rest>" — drill-down for command
+^--help\s+\S            # "--help <rest>" — same
+\S+\s+\?\s*$            # "<token> ?" — drill-down for that token
+\S+\s+--help\s*$        # "<token> --help" — same
+```
+
+It DOES NOT trigger if `?` appears mid-string (e.g., `/healer:debug "why is this ?"` — the question mark is part of the topic, not a help request).
+
+### Dispatch
+
+1. Identify the current command from the file path (e.g., `commands/flow.md` → `flow`).
+2. Strip the `?` or `--help` token from `$ARGUMENTS`. The remainder, if any, is the **drill-down target**.
+3. Read `${CLAUDE_PLUGIN_ROOT}/data/help-index.json` (single file read, ~50ms).
+4. Lookup table:
+
+   | Current command | Drill-down target | Render |
+   |---|---|---|
+   | any `<cmd>` | empty | `commands.<cmd>.panel` from index |
+   | `flow` | empty | `flow_overview` from index |
+   | `flow` | `<preset>` matching a built-in flow | `flows.<preset>.panel` from index |
+   | `flow` | `<recipe>` matching `~/.healer/recipes.yaml` | runtime-render using six-section format from `_help_renderer.md` |
+   | `help` | `<command-name>` | equivalent to `commands.<name>.panel` |
+   | any | unrecognized target | render "Unknown" panel with Levenshtein-suggested alternatives |
+
+5. Print the panel text VERBATIM (it is pre-rendered — do not reformat, do not summarize).
+6. **HALT.** Do not proceed with research, the command's procedure, or any other protocol below this section.
+
+### Fallback
+
+If `data/help-index.json` is missing or unreadable:
+
+1. Print a one-line warning: `⚠ help-index.json missing — falling back to slow path`
+2. Render help dynamically by reading the command file's frontmatter `description` field
+3. Suggest: `Run \`bash scripts/build-help-index.sh\` to restore fast help`
+4. HALT
+
+### Pseudocode (Reference Implementation)
+
+```
+ARGS = $ARGUMENTS (raw)
+
+if ARGS matches "^\s*(\?|--help)\s*$":
+    target = None
+elif ARGS matches "^\s*(\?|--help)\s+(\S+.*)$":
+    target = capture group 2
+elif ARGS matches "^(\S+.*)\s+(\?|--help)\s*$":
+    target = capture group 1
+else:
+    # `?` mid-string or no `?` at all → pass through to command procedure
+    PROCEED to research protocol below
+
+# Help mode active — load index
+index = read_json("${CLAUDE_PLUGIN_ROOT}/data/help-index.json")
+cmd = current_command_name()  # from file path
+
+if cmd == "flow":
+    if target is None:
+        print(index["flow_overview"])
+    elif target in index["flows"]:
+        print(index["flows"][target]["panel"])
+    elif recipe := lookup_recipe(target):
+        print(render_recipe_panel(recipe))
+    else:
+        print(unknown_panel(target, candidates=index["flows"].keys()))
+elif cmd == "help" and target:
+    if target in index["commands"]:
+        print(index["commands"][target]["panel"])
+    elif target in index["flows"]:
+        print(index["flows"][target]["panel"])
+    else:
+        print(unknown_panel(target))
+else:
+    if cmd in index["commands"]:
+        print(index["commands"][cmd]["panel"])
+    else:
+        print(unknown_panel(cmd))
+
+HALT
+```
+
+See `shared/_help_renderer.md` for the rendering contract and recipe variant details.
 
 ---
 

@@ -2,6 +2,8 @@
 description: "Research-augmented code review — reviews recent changes for bugs, security, performance, and adherence to project conventions with online best practice validation."
 ---
 
+<!-- Help metadata: data/commands.yaml -->
+
 # Healer: Review
 
 **ENFORCEMENT: Read and apply all protocols from `${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md` before proceeding. HARD-GATEs are non-negotiable.**
