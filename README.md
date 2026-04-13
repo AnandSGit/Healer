@@ -172,6 +172,7 @@ cp docs/healer-user-guide.html ~/.healer/
 
 | Command | Description |
 |---------|-------------|
+| `/healer:adapt` | Style DNA consumer and replicator — takes the Style DNA YAML produced |
 | `/healer:imitate` | Reverse-engineer a specific layer (frontend, backend, server, db, ai) — |
 | `/healer:indulge` | Imitate-driven exhaustive flow testing engine — parses /healer:imitate |
 

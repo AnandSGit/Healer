@@ -1435,21 +1435,42 @@ imitate:
   category: recording
   purpose: |
     Reverse-engineer a specific layer (frontend, backend, server, db, ai) —
-    or the whole app — into a single 4-in-1 document combining Requirements
-    + Design + Spec + Implementation Plan. The FIRST healer command that
-    reads code and PRODUCES enough information to rebuild the layer from
-    scratch (reverse direction of spec → implement → verify).
+    or the whole app — into a 4-in-1 Requirements + Design + Spec + Plan
+    markdown PLUS a machine-readable Style DNA YAML consumed deterministically
+    by /healer:adapt. Captures page compositions, visual motifs, chart render
+    configs, per-icon styles, branding SVG paths, copy voice, AI response
+    patterns, and literal motion values — the dimensions that separate
+    "same design family" from "same app feel."
   what_it_does: |
-    9-layer discovery with layer scoping via --layer (frontend|backend|
-    server|db|ai), flow ID system (adds AI-NNN and SRV-NNN), cross-layer
-    reference matrix, and 4-in-1 output per layer. 10x flags add: Mermaid
-    diagrams, risk scoring, git timeline, impact analysis, dead code
-    detection, imitate diff, CLAUDE.md generation, OpenAPI generation.
+    9-layer discovery with --layer scoping. Frontend layer emits 8 new ID
+    prefixes (PC page compositions, VM visual motifs, CH chart renders,
+    IC icon usage, BR branding assets, CV copy voice, AR AI response
+    patterns, MD motion literals) and a Style DNA YAML with deterministic
+    canonical hash. Exhaustive page-composition capture by default
+    (--pages=sample escape hatch). Optional --rendered mode opts into
+    headless-browser evidence. 10x flags add Mermaid diagrams, risk
+    scoring, git timeline, impact analysis, imitate diff, CLAUDE.md
+    generation, OpenAPI generation.
   input:
-    syntax: /healer:imitate [--layer=<list>] [--full | --risk | --impact <file> | --diff | --claude-md | ...]
+    syntax: /healer:imitate [--layer=<list>] [--style-dna | --no-style-dna] [--pages=exhaustive|sample] [--rendered] [--deep-style] [--full | --risk | --impact <file> | --diff | --claude-md | ...]
     args:
       - name: --layer
         desc: 'Comma-separated layers: frontend, backend, server, db, ai'
+        required: false
+      - name: --style-dna
+        desc: Emit Style DNA YAML (default ON when frontend in scope)
+        required: false
+      - name: --no-style-dna
+        desc: Suppress Style DNA emission
+        required: false
+      - name: --pages
+        desc: 'Page composition scope: exhaustive (default) or sample'
+        required: false
+      - name: --rendered
+        desc: Opt-in to headless-browser rendered evidence
+        required: false
+      - name: --deep-style
+        desc: Alias for --style-dna --pages=exhaustive --rendered
         required: false
       - name: --full
         desc: Enable all 10x flags across all layers
@@ -1468,37 +1489,166 @@ imitate:
         required: false
     valid:
       - --layer=frontend
+      - --layer=frontend --deep-style
       - --layer=backend,db
       - --full --claude-md
+      - --pages=sample
+      - --no-style-dna
       - --risk
       - --impact src/payment.ts
-    invalid: []
+    invalid:
+      - text: --pages=all
+        why: invalid enum — use exhaustive or sample
+      - text: --rendered --no-style-dna
+        why: --rendered requires --style-dna emission
   example:
-    command: /healer:imitate --layer=frontend --full
+    command: /healer:imitate --layer=frontend --deep-style
     trace:
-      - 'Scope parsed: frontend only, all 10x features enabled'
+      - 'Scope parsed: frontend only, deep-style (exhaustive pages + rendered evidence)'
       - Scans components, pages, state stores, styles, design tokens
-      - Extracts CP-NNN component patterns, FF-NNN user journeys
-      - Builds 4-in-1 output (Requirements, Design, Spec, Plan) for frontend
-      - Writes {App}_Imitate_{MMDDYYYY}.md with layer-scoped content
+      - Scans Step 8.5 deep style dimensions (PC/VM/CH/IC/BR/CV/AR/MD)
+      - Extracts CP-NNN primitives, FF-NNN journeys, PC-NNN compositions per route
+      - Launches headless browser for computed-CSS evidence per page
+      - Emits {App}_Imitate_{MMDDYYYY}.md (human-readable prose)
+      - Emits {App}_StyleDNA_{MMDDYYYY}.yaml (machine-readable, schema-validated, canonically hashed)
     why_this_example: |
-      Per-layer imitate with --full is the canonical use case — produces a
-      document that a developer can follow to rebuild the entire frontend
-      from scratch in a new stack.
+      --deep-style is the canonical configuration for visual replication.
+      It produces a StyleDNA YAML that /healer:adapt consumes deterministically
+      to replicate the visual identity onto a target codebase with a fidelity
+      score trajectory toward 9-10/10 rather than the 5-6/10 ceiling of
+      token-only imitation.
   input_purpose: |
-    --layer controls which layers are scanned and emitted. --full enables all
-    10x features. Without flags, all 5 layers are imitated with base features.
+    --layer controls scope. --style-dna (default ON for frontend) emits the
+    adapt-consumable YAML. --pages=exhaustive (default) captures every route
+    as a PC-NNN composition. --rendered opts into headless-browser evidence.
+    --deep-style is the canonical maximum-fidelity configuration.
   next:
+    - adapt
     - indulge
     - verify
     - test
     - report
     - analyze
   related:
+    - adapt
     - analyze
     - indulge
   errors:
     - If repo too large (>10k files) → recommends incremental scope
+    - If --rendered passed without running dev server or static export → halts, asks user to start one
+    - If Style DNA fails schema validation during emission → halts with specific violation
+adapt:
+  category: recording
+  purpose: |
+    Style DNA consumer and replicator — takes the Style DNA YAML produced
+    by /healer:imitate on a source project and applies it deterministically
+    to a target codebase. Where imitate is the encoder (code → StyleDNA),
+    adapt is the decoder (StyleDNA → code on a new target). Closes the
+    "5-6/10 visual fidelity" gap by replicating page compositions, visual
+    motifs, chart render configs, per-icon styles, motion literals, and
+    tokens — not just tokens and primitives.
+  what_it_does: |
+    Validates the Style DNA against its schema, scans the target codebase
+    for existing tokens/primitives/pages/icons/motion, computes an
+    adaptation plan of AD-NNN decisions, CF-NNN conflicts, and GP-NNN
+    gaps, then optionally applies it. Three write modes: --plan-only
+    (safe; writes only ADAPTATION_PLAN.md), --write-components (DEFAULT;
+    writes tokens + primitives + reusable compositions without touching
+    pages), --full (also rewrites target pages to echo source PC-NNN
+    compositions). Deterministic: same StyleDNA + same target SHA = same
+    plan. Emits ADAPTATION_PLAN.md and ADAPTATION_REPORT.md with per-section
+    fidelity scores 0-10.
+  input:
+    syntax: /healer:adapt <path/to/StyleDNA.yaml> [--plan-only | --write-components | --full] [--only=<sections>] [--exclude=<sections>] [--copy-voice] [--branding] [--no-page-wipe] [--dry-run] [--report] [--target-root <path>]
+    args:
+      - name: style_dna_path
+        desc: Path to Style DNA YAML from /healer:imitate
+        required: true
+      - name: --plan-only
+        desc: Emit ADAPTATION_PLAN.md only; no file changes
+        required: false
+      - name: --write-components
+        desc: (DEFAULT) Write tokens + primitives + compositions; skip page rewrites
+        required: false
+      - name: --full
+        desc: Also rewrite target pages to echo source PC-NNN compositions
+        required: false
+      - name: --only
+        desc: 'Comma-separated subset: tokens, motifs, pages, charts, icons, branding, copy_voice, ai_response, motion'
+        required: false
+      - name: --exclude
+        desc: Subtractive opposite of --only (mutually exclusive with it)
+        required: false
+      - name: --copy-voice
+        desc: Apply CV-NNN microcopy to target (OFF by default)
+        required: false
+      - name: --branding
+        desc: Apply BR-NNN branding assets to target (OFF by default)
+        required: false
+      - name: --no-page-wipe
+        desc: With --full, preserve existing page content inside new composition shells
+        required: false
+      - name: --dry-run
+        desc: Print per-file diffs without writing
+        required: false
+      - name: --report
+        desc: Emit ADAPTATION_REPORT.md after apply (default ON unless --plan-only)
+        required: false
+      - name: --target-root
+        desc: Explicit target root path (defaults to CWD)
+        required: false
+    valid:
+      - Prism_StyleDNA_04122026.yaml
+      - Prism_StyleDNA_04122026.yaml --plan-only
+      - Prism_StyleDNA_04122026.yaml --full --no-page-wipe
+      - Prism_StyleDNA_04122026.yaml --only=tokens,motion
+      - Prism_StyleDNA_04122026.yaml --exclude=branding,copy_voice
+      - Prism_StyleDNA_04122026.yaml --dry-run
+    invalid:
+      - text: Prism_StyleDNA.yaml --only=tokens --exclude=motion
+        why: --only and --exclude are mutually exclusive
+      - text: Prism_StyleDNA.yaml --full
+        why: --full is dangerous without review; pair with --no-page-wipe unless you truly want to replace pages
+      - text: nonexistent.yaml
+        why: Style DNA must exist and pass schema validation
+  example:
+    command: /healer:adapt Prism_StyleDNA_04122026.yaml --write-components --report
+    trace:
+      - 'Resolves Style DNA path and write mode (write-components, default)'
+      - Validates YAML against references/ui-styling/style-dna.md schema
+      - Scans target codebase for existing tokens/primitives/pages/icons/motion
+      - Computes adaptation plan — AD/CF/GP decisions per StyleDNA section
+      - Emits ADAPTATION_PLAN.md with per-section applicability table
+      - Applies AD-NNN writes — tokens into target config, primitives scaffolded, compositions templates written
+      - Emits ADAPTATION_REPORT.md with per-section fidelity scores
+    why_this_example: |
+      --write-components is the canonical safe-but-substantial use case —
+      gets a target to ~7/10 visual fidelity without rewriting its pages.
+      Pages stay as-is; the composition templates are imported by the
+      user when they want to echo a specific source page composition.
+  input_purpose: |
+    The Style DNA path is load-bearing: it IS the contract. Every decision
+    adapt makes traces to a field in that YAML. Write mode controls blast
+    radius: --plan-only is zero-risk preview, --write-components is the
+    default safe-apply, --full is the full rewrite. --only/--exclude let
+    users stage adaptations section-by-section. --copy-voice and --branding
+    are opt-in because a target app is usually not a clone of the source.
+  next:
+    - conform
+    - design-review
+    - implement
+    - test
+    - push
+  related:
+    - imitate
+    - conform
+    - design-review
+    - design-system
+  errors:
+    - If Style DNA fails schema validation → halt with specific violation
+    - If --full passed without --no-page-wipe and target has uncommitted page changes → warn before proceeding
+    - If --only and --exclude both passed → halt (mutually exclusive)
+    - If target stack cannot express a StyleDNA section (e.g., springs on plain-CSS target) → logged as GP-NNN, not an error
 indulge:
   category: recording
   purpose: |

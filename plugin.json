@@ -1,7 +1,7 @@
 {
   "name": "healer",
-  "version": "8.0.0",
-  "description": "Universal Development Lifecycle Engine — 42 commands, 25 flow presets, postfix `?` and `--help` discoverability, self-validating command catalog with auto-rebuild hook, 10x imitate (5-layer reverse-engineering with 4-in-1 output) & flow testing, design intelligence with 161 palettes, 57 fonts, and 99 UX guidelines.",
+  "version": "8.1.0",
+  "description": "Universal Development Lifecycle Engine — 43 commands, 25 flow presets, postfix `?` and `--help` discoverability, self-validating command catalog with auto-rebuild hook, 10x imitate (5-layer reverse-engineering with 4-in-1 output + Style DNA YAML) & flow testing, /healer:adapt replicator consuming Style DNA deterministically (PC/VM/CH/IC/BR/CV/AR/MD deep-style capture), design intelligence with 161 palettes, 57 fonts, and 99 UX guidelines.",
   "author": {
     "name": "WeaverBird LLC"
   },

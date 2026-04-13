@@ -7,6 +7,128 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [8.1.0] — 2026-04-12
+
+### Added — Style DNA deep-style capture + `/healer:adapt` replicator
+
+Motivation: a user ran `/healer:imitate --layer=frontend --full` on a financial
+app ("Prism") and adapted the output onto a second project ("Adapt"). The
+result landed at a 5-6/10 visual-fidelity ceiling — structural bones matched,
+but the specific feel did not. Root cause: imitate captured primitives and
+tokens, but not the dimensions where "looks like the same app" actually
+lives — page-level composition grammar, per-context visual micro-decisions,
+chart render specifics, per-icon styles, branding SVG data, copy voice,
+AI-response rendering patterns, and literal motion values. And the output
+was prose, not a machine-parseable contract — so no downstream command could
+replicate it deterministically.
+
+#### `/healer:imitate` — deep-style capture (additive)
+- **Eight new ID prefixes** scoped to the frontend layer:
+  - `PC-NNN` Page Composition (layout shell, hero variant, primary/secondary
+    section grammar, density, per-page micro-spacing, section-icon-color
+    map, copy voice ref, composition hash)
+  - `VM-NNN` Visual Motif (named gestures like card-lift-on-hover,
+    glass-overlay, number-ticker — definition, triggers, applied_to list)
+  - `CH-NNN` Chart Render Config (library, chart type, full axes config,
+    legend, tooltip, colors, animation — captures render-output not just
+    component name)
+  - `IC-NNN` Icon Usage (system fingerprint with stroke width / corner
+    style / fill / size scale / color strategy PLUS per-icon catalog PLUS
+    custom inline-SVG path data)
+  - `BR-NNN` Branding Asset (logos, gradients, marks with exact SVG path
+    data, gradient stops, viewBox, aspect ratio)
+  - `CV-NNN` Copy Voice (tone markers 0-1, sentence pattern templates,
+    emoji usage rules per-context, microcopy catalog)
+  - `AR-NNN` AI Response Pattern (RichResponse-style rendering: markdown
+    lib, citation style, suggestion-chip layout, streaming cursor, structured
+    output handlers)
+  - `MD-NNN` Motion Literal (EXACT cubic-bezier arrays, spring stiffness /
+    damping / mass, duration scale, stagger scale, page transition config,
+    reduced-motion handling)
+- **New Step 8.5** (deep-style scan) runs when frontend is in scope, emitting
+  PC/VM/CH/IC/BR/CV/AR/MD entries with source-file:line provenance on every
+  field.
+- **New Sections 1.B.10–1.B.20** in the markdown output surface findings
+  for human review (page compositions table, visual motifs, chart render
+  configs, per-icon catalog, branding assets, copy voice, AI response
+  patterns, motion literals, per-context spacing overrides, focus ring &
+  a11y visuals, Style DNA emission summary).
+- **New Step 13.5** emits `{AppName}_StyleDNA_{MMDDYYYY}.yaml` alongside
+  the markdown. Validated against a rigorous schema with closed enums and
+  mandatory `source_file:line` provenance. Deterministic: same git SHA =
+  byte-identical YAML (canonical hash excludes `generated_at`).
+- **New flags:**
+  - `--style-dna` (DEFAULT ON when frontend in scope)
+  - `--no-style-dna` (suppress emission)
+  - `--pages=exhaustive` (DEFAULT — every route gets a PC-NNN entry)
+  - `--pages=sample` (landing + 3 most-distinct + 1 per unique layout shell)
+  - `--rendered` (opt into headless-browser evidence for computed CSS
+    snapshots and screenshot paths — augments, never overrides, source
+    values)
+  - `--deep-style` (alias: `--style-dna --pages=exhaustive --rendered`)
+
+#### `/healer:adapt` — NEW command (the replicator / decoder)
+
+- **The consumer side of imitate.** Takes a Style DNA YAML, scans a target
+  codebase, computes an adaptation plan, and optionally applies it. Closes
+  the 5-6/10 visual-fidelity ceiling by replicating page compositions,
+  visual motifs, chart render configs, per-icon styles, and motion literals
+  — not just tokens and primitives.
+- **Three write modes:**
+  - `--plan-only` — emits `ADAPTATION_PLAN.md` only. Safe preview. Zero
+    writes to target files.
+  - `--write-components` (DEFAULT) — writes tokens + primitives +
+    reusable composition templates. Does NOT touch target pages.
+  - `--full` — also rewrites target pages to echo source PC-NNN page
+    compositions. Explicit flag required.
+- **Decision records:** `AD-NNN` (Adaptation Decision), `CF-NNN` (Conflict
+  Flag — target has a differing value), `GP-NNN` (Gap — target stack cannot
+  express this StyleDNA section).
+- **Opt-in sections** with explicit defaults OFF: `--copy-voice` (source
+  microcopy usually doesn't apply), `--branding` (target has its own brand).
+- **Section filters:** `--only=<sections>` and `--exclude=<sections>` with
+  9-section vocabulary (tokens, motifs, pages, charts, icons, branding,
+  copy_voice, ai_response, motion). Mutually exclusive.
+- **Target-stack translation:** tokens translate into target's idiom —
+  Tailwind target gets `tailwind.config.*` extensions, CSS-modules target
+  gets `:root { --* }` variables, styled-components target gets theme
+  object. Chart configs translate across libraries (recharts ↔ chart.js
+  ↔ nivo) where possible; otherwise logged as `GP-NNN`.
+- **Determinism contract:** same StyleDNA + same target SHA + same flags =
+  byte-identical `ADAPTATION_PLAN.md`.
+- **Fidelity scoring:** `ADAPTATION_REPORT.md` emits 0-10 per-section
+  scores and an overall projected fidelity with plain-English rationale.
+- **Never commits.** Writes files. User commits via `/healer:push` or
+  `/healer:ship`.
+
+#### New shared schema: `references/ui-styling/style-dna.md`
+- 12 top-level sections (envelope, tokens, visual_motifs, page_compositions,
+  chart_renders, icon_usage, branding_assets, copy_voice,
+  ai_response_patterns, motion_literals, primitives_ref, provenance).
+- Closed enums throughout (layout_shell, chart_type, icon style, gradient
+  type, citation style, etc.) — prevents string drift between imitate and
+  adapt.
+- Mandatory `source_file:line` provenance on every non-trivial field.
+- Canonical-hash determinism contract.
+- Companion JSON Schema Draft 2020-12 for automated validation.
+
+#### Flow preset updates
+- `imitate-test`, `imitate-full`, `imitate-secure`, `imitate-visual`,
+  `imitate-onboard`, `imitate-regression` all still function unchanged —
+  they automatically benefit from StyleDNA emission when the frontend
+  layer is in scope.
+- Suggested-next graph: `imitate → adapt` added. State file records
+  `style_dna_file`, `style_dna_hash`, `pages_mode`, `rendered_evidence`,
+  and per-prefix counts.
+
+#### Non-breaking by design
+- Existing `/healer:imitate` invocations continue to work. StyleDNA emission
+  is ADDITIVE (a second output file) — nothing existing is replaced. Users
+  who do not want the YAML can pass `--no-style-dna`.
+- Command count: 42 → 43. Flow preset count unchanged at 25.
+
+---
+
 ## [8.0.0] — 2026-04-12
 
 ### Changed — BREAKING: `/healer:record` renamed to `/healer:imitate`

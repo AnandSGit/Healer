@@ -1,5 +1,5 @@
 ---
-description: "Reverse-engineer a specific layer (frontend, backend, server, db, ai) — or the whole app — into a single 4-in-1 document combining Requirements + Design + Spec + Implementation Plan. The FIRST healer command that reads code and PRODUCES enough information to rebuild the layer from scratch (reverse direction of spec -> implement -> verify). 9-layer discovery with layer scoping, flow ID system, cross-reference matrix, and 10x features (Mermaid diagrams, risk scoring, git timeline, impact analysis, dead code detection, imitate diff, CLAUDE.md generation, data lineage, security surface, complexity heatmap, OpenAPI generation)."
+description: "Reverse-engineer a specific layer (frontend, backend, server, db, ai) — or the whole app — into a single 4-in-1 document combining Requirements + Design + Spec + Implementation Plan, PLUS a machine-readable Style DNA YAML for deterministic replication by /healer:adapt. The FIRST healer command that reads code and PRODUCES enough information to rebuild the layer from scratch (reverse direction of spec -> implement -> verify). 9-layer discovery, flow ID system, cross-reference matrix, full visual Style DNA capture (page compositions PC-NNN, visual motifs VM-NNN, chart render configs CH-NNN, icon usage IC-NNN, branding assets BR-NNN, copy voice CV-NNN, AI response patterns AR-NNN, motion literals MD-NNN), and 10x features (Mermaid diagrams, risk scoring, git timeline, impact analysis, dead code detection, imitate diff, CLAUDE.md generation, OpenAPI generation, optional rendered evidence via headless browser)."
 ---
 
 <!-- Help metadata: data/commands.yaml -->
@@ -52,8 +52,14 @@ Accepted arguments:
 | `--decisions` | Enable: Extract Architecture Decision Records from comments + git log |
 | `--validate` | Enable: Read previous imitate, check staleness via git log per flow |
 | `--full` | ALL 10x features enabled (all flags above, all layers included) |
+| `--style-dna` | (DEFAULT ON when frontend in scope) Emit machine-readable `{App}_StyleDNA_{date}.yaml` alongside the markdown. Conforms to `references/ui-styling/style-dna.md`. Consumed by `/healer:adapt`. |
+| `--no-style-dna` | Suppress Style DNA emission (markdown-only output) |
+| `--pages=exhaustive` | (DEFAULT) Capture `PC-NNN` Page Composition for EVERY route in the app — the grammar of how primitives arrange per page |
+| `--pages=sample` | Capture Page Compositions only for representative pages (landing + up to 3 most-distinct + every unique layout shell). Faster; risks missing unique page patterns |
+| `--rendered` | Opt-in to headless-browser rendered evidence: computed CSS snapshots, screenshot paths, computed gradient stops. Requires a running dev server or buildable static export. Without this flag, StyleDNA uses source-derivable facts only (deterministic, read-only) |
+| `--deep-style` | Alias for `--style-dna --pages=exhaustive --rendered` — maximum visual-fidelity capture |
 
-If no `--layer` flag is provided, ALL five layers are imitated. If `--layer` is provided, ONLY the listed layers are scanned and included in output.
+If no `--layer` flag is provided, ALL five layers are imitated. If `--layer` is provided, ONLY the listed layers are scanned and included in output. When the frontend layer is in scope, Style DNA emission is ON by default — pass `--no-style-dna` to suppress.
 
 ### Layer → Scan Mapping
 
@@ -85,8 +91,18 @@ Every discovered element gets a unique ID within its category:
 | `DEC-NNN` | Architecture Decision (extracted from code/git) | DEC-001: Chose Supabase over Firebase | any |
 | `AI-NNN` | AI Surface (prompts, agents, chains, embeddings) | AI-001: Customer support agent | ai |
 | `SRV-NNN` | Server Element (middleware, lifecycle hook, CI step) | SRV-001: JWT auth middleware | server |
+| `PC-NNN` | Page Composition (per-page layout grammar, density, hierarchy, framing) | PC-001: /dashboard composition | frontend |
+| `VM-NNN` | Visual Motif (named visual gesture: card-lift-on-hover, glass-overlay, number-ticker) | VM-001: card-lift-on-hover | frontend |
+| `CH-NNN` | Chart Render Config (axis styling, legend, tooltip, colors, animation) | CH-001: revenue-bar-chart | frontend |
+| `IC-NNN` | Icon Usage (per-icon role, size, stroke, color, context) | IC-001: nav.dashboard icon | frontend |
+| `BR-NNN` | Branding Asset (logos, gradients, marks with SVG path data + gradient stops) | BR-001: primary-logomark | frontend |
+| `CV-NNN` | Copy Voice entry (microcopy, tone, emoji rules) | CV-001: dashboard.empty-state | frontend |
+| `AR-NNN` | AI Response Pattern (RichResponse rendering: markdown, citations, suggestion chips, streaming) | AR-001: rich-response renderer | frontend/ai |
+| `MD-NNN` | Motion/Animation Literal (exact cubic-bezier arrays, spring stiffness, stagger ms) | MD-001: standard easing | frontend |
 
-IDs are sequential within each category. Cross-references use these IDs (e.g., "BLF-003 touches DA-001, DA-004, calls API-007, uses AI-002").
+IDs are sequential within each category. Cross-references use these IDs (e.g., "BLF-003 touches DA-001, DA-004, calls API-007, uses AI-002"; "PC-001 uses CP-020, CP-021, CH-001, IC-012, colors via color-success-subtle, motion via MD-001").
+
+**Why the style-capture prefixes matter.** The `CP-NNN` Component Patterns and legacy `1.B` Design subsections capture tokens and primitives — enough for "same design family" but not for "same app feel." The PC/VM/CH/IC/BR/CV/AR/MD prefixes close that gap by capturing page-composition grammar, reusable visual gestures, chart render specifics, per-icon style decisions, branding SVG data, microcopy tone, AI response rendering, and literal animation values. These are serialized into the Style DNA YAML and consumed deterministically by `/healer:adapt`.
 
 ## Procedure
 
@@ -375,6 +391,113 @@ Extract and record design tokens:
 For each state store / reducer / machine, record as `CF-NNN` (control flows) or `SF-NNN` (state machines).
 
 For each user journey traced through pages → API calls → DB operations, record as `FF-NNN`.
+
+### Step 8.5: Deep Style Capture (skip if `frontend` not in scope OR `--no-style-dna`)
+
+This step scans the eight style-capture dimensions that close the gap between "same design system" and "looks like the same app." Each dimension produces entries that populate both the `1.B` Design subsections of the markdown AND the Style DNA YAML (emitted in Step 13.5).
+
+**Principle: every field must trace to a source file and line.** No estimates. If a value is not source-derivable and `--rendered` was not passed, omit it (do not null-stub).
+
+```bash
+# --- Page Composition scan (PC-NNN) — D1 exhaustive default ---
+# Enumerate every route file
+find . -path "*/app/*" -name "page.*" -o -path "*/pages/*" -name "*.tsx" -o -path "*/pages/*" -name "*.jsx" -o -name "+page.svelte" -o -name "+page.tsx" | grep -v node_modules | sort
+
+# For each route file: read fully, parse the JSX/composition tree
+#   - Detect layout shell (sidebar-main, top-nav-main, three-column, centered-single-column, split, full-bleed)
+#   - Detect hero section: present? variant? grid? padding? content refs
+#   - Detect primary section: role (summary|detail|list|mixed), layout grid, density, item refs
+#   - Detect secondary sections in order with their frames
+#   - Detect empty states: variant (illustration|icon|text-only|cta-focused), copy ref, illustration ref
+#   - Detect per-page spacing overrides (card_padding, row_gap, section_gap) — grep for p-N, gap-N tokens
+#   - Detect section-icon-color map (accent/success/info/warning per-section)
+#   - Hash the composition for change detection
+
+# --- Visual Motif scan (VM-NNN) — reusable gestures ---
+# Find transform/filter combinations used in >1 component
+grep -rn "translate-y\|translate-x\|scale-\|rotate-\|backdrop-blur\|backdrop-filter" --include="*.tsx" --include="*.jsx" --include="*.css" | grep -v node_modules | head -100
+grep -rn "framer-motion\|react-spring\|motion\.\|useSpring\|useMotionValue\|animate(" --include="*.tsx" --include="*.ts" | grep -v node_modules | head -80
+# Cluster by gesture: card-lift-on-hover, glass-overlay, number-ticker, parallax, magnetic-hover
+# Count applied_to > 1 threshold to qualify as a motif
+
+# --- Chart Render Config scan (CH-NNN) ---
+grep -rn "from 'recharts\|from 'chart.js\|from 'd3\|from '@visx\|from 'nivo\|from 'victory\|from '@nivo\|new Chart(" --include="*.tsx" --include="*.ts" --include="*.jsx" --include="*.js" | grep -v node_modules | head -50
+find . -path "*/charts/*" -o -name "*Chart*.tsx" -o -name "*Chart*.jsx" | grep -v node_modules | sort
+# For each chart: read the component source and extract:
+#   - library, chart_type
+#   - axes (x/y): tick_format, tick_color, font_size, gridlines, grid_opacity
+#   - legend: position, alignment, swatch_shape
+#   - tooltip: shape, background, border_radius, shadow, padding
+#   - colors: series palette refs, hover brightness
+#   - animation: entry_duration, entry_stagger, easing
+#   - empty_state variant
+
+# --- Icon Usage scan (IC-NNN) — deep ---
+# Identify icon library
+grep -rn "from 'lucide-react\|from '@phosphor-icons\|from '@heroicons\|from 'react-feather\|from '@tabler/icons\|from '@radix-ui/react-icons" --include="*.tsx" --include="*.ts" | grep -v node_modules | head -20
+# Detect style fingerprint
+grep -rn "strokeWidth=\|stroke-width\|<Icon\s\|<svg" --include="*.tsx" --include="*.jsx" --include="*.svg" | grep -v node_modules | head -50
+# Enumerate per-icon usage with role + context
+# For custom inline SVGs: extract viewBox, path d, fill, stroke, gradient refs
+find . -name "*.svg" -not -path "*/node_modules/*" -not -path "*/.git/*" | sort | head -50
+
+# --- Branding Asset scan (BR-NNN) ---
+find . -path "*/components/*" -iname "*logo*" -o -iname "*brand*" -o -iname "*mark*" | grep -v node_modules | head -20
+# For each logo component/SVG: extract path data, viewBox, gradient <defs>, gradient stops, angle
+grep -rn "linearGradient\|radialGradient\|<stop " --include="*.tsx" --include="*.jsx" --include="*.svg" --include="*.css" | grep -v node_modules | head -50
+
+# --- Copy Voice scan (CV-NNN) ---
+# Extract microcopy strings in context: empty states, error messages, success confirmations, CTA labels
+grep -rn "Empty\|empty\|NoData\|no-data\|No\s\+[A-Z]\w\+\s\+yet" --include="*.tsx" --include="*.jsx" | grep -v node_modules | head -40
+grep -rn "ErrorMessage\|errorMessage\|error:\s\+[\"']" --include="*.tsx" --include="*.ts" | grep -v node_modules | head -40
+# Emoji usage audit — find literal emoji characters in source
+grep -rnP "[\x{1F300}-\x{1FAFF}]|[\x{2600}-\x{27BF}]" --include="*.tsx" --include="*.ts" --include="*.json" | grep -v node_modules | head -50
+# Category → emoji maps
+grep -rn "emoji:\s*['\"]\|icon:\s*['\"]\p{Emoji}" --include="*.ts" --include="*.tsx" | grep -v node_modules | head -30
+
+# --- AI Response Pattern scan (AR-NNN) ---
+find . -iname "*response*.tsx" -o -iname "*message*.tsx" -o -iname "*chat*.tsx" -o -iname "*assistant*.tsx" -o -iname "*rich*.tsx" | grep -v node_modules | sort
+grep -rn "react-markdown\|marked\|rehype\|remark\|shiki\|prism-react\|highlight.js" --include="*.tsx" --include="*.ts" | grep -v node_modules | head -20
+grep -rn "streaming\|typewriter\|stream\s*:\s*true\|onToken\|useChat" --include="*.tsx" --include="*.ts" | grep -v node_modules | head -20
+# For each AI response renderer: identify markdown library, syntax highlighter, citation style, suggestion-chip layout, streaming cursor, structured output handlers
+
+# --- Motion Literal scan (MD-NNN) — EXACT values ---
+# Cubic-bezier arrays
+grep -rnP "cubic-bezier\(|cubicBezier|\[\s*[\d.]+\s*,\s*[\d.]+\s*,\s*[\d.]+\s*,\s*[\d.]+\s*\]" --include="*.tsx" --include="*.ts" --include="*.css" | grep -v node_modules | head -40
+# Spring configs
+grep -rn "stiffness\s*:\|damping\s*:\|mass\s*:\|useSpring\(" --include="*.tsx" --include="*.ts" | grep -v node_modules | head -30
+# Durations and stagger
+grep -rn "duration\s*:\|staggerChildren\|delayChildren\|transition-duration" --include="*.tsx" --include="*.ts" --include="*.css" | grep -v node_modules | head -40
+# Page transitions
+grep -rn "AnimatePresence\|motion\.div\|transition\s*=\s*{" --include="*.tsx" | grep -v node_modules | head -30
+# Reduced motion respect
+grep -rn "prefers-reduced-motion\|useReducedMotion" --include="*.tsx" --include="*.ts" --include="*.css" | grep -v node_modules | head -10
+
+# --- Per-context spacing overrides (the "p-4 vs p-6" problem) ---
+# Find every Tailwind padding token per page
+grep -rn "\sp-[0-9]\|\spx-[0-9]\|\spy-[0-9]\|\sgap-[0-9]" --include="*.tsx" --include="*.jsx" | grep -v node_modules | head -200
+# Group by file → most common padding token per context
+
+# --- Rendered evidence (only if --rendered passed) ---
+# Run a headless browser against a running dev server or static export
+# Capture: computed CSS snapshots per PC-NNN, screenshot paths, computed gradient stops
+# (Implementation: use Playwright MCP if available; otherwise emit PENDING_RENDERED flags)
+```
+
+For every element discovered in this step, assign the appropriate ID (PC-NNN, VM-NNN, CH-NNN, IC-NNN, BR-NNN, CV-NNN, AR-NNN, MD-NNN) and record:
+
+- **PC-NNN**: route, source file, line range, layout shell enum, content grammar (hero/primary/secondary sections with roles and refs), micro_spacing overrides, iconography (section-icon-color map), copy_voice_ref, composition_hash
+- **VM-NNN**: name, gesture type, definition (from/to values, duration, easing ref, shadow shift), triggers, applied_to list, source file
+- **CH-NNN**: component ref, library, chart type, full axes config, legend config, tooltip config, color series refs, animation config, empty_state variant
+- **IC-NNN**: system fingerprint (library, style, stroke width, corner style, default size, size scale, color strategy) PLUS per-icon entries (role, name_in_library, size, stroke, colors, background shape, used_in_files) PLUS custom inline SVGs with path data
+- **BR-NNN**: name, format, viewBox, path data, gradient refs, aspect ratio, contexts used, gradient definitions (type, angle, stops array)
+- **CV-NNN**: tone markers (warmth, formality, playfulness, technicality 0-1), sentence pattern templates, emoji usage rules (allowed/forbidden contexts, per-category map), microcopy catalog entries per context
+- **AR-NNN**: component ref, markdown renderer lib, GFM flag, syntax highlighter, code block style, citation style, suggestion chips layout, streaming cursor style, structured output renderers
+- **MD-NNN**: easings (named + cubic_bezier arrays), springs (stiffness/damping/mass), duration scale, stagger scale, page transition config, reduced-motion respect
+
+**Enforcement in this step.** If `--pages=exhaustive` (default): every route file in the project produces a PC-NNN entry. Missing a route = incomplete scan. If `--pages=sample`: emit landing + up to 3 pages with maximally-distinct `layout_shell` + every unique layout_shell appearing in the app (at minimum). Record in the output which mode was used.
+
+**`--rendered` mode.** When passed, after source scanning is complete, launch a headless browser (Playwright MCP if available) against the running dev server / built export. For each PC-NNN: capture a screenshot at each breakpoint, read computed styles of representative elements, and attach the evidence paths to the PC-NNN entry. This does NOT override source-derived values — it augments them. When Playwright MCP is unavailable, this step no-ops and is reported as SKIPPED in the output.
 
 ### Step 9: AI Layer Scan (skip if `ai` not in scope)
 
@@ -696,6 +819,53 @@ notable patterns, and anything an imitator must know before starting}
 
 #### 1.B.9 State Architecture
 {Which state lives where: local, global store, server state, URL state}
+
+#### 1.B.10 Page Compositions (PC-NNN) — the "grammar per page"
+For every route, a PC-NNN entry:
+| PC-ID | Route | Layout Shell | Hero Variant | Primary Section Role | Density | Micro-spacing (card padding / row gap / section gap) | Section-Icon-Color Map | Copy Voice Ref | Composition Hash |
+|-------|-------|--------------|--------------|---------------------|---------|-----------------------------------------------------|-----------------------|----------------|------------------|
+
+Each PC-NNN lists the ordered secondary sections (chart-panel, activity-feed, filter-bar, etc.) with their frames and refs to CP-NNN, CH-NNN, IC-NNN, CV-NNN, BR-NNN.
+
+#### 1.B.11 Visual Motifs (VM-NNN) — reusable visual gestures
+| VM-ID | Name | Gesture | Definition (from→to, duration, easing) | Triggers | Applied To | Source |
+|-------|------|---------|--------------------------------------|----------|-----------|--------|
+
+#### 1.B.12 Chart Render Configurations (CH-NNN)
+For every chart component in use, a row with library, chart type, full axes config, legend position + alignment + swatch shape, tooltip shape + colors + radius + shadow, series palette refs, animation config, empty-state variant.
+
+#### 1.B.13 Icon Usage (IC-NNN) — deep
+**System fingerprint**: primary library, style (outline/solid/duotone/mixed), stroke width, corner style, default size, size scale, color strategy.
+
+**Per-icon catalog**: every icon in use with role, name-in-library, size, stroke width, color refs (default + active), background shape (none/circle/square/squircle) and background ref, used-in files.
+
+**Custom inline SVGs**: per-icon path data, viewBox, fill/stroke, gradient refs, source file:line.
+
+#### 1.B.14 Branding Assets (BR-NNN)
+Every logomark, wordmark, and brand-specific SVG with exact path data, gradient definitions (type, angle, stops array), aspect ratio, contexts used.
+
+#### 1.B.15 Copy Voice (CV-NNN)
+Tone markers (warmth/formality/playfulness/technicality 0-1). Sentence pattern templates for empty states, errors, success, CTAs. Emoji usage rules (allowed/forbidden contexts, per-category map). Microcopy catalog entries per context.
+
+#### 1.B.16 AI Response Patterns (AR-NNN) {if frontend renders AI output}
+For every component that renders AI output: markdown renderer lib, GFM flag, syntax highlighter, code block style, citation style (numbered-superscript/inline-badge/footnote), suggestion-chip layout and max visible, streaming cursor style, typing stagger, structured output handlers (table, chart).
+
+#### 1.B.17 Motion Literals (MD-NNN)
+**Easings**: named + exact `cubic-bezier` arrays, used-in list.
+**Springs**: stiffness, damping, mass, library, used-in list.
+**Durations**: micro / short / medium / long / extra_long ms values.
+**Stagger**: list-items, grid-items, hero-letters ms values.
+**Page transitions**: type, y-offset px, duration, easing ref.
+**Reduced motion**: respects `prefers-reduced-motion`? fallback strategy.
+
+#### 1.B.18 Per-Context Spacing Overrides
+The "p-4 vs p-6 per page" capture. Table of `context → padding token → px values → source file:line`.
+
+#### 1.B.19 Focus Ring & A11y Visuals
+Focus ring width/offset/color/style. Keyboard nav visual treatment. Skip-link style. Screen-reader-only utilities in use.
+
+#### 1.B.20 Style DNA Emission
+Reference to the emitted `{App}_StyleDNA_{date}.yaml` file with its `canonical_hash`. Links each 1.B.10–1.B.19 subsection to its corresponding YAML path. States clearly which mode was used (`exhaustive`/`sample`, `rendered`/`source-only`) and the scan coverage stats (files_scanned, files_producing_fields, unscanned_candidates).
 
 ### 1.C Specification (How to Rebuild It Correctly)
 
@@ -1096,6 +1266,39 @@ Per AI-NNN: minimum pass rate on golden eval set, latency budget, cost budget.
 
 **ENFORCEMENT: Skipped layers (not in `--layer` scope) are OMITTED entirely from the output — do not emit empty shells. The layer header appears only when the layer is in scope.**
 
+### Step 13.5: Emit Style DNA (skip if `frontend` not in scope OR `--no-style-dna`)
+
+When the frontend layer is in scope and Style DNA emission is not suppressed, produce a SECOND output file alongside the markdown: `{AppName}_StyleDNA_{MMDDYYYY}.yaml`.
+
+**The schema is defined in `references/ui-styling/style-dna.md`. Read that file before emitting. The YAML produced here MUST validate against it.**
+
+**Emission procedure:**
+
+1. **Assemble the envelope** with `style_dna_version: "1.0.0"`, `app_identity` (name, source_sha from `git rev-parse HEAD`, absolute repo root, imitate_mode from `--pages` flag, rendered_evidence from `--rendered` flag, ISO-8601 generated_at, generator version).
+2. **Populate `tokens`** from the token scan (Step 8): colors palette (with light/dark/hc variants), gradients, typography families + scale + body_baseline, spacing (base_unit + scale_keys + per_context_overrides from Step 8.5), radii (scale + per_element map), elevation (shadow_levels + blur_backdrop), borders (widths + styles + focus_ring), opacity scale, z_index layers, breakpoints.
+3. **Populate `visual_motifs`** from VM-NNN entries. Each motif includes gesture type, definition, triggers, applied_to list, source_file + source_line.
+4. **Populate `page_compositions`** from PC-NNN entries. Exhaustive mode: one entry per route. Sample mode: entries selected per the sampling rule (landing + 3 most-distinct + one per unique layout_shell). Each PC includes route, source_file, source_lines, layout_shell enum, content_grammar (hero/primary/secondary/empty_state), micro_spacing overrides, iconography section_icon_color_map, copy_voice_ref, composition_hash.
+5. **Populate `chart_renders`** from CH-NNN entries with complete axes/legend/tooltip/colors/animation configs.
+6. **Populate `icon_usage`** with system fingerprint, per-icon catalog, and custom-inline-SVG entries (path data, viewBox, fill/stroke, gradient refs).
+7. **Populate `branding_assets`** with logo SVG path data, gradient definitions (type, angle, stops array), aspect ratios, contexts.
+8. **Populate `copy_voice`** with tone markers, sentence patterns, emoji usage rules, microcopy catalog.
+9. **Populate `ai_response_patterns`** from AR-NNN entries (if the app renders AI output).
+10. **Populate `motion_literals`** from MD-NNN entries with EXACT cubic-bezier arrays, spring configs, duration/stagger scales, page transition config, reduced-motion handling.
+11. **Populate `primitives_ref`** with pointers back to CP-NNN entries in the markdown (cp_id, name, file, variants, imitate_doc_anchor). Do NOT duplicate primitive content — StyleDNA stays lean.
+12. **Populate `provenance`** with field_to_source and file_to_fields backmaps + scan_coverage stats (files_scanned, files_producing_fields, unscanned_candidates list of source files with CSS-adjacent content that did not yield fields — flagged for human review).
+13. **Canonicalize**: sort every list by `id` ascending. Normalize all path strings to be relative to `app_identity.source_repo_root`. Remove any null-stubbed fields (omit absent data; never emit `null`).
+14. **Hash**: compute `canonical_hash = sha256(canonical_yaml_bytes_minus_hash_field)` and write it into the envelope. This makes two imitate runs on the same SHA byte-identical.
+15. **Validate**: the emitted YAML MUST conform to the schema in `references/ui-styling/style-dna.md`. If any required field is missing or any enum value falls outside the defined set, HALT and report the specific violation.
+16. **Write** to `{AppName}_StyleDNA_{MMDDYYYY}.yaml` in the repo root (alongside the markdown imitate document).
+
+<HARD-GATE>NO GUESSING IN STYLE DNA. Every field traces to a source file:line. If a value is not source-derivable and `--rendered` was not passed, omit the field. Null-stubs and estimates are forbidden — they poison the contract with /healer:adapt.</HARD-GATE>
+
+<HARD-GATE>DETERMINISM IS MANDATORY. Two runs of imitate on the same git SHA MUST produce byte-identical StyleDNA (after excluding `generated_at` from the hash body). If they don't, there is non-determinism somewhere — investigate and fix before emitting.</HARD-GATE>
+
+<HARD-GATE>NO SECRETS IN STYLE DNA. Same rule as the markdown document: NEVER embed API keys, tokens, or user data. Microcopy examples must be redacted if they contain PII.</HARD-GATE>
+
+Announce in the output markdown (Section 1.B.20) that the Style DNA was emitted, with its filename and canonical hash. If `--no-style-dna` was passed, Section 1.B.20 states "Style DNA emission suppressed by --no-style-dna."
+
 ### Step 14: Update State
 
 Write to `.healer/state.json`:
@@ -1104,15 +1307,29 @@ Write to `.healer/state.json`:
 {
   "last_command": "imitate",
   "status": "completed",
-  "suggested_next": "indulge",
+  "suggested_next": "adapt",
   "timestamp": "ISO-8601",
-  "imitate_file": "{output file path}",
+  "imitate_file": "{markdown output path}",
+  "style_dna_file": "{yaml output path or null if suppressed}",
+  "style_dna_hash": "{canonical_hash or null}",
   "layers_in_scope": ["frontend", "backend", "server", "db", "ai"],
   "flows_discovered": N,
   "requirements_extracted": N,
-  "flags_used": ["--full", "--risk", "etc."]
+  "pc_count": N,
+  "vm_count": N,
+  "ch_count": N,
+  "ic_count": N,
+  "br_count": N,
+  "cv_count": N,
+  "ar_count": N,
+  "md_count": N,
+  "pages_mode": "exhaustive|sample",
+  "rendered_evidence": true|false,
+  "flags_used": ["--full", "--risk", "--style-dna", "etc."]
 }
 ```
+
+Suggested next is `adapt` when `style_dna_file` was emitted; otherwise `indulge`.
 
 ## Red Flags — STOP and Reassess
 
@@ -1197,3 +1414,11 @@ RED FLAGS:
 18. **CLAUDE.md is condensed** — `--claude-md` output is a summary, not a full copy
 19. **OpenAPI spec is standards-compliant** — `--openapi` output must be valid OpenAPI 3.0 YAML
 20. **Implementation Plan tasks trace to flows** — every task references at least one flow ID from the layer's Requirements or Design subsection
+21. **Style DNA is ON by default for frontend** — when the frontend layer is in scope, `{App}_StyleDNA_{date}.yaml` is emitted alongside the markdown unless `--no-style-dna` is passed
+22. **Style DNA fields trace to source** — every non-trivial field in the YAML has a `source_file:line` provenance. No estimates, no null-stubs
+23. **Style DNA is deterministic** — same git SHA → byte-identical YAML (after excluding `generated_at` from the hash body). Sort lists by `id`, normalize paths to relative, omit absent fields
+24. **Style DNA validates against schema** — the YAML MUST conform to the schema in `references/ui-styling/style-dna.md`. Halt on violation
+25. **Page composition is exhaustive by default** — every route gets a PC-NNN entry unless `--pages=sample` is passed; sample mode is explicit
+26. **Rendered evidence is opt-in** — StyleDNA is source-derivable only unless `--rendered` is passed. Rendered mode augments, never overrides, source-derived values
+27. **Eight style-capture prefixes are frontend-layer-only** — PC, VM, CH, IC, BR, CV, AR, MD are emitted only when frontend is in scope. Backend/db/ai/server layers do not use them
+28. **Style DNA is adapt-consumable** — output is designed to be parsed by `/healer:adapt`, not read by humans. The markdown is the human-readable sibling
