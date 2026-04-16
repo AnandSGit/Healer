@@ -1705,6 +1705,59 @@ indulge:
     - test
   errors:
     - If no imitate document found → halts (recommend /healer:imitate first)
+karpathy:
+  category: quality
+  purpose: |
+    Karpathy-lens code review — checks recent changes against the four
+    Karpathy principles (Think Before Coding, Simplicity First, Surgical
+    Changes, Goal-Driven Execution) with research-augmented validation.
+  what_it_does: |
+    Gathers code changes (diff, PR, branch, or files), researches
+    principle-specific patterns online, checks every change against
+    P1-P4 heuristics with per-principle and per-file reporting, and
+    produces a structured Karpathy Report with specific violation
+    descriptions and fix recommendations.
+  input:
+    syntax: /healer:karpathy [target]
+    args:
+      - name: target
+        desc: What to review — diff (default), PR number, branch, file, or "last commit"
+        required: false
+    valid:
+      - /healer:karpathy
+      - /healer:karpathy last commit
+      - /healer:karpathy src/lib/auth.ts
+    invalid:
+      - text: /healer:karpathy fix
+        why: karpathy reviews, it doesn't fix — use /healer:fix after reviewing
+  example:
+    command: /healer:karpathy last commit
+    trace:
+      - 'Runs git diff HEAD~1 to gather last commit changes'
+      - 'WebSearches "{pattern} over-engineering" for each concern found'
+      - 'Checks 4 files against P1-P4: finds P2 violation (unused abstraction in utils.ts) and P3 violation (reformatted adjacent function in api.ts)'
+      - 'Reports: 2 violations across 2 files, P1 ✅, P2 ⚠️, P3 ⚠️, P4 ✅'
+      - 'Recommends: inline the abstraction, revert the formatting change'
+    why_this_example: |
+      "last commit" is the most common use case — quick post-commit
+      hygiene check. The example shows both P2 and P3 violations,
+      demonstrating the dual per-principle + per-file report format.
+  input_purpose: |
+    [target] scopes what code to review. Empty means all uncommitted
+    changes. Specific targets (file, PR, branch) narrow the review.
+    "last commit" is the most common quick-check pattern.
+  next:
+    - fix
+    - implement
+    - push
+    - review
+  related:
+    - review
+    - refactor
+    - verify
+  errors:
+    - If no changes found → reports "No changes to review" and suggests checking git status
+    - If target file doesn't exist → error with suggestion
 debug:
   category: debug
   purpose: |

@@ -43,6 +43,8 @@ The user provides: $ARGUMENTS
 /healer:flow imitate-visual    # Visual audit: imitate --layer=frontend → indulge --visual --a11y → design-review → report
 /healer:flow imitate-onboard   # Full onboarding + CLAUDE.md: imitate --full --claude-md → report
 /healer:flow imitate-regression # Regression detection: imitate --diff → indulge --regression → report
+/healer:flow karpathy-review   # Karpathy lens: implement → karpathy !→ push
+/healer:flow karpathy-fix      # Karpathy fix loop: karpathy → fix → karpathy !→ push
 ```
 
 ### Inline Custom Flow
@@ -161,15 +163,15 @@ design        → spec, architect, implement, design-review
 architect     → spec, design, plan
 spec          → plan, implement
 strategy      → plan, spec, implement
-implement     → verify, test, conform, review, push
+implement     → verify, test, conform, review, push, karpathy
 tdd           → coverage, review, push
 test          → coverage, fix, push
 coverage      → test, fix
 debug         → fix, test
 fix           → test, diagnose, push
-refactor      → test, review, push
+refactor      → test, review, push, karpathy
 optimize      → test, review, push
-review        → fix, push, ship
+review        → fix, push, ship, karpathy
 analyze       → refactor, audit, fix
 audit         → fix, implement
 diagnose      → fix, report, deploy
@@ -192,6 +194,7 @@ verify        → fix, implement, test, push, ship
 catchup       → test, review, implement, verify, deploy
 imitate       → indulge, verify, test, report, analyze
 indulge       → fix, test, push, report, coverage
+karpathy      → fix, implement, push, review
 ```
 
 When `/healer` is called with NO arguments and state exists:
@@ -451,6 +454,28 @@ catchup:
       gate: must-pass
     - command: review
       gate: interactive
+
+  karpathy-review:
+    description: "Karpathy-lens review before shipping"
+    steps:
+      - command: implement
+        gate: auto
+      - command: karpathy
+        gate: must-pass
+      - command: push
+        gate: interactive
+
+  karpathy-fix:
+    description: "Karpathy review + fix loop"
+    steps:
+      - command: karpathy
+        gate: auto
+      - command: fix
+        gate: auto
+      - command: karpathy
+        gate: must-pass
+      - command: push
+        gate: interactive
 ```
 
 ## Custom Recipes

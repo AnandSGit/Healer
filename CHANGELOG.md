@@ -7,6 +7,60 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [9.0.0] — 2026-04-15
+
+### Breaking — Karpathy Enforcement Integration
+
+New HARD-GATE enforcement rules change behavior of all code-writing commands.
+Commands that write or edit source code now enforce Karpathy's Simplicity and
+Surgical Changes principles automatically. Existing workflows may surface
+violations that were previously silent.
+
+### Added
+
+- **`/healer:karpathy`** — Karpathy-lens code review checking recent changes
+  against four principles (Think Before Coding, Simplicity First, Surgical
+  Changes, Goal-Driven Execution) with research-augmented validation and dual
+  per-principle + per-file report format (Option C)
+- **HARD-GATE: Simplicity Protocol (Karpathy P2)** — self-scoped gate in
+  `_enforcement.md` preventing over-engineering, speculative features, and
+  single-use abstractions. Heuristic: "200 lines → could be 50? Rewrite."
+- **HARD-GATE: Surgical Changes Protocol (Karpathy P3)** — self-scoped gate
+  enforcing minimal diffs with traceback test: "Every changed line traces
+  directly to the user's request"
+- **P1 enhancement** — Research Protocol now requires surfacing tradeoffs,
+  presenting alternative approaches, and pushing back when simpler options exist
+- **5 anti-rationalization entries** — YAGNI abstractions, speculative config,
+  drive-by cleanups, over-architecture, future-requirement speculation
+- **3 red-flag stop conditions** — file drift, single-use abstraction, unrelated
+  formatting in diffs
+- **Flow presets**: `karpathy-review` (implement → karpathy !→ push),
+  `karpathy-fix` (karpathy → fix → karpathy !→ push)
+- **Suggested-next graph**: karpathy integrated into implement/review/refactor paths
+
+### Documented
+
+- P4 (Goal-Driven Execution) noted as already fully covered by existing
+  Verification Protocol and Fix Verification Protocol — no new gate needed
+
+### Design
+
+- Self-scoping HARD-GATEs: P2/P3 gates activate only when commands write source
+  code (Write/Edit tools). Dormant for ideation commands (brainstorm, validate,
+  research, etc.). Handles mixed commands (fix, tdd) naturally by scoping to
+  code-writing phases.
+- `_enforcement.md` stays at 607 lines (within 800-line budget)
+
+### Artifacts
+
+- Design: `docs/designs/2026-04-15-karpathy-integration.md`
+- Spec: `docs/specs/2026-04-15-karpathy-integration.md`
+- Plan: `docs/plans/2026-04-15-karpathy-integration.md`
+- Brainstorm: `~/.healer/brainstorms/2026-04-15-karpathy-in-healer.md`
+- Research: `~/.healer/research/2026-04-15-karpathy-in-healer.md`
+
+---
+
 ## [8.1.0] — 2026-04-12
 
 ### Added — Style DNA deep-style capture + `/healer:adapt` replicator

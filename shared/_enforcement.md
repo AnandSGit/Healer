@@ -111,6 +111,13 @@ NO CODE CHANGES WITHOUT COMPLETING THE RESEARCH PHASE FIRST.
 If the skill has a "Research Phase" step, you MUST execute it using the actual tools listed below BEFORE writing or modifying any code. Thinking about what you know is NOT research. You must USE THE TOOLS.
 </HARD-GATE>
 
+### Karpathy P1 — Surface Tradeoffs Before Implementing
+
+Before implementing any solution:
+- State your assumptions explicitly. If uncertain, ask.
+- If multiple valid approaches exist, present them with tradeoffs — do not silently pick one.
+- If a simpler approach exists than what was requested, say so. Push back when warranted.
+
 ### How to Actually Research (Explicit Tool Usage)
 
 When a skill says "search online" or "research", you MUST use these actual tools — not your training knowledge:
@@ -200,6 +207,8 @@ BEFORE claiming any status, execute this gate:
 | "No regressions" | Full test suite output showing same or better pass count |
 | "Performance improved" | Before AND after benchmark numbers from actual runs |
 
+> **NOTE — Karpathy P4 (Goal-Driven Execution):** P4 is fully covered by the Verification Protocol and Fix Verification Protocol. Transform tasks into verifiable goals before implementing. No additional gate needed.
+
 ---
 
 ## HARD-GATE: Fix Verification Protocol
@@ -251,6 +260,11 @@ These are the thoughts that lead to ineffective Healer sessions. When you notice
 | "The design spec is just a guideline" | Design specs are requirements. Every class, color, and font matters. | Read the spec. Implement exactly. Deviate only with approval. |
 | "I'll match the design in a polish pass" | Polish passes never happen. Ship matches spec or doesn't ship. | Match the design during implementation, not after. |
 | "The user won't notice this difference" | The user approved specific designs. Differences erode trust. | If the user won't notice, it's easy to get right. Do it. |
+| "This abstraction will be reusable later" | Single-use abstractions are debt, not investment. YAGNI. | Write the direct implementation. Extract only when a second caller appears. |
+| "I'll add this config flag for future flexibility" | Unrequested configurability is speculative code. | Build what was asked. If they need a flag later, they'll ask. |
+| "While I'm here, I'll clean up this adjacent code" | Drive-by cleanups create noisy diffs and hide the real change. | File a separate issue or mention it. Don't mix it into this diff. |
+| "This needs a proper architecture" | For a small task, "proper architecture" often means over-architecture. | Match the solution's complexity to the problem's complexity. |
+| "The user will want this configured later" | You're speculating about future requirements. | Solve today's problem. Tomorrow's requirements get tomorrow's code. |
 
 ---
 
@@ -284,7 +298,58 @@ RED FLAGS — STOP AND REASSESS:
 
   STOP if your "fix" is more than 50 lines of new code for what was described as a small bug
   → Something is wrong with your approach. The fix should be proportional to the bug.
+
+  STOP if your change touches files not mentioned in the task
+  → You're making surgical drift. Trace every file back to the request.
+
+  STOP if you're introducing an abstraction for a single call site
+  → That's speculative reuse. Write the direct code. Extract later if needed.
+
+  STOP if your diff includes formatting/style changes unrelated to the task
+  → Separate concerns: style changes get their own commit, not mixed in.
 ```
+
+---
+
+## HARD-GATE: Simplicity Protocol (Karpathy P2)
+
+<HARD-GATE>
+SCOPE: This gate applies when the current command is about to write or modify source code files (Write or Edit tools on project source). It does NOT apply to artifacts (~/.healer/), data files, or documentation. If the current command is purely analytical or ideation, this gate is dormant.
+
+MINIMUM CODE THAT SOLVES THE PROBLEM. NOTHING SPECULATIVE.
+
+Before writing or modifying code, verify:
+1. No features beyond what was asked
+2. No abstractions for single-use code paths
+3. No "flexibility" or "configurability" that wasn't requested
+4. No error handling for scenarios that cannot happen
+5. No speculative future-proofing
+
+HEURISTIC TEST: If you write 200 lines and it could be 50, rewrite it.
+ASK YOURSELF: "Would a senior engineer say this is overcomplicated?" If yes, simplify before proceeding.
+</HARD-GATE>
+
+---
+
+## HARD-GATE: Surgical Changes Protocol (Karpathy P3)
+
+<HARD-GATE>
+SCOPE: Same as Simplicity Protocol — applies only when writing/modifying source code via Write or Edit tools. Dormant for ideation commands.
+
+TOUCH ONLY WHAT YOU MUST. CLEAN UP ONLY YOUR OWN MESS.
+
+When editing existing code:
+1. Do NOT "improve" adjacent code, comments, or formatting
+2. Do NOT refactor things that aren't broken
+3. Match existing style, even if you'd do it differently
+4. If you notice unrelated dead code, MENTION it — don't delete it
+
+When your changes create orphans:
+- Remove imports/variables/functions that YOUR changes made unused
+- Do NOT remove pre-existing dead code unless explicitly asked
+
+TRACEBACK TEST: Every changed line should trace directly to the user's request. If a line can't be traced, it shouldn't be in the diff.
+</HARD-GATE>
 
 ---
 

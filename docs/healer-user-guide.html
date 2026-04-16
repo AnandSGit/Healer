@@ -677,6 +677,7 @@ cd Healer &amp;&amp; ./install.sh</code></pre>
 | `/healer:catchup` | Full-pipeline gap analysis and auto-fix — reads ALL project artifacts |
 | `/healer:conform` | Design conformance gate — reads approved design docs before and after |
 | `/healer:coverage` | Test coverage analysis — identifies untested critical paths, measures |
+| `/healer:karpathy` | Karpathy-lens code review — checks recent changes against the four |
 | `/healer:review` | Research-augmented code review — reviews recent changes for bugs, |
 | `/healer:test` | Research-augmented test writing — searches for testing patterns, |
 | `/healer:verify` | Requirement-driven autonomous verification engine — reads all specs, |
@@ -1400,6 +1401,8 @@ cd Healer &amp;&amp; ./install.sh</code></pre>
 | `imitate-secure` | imitate → indulge → audit → report → | Security-focused imitation — imitate --risk → indulge --security → audit → re... |
 | `imitate-test` | imitate → indulge !→ | Imitate flows + test them — imitate → indulge (must-pass). Use for app revers... |
 | `imitate-visual` | imitate → indulge → design-review → report → | Visual audit — imitate --layer=frontend → indulge --visual --a11y → design-re... |
+| `karpathy-fix` | karpathy → fix → karpathy !→ push ?→ | Karpathy review + fix loop — karpathy → fix → karpathy (must-pass) → push. |
+| `karpathy-review` | implement → karpathy !→ push ?→ | Karpathy-lens review before shipping — implement → karpathy (must-pass) → push. |
 | `morning` | diagnose → report → | Quick morning health check — runs diagnose and produces a health report. Use ... |
 | `onboard` | imitate → report → | Onboarding (read-only) — imitate → report. Use when joining a new project to ... |
 | `pre-ship` | verify !→ review ?→ ship !→ | Pre-ship gate to production — verify → review → ship. Use when you want one s... |

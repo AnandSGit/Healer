@@ -1,14 +1,27 @@
-# Healer v7.1
+# Healer v9.0
 
 **Universal Autonomous Codebase Health & Development Engine with Design Intelligence**
 
-41 commands | 26 flow presets | 36+ recipes | Postfix `?` discoverability | Self-validating command catalog | Shared enforcement protocol | Integrated UI/UX design databases | Any project, any language, any platform
+44 commands | 27 flow presets | 36+ recipes | Karpathy enforcement | Postfix `?` discoverability | Self-validating command catalog | Shared enforcement protocol | Integrated UI/UX design databases | Any project, any language, any platform
 
 ---
 
 ## What is Healer?
 
 Healer is a comprehensive command suite for [Claude Code](https://claude.ai/code) that turns your AI assistant into a research-augmented development lifecycle engine. Every command searches for best practices, patterns, and proven solutions **before** acting.
+
+### What's New in v9.0: Karpathy Principles Integration
+
+v9 integrates [Andrej Karpathy's coding principles](https://github.com/forrestchang/andrej-karpathy-skills) directly into Healer's enforcement layer — upgrading them from passive CLAUDE.md suggestions to actively enforced HARD-GATEs:
+
+- **`/healer:karpathy`** — focused code review against 4 Karpathy principles with dual per-principle + per-file report format
+- **Simplicity Protocol (P2)** — HARD-GATE preventing over-engineering, speculative features, and single-use abstractions. Self-scoped: only activates when commands write source code.
+- **Surgical Changes Protocol (P3)** — HARD-GATE enforcing minimal diffs with traceback test: "Every changed line traces to the user's request." Self-scoped.
+- **P1 enhancement** — Research Protocol now requires surfacing tradeoffs and pushing back when simpler approaches exist
+- **P4 coverage** — already enforced by Healer's Verification and Fix Verification Protocols since v4
+- **5 anti-rationalization entries** + **3 red-flag stop conditions** targeting over-engineering patterns
+- **Flow presets**: `karpathy-review`, `karpathy-fix`
+- See [docs/designs/2026-04-15-karpathy-integration.md](docs/designs/2026-04-15-karpathy-integration.md) for design rationale and [CHANGELOG.md](CHANGELOG.md) for full details.
 
 ### What's New in v7.1: Postfix `?` Help + Self-Validating Catalog
 
@@ -149,6 +162,7 @@ cp docs/healer-user-guide.html ~/.healer/
 | `/healer:catchup` | Full-pipeline gap analysis and auto-fix — reads ALL project artifacts |
 | `/healer:conform` | Design conformance gate — reads approved design docs before and after |
 | `/healer:coverage` | Test coverage analysis — identifies untested critical paths, measures |
+| `/healer:karpathy` | Karpathy-lens code review — checks recent changes against the four |
 | `/healer:review` | Research-augmented code review — reviews recent changes for bugs, |
 | `/healer:test` | Research-augmented test writing — searches for testing patterns, |
 | `/healer:verify` | Requirement-driven autonomous verification engine — reads all specs, |
@@ -236,6 +250,8 @@ Chain commands into pipelines with gate operators:
 | `imitate-secure` | imitate → indulge → audit → report → | Security-focused imitation — imitate --risk → indulge --security → audit → re... |
 | `imitate-test` | imitate → indulge !→ | Imitate flows + test them — imitate → indulge (must-pass). Use for app revers... |
 | `imitate-visual` | imitate → indulge → design-review → report → | Visual audit — imitate --layer=frontend → indulge --visual --a11y → design-re... |
+| `karpathy-fix` | karpathy → fix → karpathy !→ push ?→ | Karpathy review + fix loop — karpathy → fix → karpathy (must-pass) → push. |
+| `karpathy-review` | implement → karpathy !→ push ?→ | Karpathy-lens review before shipping — implement → karpathy (must-pass) → push. |
 | `morning` | diagnose → report → | Quick morning health check — runs diagnose and produces a health report. Use ... |
 | `onboard` | imitate → report → | Onboarding (read-only) — imitate → report. Use when joining a new project to ... |
 | `pre-ship` | verify !→ review ?→ ship !→ | Pre-ship gate to production — verify → review → ship. Use when you want one s... |

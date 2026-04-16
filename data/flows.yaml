@@ -1134,3 +1134,95 @@ imitate-regression:
     sister_presets:
       - imitate-test
     on_failure: all auto; regressions appear in report
+karpathy-review:
+  purpose: |
+    Karpathy-lens review before shipping — implement → karpathy (must-pass) → push.
+    Use after implementation to check code against the four Karpathy principles
+    before pushing.
+  what_it_does: |
+    Chains 3 sub-commands (implement → karpathy → push). Karpathy is must-pass —
+    the flow halts if any principle violation is found. Push is interactive.
+  input:
+    syntax: /healer:flow karpathy-review [feature]
+    args:
+      - name: feature
+        desc: Feature to implement and review
+        required: false
+    valid:
+      - auth middleware refactor
+      - ''
+    invalid: []
+  steps:
+    - command: implement
+      gate: auto
+      produces: code changes
+    - command: karpathy
+      gate: must-pass
+      produces: Karpathy principle review (P1-P4)
+    - command: push
+      gate: interactive
+      produces: commit + push
+  example:
+    command: /healer:flow karpathy-review auth middleware refactor
+    trace:
+      - 'implement: builds the auth middleware changes'
+      - 'karpathy: reviews against P1-P4 — must-pass halts if violations found'
+      - 'push: standard finish after clean review'
+    why_this_example: Post-implementation Karpathy review catches over-engineering and scope
+      creep before code leaves the branch.
+  input_purpose: '[feature] is forwarded to implement as the build target. Karpathy reviews
+    the resulting diff.'
+  after:
+    next:
+      - ship
+      - deploy
+    sister_presets:
+      - karpathy-fix
+      - verify
+    on_failure: karpathy must-pass halts; fix violations and re-run
+karpathy-fix:
+  purpose: |
+    Karpathy review + fix loop — karpathy → fix → karpathy (must-pass) → push.
+    Use when you want to review, auto-fix violations, then re-verify before pushing.
+  what_it_does: |
+    Chains 4 sub-commands. First karpathy (auto) identifies violations, fix addresses
+    them, second karpathy (must-pass) verifies the fixes pass all four principles.
+    Push is interactive.
+  input:
+    syntax: /healer:flow karpathy-fix
+    args: []
+    valid:
+      - ''
+    invalid: []
+  steps:
+    - command: karpathy
+      gate: auto
+      produces: initial Karpathy review with violations
+    - command: fix
+      gate: auto
+      produces: fixes for identified violations
+    - command: karpathy
+      gate: must-pass
+      produces: clean Karpathy review (P1-P4 all passing)
+    - command: push
+      gate: interactive
+      produces: commit + push
+  example:
+    command: /healer:flow karpathy-fix
+    trace:
+      - 'karpathy: finds P2 violation (unnecessary abstraction) and P3 violation (unrelated formatting)'
+      - 'fix: inlines the abstraction, reverts the formatting change'
+      - 'karpathy: re-reviews — P1-P4 all passing; must-pass continues'
+      - 'push: standard finish'
+    why_this_example: The review-fix-review loop is the canonical Karpathy hygiene pattern;
+      demonstrates iterative convergence to clean principles.
+  input_purpose: No arguments — operates on the current diff/changes. The fix step targets
+    whatever violations karpathy identified.
+  after:
+    next:
+      - ship
+      - deploy
+    sister_presets:
+      - karpathy-review
+      - verify
+    on_failure: second karpathy must-pass halts; violations persist after fix attempt
