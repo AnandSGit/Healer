@@ -76,32 +76,70 @@ python3 ${CLAUDE_PLUGIN_ROOT}/scripts/search.py "<query>" --domain ux
 4. Check git history for prior attempts
 5. If the project uses a UI framework (React, Vue, Svelte, Tailwind, shadcn/ui, etc.), note it for Context7 lookup in Step 2
 
-### Step 2: Research Phase (THE DIFFERENTIATOR)
+### Step 2: Deep Research Phase (THE DIFFERENTIATOR)
 
-Execute these tool calls (mandatory):
+Execute the **Deep-Research Protocol** in `${CLAUDE_PLUGIN_ROOT}/shared/_research_and_options.md` — ALL 8 categories apply to design work:
 
-1. WebSearch("{feature type} API design {framework} best practices 2025 2026")
-2. WebSearch("Stripe Shopify GitHub {feature type} design pattern")
-3. WebSearch("{feature type} data model schema design")
-4. WebSearch("{feature type} UX patterns real world examples")
-5. WebFetch top 3 results for deep reading
+1. **Category 1** — Best-practice current state (API/UX/data-model norms for this year)
+2. **Category 2** — Competitor teardown (≥3 competitors; for UI, WebFetch and describe their pages in prose)
+3. **Category 3** — Reference implementations (top-starred GitHub repos solving this exact problem)
+4. **Category 4** — Anti-patterns / postmortems (**non-negotiable** — "X considered harmful", "Y postmortem")
+5. **Category 5** — Authoritative specs (RFCs for protocols, W3C for web APIs, ADR repos for architecture)
+6. **Category 6** — **Visual inspiration galleries** (mandatory for any UI work): Mobbin, Dribbble, Awwwards, Behance, Land-book, godly.website, SaaS landing page galleries. WebFetch top 3-5 references and describe layout/typography/color/motion in prose.
+7. **Category 7** — Library / API current docs via Context7 for every UI library in the detected stack
+8. **Category 8** — Contradiction & consensus scan
 
-**Competitor Visual Research (mandatory for UI features):**
+**PROOF REQUIREMENT**: Research Brief must include ≥3 WebSearches across categories, ≥3 distinct organizations, ≥2 anti-pattern findings, and for UI work — ≥5 visual references described in prose (not just URLs).
 
-6. WebSearch("{feature type} UI design {competitor1} {competitor2} screenshots examples")
-7. WebSearch("{feature type} component design system examples")
-8. WebFetch competitor product pages or design system documentation
-9. Document specific visual patterns observed: layout structure, information density, interaction paradigms, color usage, typography hierarchy
+### Step 3: Options Phase — Present 10 UI Directions / 7 API-Data Options / 5 UX Flows
 
-**Context7 for Component Libraries (mandatory if UI framework detected):**
+**THIS STEP IS NEW AND NON-NEGOTIABLE.** Per the Options-First Protocol in `${CLAUDE_PLUGIN_ROOT}/shared/_research_and_options.md`:
 
-10. If using a UI framework: `mcp__claude_ai_Context7__resolve-library-id` for the detected framework
-11. Then `mcp__claude_ai_Context7__query-docs` for component patterns relevant to this feature
-12. Reference current component API signatures and recommended usage patterns
+- If the design includes UI: produce **10 visual directions** from the Visual Direction Starter Catalog (10 DIFFERENT aesthetic families — see catalog in the shared module: editorial, swiss-grid, brutalist, neo-brutalist, glassmorphism, neumorphic, bento, terminal, skeuomorphic-modern, Memphis, liquid-glass, data-dense, pastel/gradient, zine, maximalist-animated, command-palette, etc. Pick 10 genuinely different families).
+- If the design includes API / data-model: produce **7 architectural options** (e.g., REST / GraphQL / tRPC / Server Actions / gRPC / Event-sourcing / CQRS — or the equivalent divergence for your domain).
+- If the design includes UX flow: produce **5 flow variants** (e.g., wizard / single-page / progressive disclosure / command-palette-first / conversational).
 
-**PROOF REQUIREMENT**: Your response MUST include at least one WebSearch or Context7 tool call in this phase. If you skip this, you are violating the enforcement protocol.
+**Divergence requirement**: options MUST come from different aesthetic families / architectures / UX paradigms. Not parameter variations. See the "Candidate Divergence Rule" in the shared module.
 
-### Step 3: Design the Solution
+#### 3a. Numbered Pros/Cons Table (in-conversation)
+
+Render the options using the template in the shared module (`Presentation Format — Numbered Pros/Cons Table`). Each option block includes:
+- Name (short, evocative — e.g. "Editorial Mono", "Liquid Visionary", "Bento Terminal")
+- Essence (one-sentence characterization)
+- Inspired by (research-brief source with URL — this is a hard requirement)
+- Best for / Pros / Cons / Risks / Fit for this project / Effort
+- Tradeoff Matrix row with dots across Simplicity / Performance / Flex / Cost / Risk / Fit
+
+#### 3b. HTML Gallery (UI options — mandatory)
+
+For any UI options, ALSO generate a self-contained HTML gallery per the shared module spec:
+
+```bash
+mkdir -p docs/design-previews/options/{YYYY-MM-DD}-{feature-slug}/
+```
+
+For each option, generate a self-contained HTML mockup at:
+`docs/design-previews/options/{YYYY-MM-DD}-{feature-slug}/option-{N}-{name-slug}.html`
+
+Each mockup MUST:
+- Use domain-accurate content from Step 1 (not lorem ipsum)
+- Demonstrate the option as a realistic page/screen (header + primary surface + at least one interaction state)
+- Be fully self-contained — no CDN, no external fonts-cdn, no network. System fonts OR inline @font-face data URIs only.
+- Show the option's distinguishing characteristics (not a generic card grid for every option)
+
+Then generate an index gallery at:
+`docs/design-previews/options/{YYYY-MM-DD}-{feature-slug}/index.html`
+
+The index MUST:
+- Embed all N options as `<iframe>` tiles in a responsive grid (3 cols desktop, 2 tablet, 1 mobile)
+- Label each tile "Option N: {name}" with a "view full" link and a "pick this" button
+- The "pick this" button copies the option number to clipboard for easy selection
+
+After saving, print the absolute `file://` URL of the index page so the user can open it in one click.
+
+<HARD-GATE>HALT after presenting the pros/cons table AND the HTML gallery URL. Do NOT proceed to Step 4 (the full design document) until the user selects an option. Acceptable replies: a number, "N but {modification}", "hybrid of N and M", "regenerate with {hint}", or "you pick".</HARD-GATE>
+
+### Step 4: Design the Solution (with chosen option)
 
 Cover relevant sections: Data Model, API Design, Component Design, UX Flow.
 
@@ -242,9 +280,9 @@ shadows:
   lg: "..."
 ```
 
-<HARD-GATE>DO NOT WRITE CODE DURING DESIGN. Design produces documents and decisions. The ONE exception is the HTML preview file in Step 4b — that is a design artifact, not implementation code. If you catch yourself using Write/Edit on source code files, STOP.</HARD-GATE>
+<HARD-GATE>DO NOT WRITE CODE DURING DESIGN. Design produces documents and decisions. The only exceptions are the HTML option gallery in Step 3b and the final HTML preview in Step 5b — those are design artifacts, not implementation code. If you catch yourself using Write/Edit on source code files, STOP.</HARD-GATE>
 
-### Step 4: Present Design Document
+### Step 5: Present Design Document
 
 ```
 HEALER DESIGN DOCUMENT
@@ -311,7 +349,7 @@ visual design system tokens to confirm fidelity.
 
 **ENFORCEMENT: Present design and WAIT for explicit user approval before suggesting next steps. Do not auto-proceed.**
 
-### Step 4b: Generate HTML Preview (UI features only)
+### Step 5b: Generate Final HTML Preview (selected option, UI features only)
 
 For features with a UI component, generate a single-file HTML preview showing the proposed design. This is a design artifact, not implementation code.
 
@@ -329,7 +367,7 @@ mkdir -p docs/design-previews
 
 Save the preview to `docs/design-previews/{feature-name}.html`. The file should be fully self-contained (inline CSS, no external dependencies) and viewable by opening in any browser.
 
-### Step 5: Design Review Checklist
+### Step 6: Design Review Checklist
 
 After presenting the design, self-evaluate against these 7 dimensions. Score each as PASS, PARTIAL, or NEEDS WORK with a brief justification:
 
@@ -394,7 +432,7 @@ OVERALL: {X}/7 PASS, {Y}/7 PARTIAL, {Z}/7 NEEDS WORK
 
 If any dimension scores NEEDS WORK, address it before finalizing the design.
 
-### Step 6: Version the Design Document
+### Step 7: Version the Design Document
 
 Save the design document to a versioned file:
 
@@ -404,7 +442,7 @@ mkdir -p docs/designs
 
 Save to `docs/designs/{YYYY-MM-DD}-{feature-name}.md` with the full design document content including all sections above.
 
-### Step 7: Iterate with User
+### Step 8: Iterate with User
 
 Present and revise until approved.
 
@@ -432,7 +470,16 @@ RED FLAGS — STOP AND REASSESS:
   → Check dimension 4 (AI Slop Detection). Make it distinctive.
 
   STOP if you skipped the design review checklist
-  → Go to Step 5. Every design must be self-evaluated before presenting.
+  → Go to Step 6. Every design must be self-evaluated before presenting.
+
+  STOP if you presented a single design instead of N options
+  → Step 3 is NON-NEGOTIABLE. Go back and generate 10 UI directions / 7 API options / 5 UX flows per the Options-First Protocol. Silently picking is a violation.
+
+  STOP if your N options are variations of the same idea
+  → Apply the Divergence Rule from `shared/_research_and_options.md`. 10 shades of glassmorphism = 1 option. Regenerate from 10 different aesthetic families.
+
+  STOP if UI options have no HTML gallery
+  → Step 3b is mandatory for UI work. Without the gallery, users cannot visually compare. Generate it.
 
   STOP if a brainstorm artifact exists but you didn't trace requirements
   → Go back and fill in the REQUIREMENTS_TRACED section. Every requirement needs a home.

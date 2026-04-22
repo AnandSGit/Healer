@@ -126,56 +126,45 @@ This question often reveals the true kernel of value buried under feature creep.
 
 **ADAPTIVE**: Don't ask all questions if the user's answers make some redundant. Skip questions whose answers are obvious from context. But DO ask the hard questions the user hasn't considered. In Hackathon mode, compress to one question per round.
 
-### Step 3: Research Phase (THEN RESEARCH)
+### Step 3: Deep Research Phase (THEN RESEARCH)
 
-NOW that you understand intent, execute these tool calls (mandatory):
+NOW that you understand intent, execute the **Deep-Research Protocol** in `${CLAUDE_PLUGIN_ROOT}/shared/_research_and_options.md` — all 8 categories:
 
-**Implementation research:**
-1. WebSearch("{feature} {framework} implementation examples")
-2. WebSearch("{similar product like Stripe/GitHub/Linear} {feature} approach")
-3. WebSearch("{feature type} architecture best practices {year}")
-4. WebSearch("{feature} common pitfalls real-world")
+1. **Category 1** — Best-practice current state (≥2 WebSearches, include current year)
+2. **Category 2** — Competitor teardown (≥3 competitors; document each pattern with URL)
+3. **Category 3** — Reference implementations (GitHub top-starred, `awesome-*` lists)
+4. **Category 4** — Anti-patterns / postmortems (**non-negotiable** — at least 2 queries on "considered harmful", "postmortem", "common mistakes")
+5. **Category 5** — Authoritative specs (if the feature touches standardized territory — RFCs, W3C)
+6. **Category 6** — Visual inspiration galleries (if the feature has UI — Mobbin, Dribbble, Awwwards, Behance, Land-book, godly, SaaS landing galleries)
+7. **Category 7** — Library / API current docs (Context7 for every library mentioned)
+8. **Category 8** — Contradiction & consensus scan (flag disagreements, mark single-source claims)
 
-**Competitive/market research:**
-5. WebSearch("{feature or product category} competitors comparison {year}")
-6. WebSearch("{feature} alternatives open source vs commercial")
-7. If startup mode: WebSearch("{product category} market size demand validation")
+**PROOF REQUIREMENT**: Your research must include ≥3 WebSearches across categories, ≥3 distinct organizations/authors, ≥2 anti-pattern findings, and — if any library is involved — Context7 lookups. Produce the Research Brief in the template defined in the shared module.
 
-**Deep research:**
-8. WebFetch on the top 3-5 URLs from above
-9. If libraries/frameworks involved: Context7 MCP
-   - `mcp__claude_ai_Context7__resolve-library-id` to find the library
-   - `mcp__claude_ai_Context7__query-docs` to fetch current documentation
+**Source diversity gate**: if all your citations come from one ecosystem (e.g., all Stripe), REGENERATE with different organizations. A single-source brief fails this step.
 
-**PROOF REQUIREMENT**: You MUST execute at least one WebSearch or Context7 call. If you skip this, you are violating the enforcement protocol.
+### Step 4: Options Phase — Present 7+ Approaches (NON-NEGOTIABLE)
 
-Compile a **Research Brief**:
-```
-RESEARCH BRIEF
-═══════════════════════════════════
-Sources consulted: {N}
+Generate **at least 7 genuinely distinct approaches** per the Options-First Protocol in `${CLAUDE_PLUGIN_ROOT}/shared/_research_and_options.md` (minimum-candidates table, row "brainstorm / approach").
 
-Key patterns found:
-- {pattern 1} — used by {who} — {source URL}
-- {pattern 2} — used by {who} — {source URL}
+**Divergence requirement**: the 7 must come from different points in the design space — different architectures, different business models, different UX paradigms, different trade-off stances. 7 variations of the same approach with parameter tuning is a FAIL (e.g., "REST + JWT", "REST + session", "REST + API key" is 1 option not 3).
 
-Competitive landscape:
-- {competitor 1} — {their approach} — {source URL}
-- {competitor 2} — {their approach} — {source URL}
-- {open source alternative} — {source URL}
+Render the **numbered pros/cons table** from the shared module, including:
+- Option name (short, evocative)
+- "Inspired by" with an ACTUAL research-brief source + URL
+- Pros, Cons, Risks, Fit for this project, Effort estimate
+- A Tradeoff Matrix with rating dots across Simplicity / Performance / Flex / Cost / Risk / Fit
 
-Common pitfalls:
-- {pitfall 1} — reported by {source URL}
-- {pitfall 2} — reported by {source URL}
+Example of GOOD divergence for "add social sharing":
+1. Native share sheet (Web Share API, minimal UI)
+2. Per-channel share buttons (Twitter/LinkedIn/FB, prebuilt SDKs)
+3. Pre-rendered OG-image + copy-link (no JS required, paste-to-anywhere)
+4. In-app ambassador invite flow (referral codes, gamification)
+5. Deep-linked universal share URL (handles app-install fallback)
+6. QR-code / NFC peer share (proximity-first, no network)
+7. Embed-widget ("copy embed code", consumer shares iframe)
 
-Novel approaches worth considering:
-- {approach} — from {source URL}
-═══════════════════════════════════
-```
-
-### Step 4: Propose Approaches (INFORMED BY BOTH)
-
-Present 2-3 approaches that synthesize user intent WITH research findings:
+**HALT after presenting. Do not proceed to synthesis until the user responds with a number, a modification, a hybrid request, or "you pick".**
 
 ```
 APPROACH A: {name}

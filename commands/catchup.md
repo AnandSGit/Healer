@@ -159,6 +159,34 @@ For EACH requirement/decision/acceptance criterion from Step 2, check if it has 
 
 **ALL four levels get fixed. No severity is exempt.**
 
+### Step 5.5: Deep-Research on Fix Strategies (NON-NEGOTIABLE before fixing)
+
+**Iteration note**: This step runs ONCE per catchup session (first pass of the convergence loop only). Subsequent iterations reuse the Fix-Strategy Brief — re-researching on every loop pass would waste tokens. If a NEW gap cluster emerges in a later iteration (not present in the first scan), run Step 5.5 for just that new cluster.
+
+Catchup does NOT invent new features — but the FIXES it applies must use current best practices, not training-data defaults. For each gap cluster identified in Step 5 (e.g., "wiring gaps in auth flow", "schema drift in orders table", "design-token drift in cards"), execute a short focused research pass per the Deep-Research Protocol in `${CLAUDE_PLUGIN_ROOT}/shared/_research_and_options.md`:
+
+1. **Category 1** — Current best practice for this fix category (≥1 WebSearch per cluster)
+2. **Category 4** — Anti-patterns / "{fix category} considered harmful" (≥1 query per cluster — don't repeat a known bad fix)
+3. **Category 7** — Context7 for any library whose API boundary appears in the gap set
+
+Compile a short **Fix-Strategy Brief** (one block per gap cluster):
+
+```
+FIX-STRATEGY BRIEF — {cluster name}
+─────────────────────────────────
+Gap cluster: {N gaps of type X}
+Current best practice: {pattern} — source: {URL, ★}
+Known anti-pattern to avoid: {bad-fix pattern} — source: {URL, ★}
+Library API check (if applicable): {library} — {any signature changes?}
+Chosen fix approach: {one-liner}
+```
+
+### Step 5.6: Options Phase — 3 Fix Strategies per Gap Cluster (ONLY if cluster has ≥3 gaps AND multiple valid fixes exist)
+
+For clusters that have ≥3 gaps AND admit multiple valid fix approaches (e.g., "schema drift — migrate vs recompute vs alias"), present 3 fix strategies per the Options-First Protocol (minimum-candidates row "catchup / fix strategy per gap-cluster"). For trivial clusters (single wiring fix, obvious one-line), proceed directly without options.
+
+Use the numbered pros/cons template. **HALT for user selection on each such cluster.** For trivial clusters, proceed directly.
+
 ### Step 6: Report
 
 ```
