@@ -1,7 +1,7 @@
 {
   "name": "healer",
-  "version": "9.0.0",
-  "description": "Universal Development Lifecycle Engine — 44 commands, 27 flow presets, Karpathy enforcement (P2 Simplicity + P3 Surgical HARD-GATEs), postfix `?` and `--help` discoverability, self-validating command catalog with auto-rebuild hook, 10x imitate (5-layer reverse-engineering with 4-in-1 output + Style DNA YAML) & flow testing, /healer:adapt replicator consuming Style DNA deterministically (PC/VM/CH/IC/BR/CV/AR/MD deep-style capture), design intelligence with 161 palettes, 57 fonts, and 99 UX guidelines.",
+  "version": "9.1.0",
+  "description": "Universal Development Lifecycle Engine — 44 commands, 27 flow presets, Karpathy enforcement (P2 Simplicity + P3 Surgical HARD-GATEs), Deep-Research + Options-First Protocol (8-category research matrix, max-choice candidate counts, HTML gallery for UI picks), postfix `?` and `--help` discoverability, self-validating command catalog with auto-rebuild hook, 10x imitate (5-layer reverse-engineering with 4-in-1 output + Style DNA YAML) & flow testing, /healer:adapt replicator consuming Style DNA deterministically (PC/VM/CH/IC/BR/CV/AR/MD deep-style capture), design intelligence with 161 palettes, 57 fonts, and 99 UX guidelines.",
   "author": {
     "name": "WeaverBird LLC"
   },

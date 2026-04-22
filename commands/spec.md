@@ -63,31 +63,53 @@ ARTIFACT TRACE (include in spec metadata):
 4. Identify stakeholders and integration points
 5. Identify existing data models that may need migration
 
-### Step 2: Research Phase (THE DIFFERENTIATOR)
+### Step 2: Deep Research Phase (THE DIFFERENTIATOR)
 
 <HARD-GATE>
-NO SPECIFICATION WRITING UNTIL RESEARCH IS COMPLETE WITH AT LEAST 2 WebSearch AND 1 WebFetch TOOL CALLS.
+NO SPECIFICATION WRITING UNTIL THE DEEP-RESEARCH PROTOCOL IS COMPLETE.
 </HARD-GATE>
 
-Execute these tool calls (mandatory):
+Execute the **Deep-Research Protocol** in `${CLAUDE_PLUGIN_ROOT}/shared/_research_and_options.md` — ALL 8 categories with spec-specific emphasis on Category 5 (authoritative specs):
 
-1. **WebSearch** -- `"{feature type} technical specification template"`
-2. **WebSearch** -- `"{feature type} RFC ADR example {framework}"`
-3. **WebSearch** -- `"{similar feature} specification real world"`
-4. **WebFetch** -- top results for spec structure inspiration
-5. **WebSearch** -- `"{relevant standard like OAuth, WebSocket, REST} specification"` for protocol references
+1. **Category 1** — Best-practice current state (spec templates, RFC style, what "good" looks like)
+2. **Category 2** — Competitor spec teardown (≥3 — e.g., Stripe API reference, Linear spec docs, GitHub's REST v3 docs). WebFetch and extract structural patterns.
+3. **Category 3** — Reference implementations (top-starred GitHub repos that solve the same problem — read their READMEs and contracts)
+4. **Category 4** — Anti-patterns / postmortems (**non-negotiable** — "{feature} considered harmful", "{pattern} postmortem")
+5. **Category 5** — **Authoritative specs (critical for spec work)**: IETF RFCs, W3C specs, public ADR repos. `WebFetch` the ACTUAL RFC text, not commentary. Cite section numbers.
+6. **Category 6** — Visual galleries (only if the spec has UI surface; usually skipped for pure API specs)
+7. **Category 7** — Context7 for every library/framework referenced in the spec (non-negotiable; training data is stale)
+8. **Category 8** — Contradiction & consensus scan (flag where RFC disagrees with popular implementation)
 
-**Context7 Integration** (mandatory for any library or framework in the spec):
+**PROOF REQUIREMENT**: Research Brief must include ≥3 WebSearches, ≥1 WebFetch of an actual RFC or W3C doc (if applicable), ≥3 distinct organizations/authors, ≥2 anti-pattern findings, and Context7 lookups for every library mentioned.
 
-6. For EACH library/framework referenced in the feature:
-   - **mcp__claude_ai_Context7__resolve-library-id** -- find the library
-   - **mcp__claude_ai_Context7__query-docs** -- fetch current API signatures, configuration options, and patterns
-   - Cross-check that any API signatures, method names, configuration keys, and type definitions in your spec match the CURRENT documentation, not your training data
-   - If Context7 returns different signatures than you expected, UPDATE your spec to match Context7 (it has the latest docs)
+### Step 2.5: Options Phase — Present 5 Structural Variants (NON-NEGOTIABLE)
 
-**PROOF REQUIREMENT**: Your response MUST include at least 2 WebSearch tool calls, 1 WebFetch call, and Context7 lookups for every library/framework mentioned in the spec.
+<HARD-GATE>
+A SPEC IS A CHOICE AMONG VALID STRUCTURES. PRESENT 5 VARIANTS BEFORE COMMITTING.
+</HARD-GATE>
 
-### Step 3: Write the Specification
+Per the Options-First Protocol in `${CLAUDE_PLUGIN_ROOT}/shared/_research_and_options.md` (minimum-candidates row "spec / structural variant"), generate **at least 5 genuinely divergent structural options** for this specification.
+
+Structural options are NOT cosmetic. They represent fundamentally different ways to shape the contract / system / API. Examples for a "notifications" feature:
+
+1. **REST + webhooks** — pull model with push subscription for events
+2. **WebSocket push** — persistent connection, server-initiated delivery
+3. **SSE (Server-Sent Events)** — one-way stream over HTTP, resumable
+4. **GraphQL subscriptions** — declarative event filtering over WS
+5. **Queue-backed pull** — client polls a queue (simplest fallback)
+
+Each option must include (using the shared module's numbered pros/cons template):
+- Name, essence, "Inspired by" (RFC / ADR / reference with URL)
+- Best for / Pros / Cons / Risks
+- Fit for this project (cite specific existing files/patterns)
+- Acceptance-criteria impact (which Given/When/Then will differ)
+- Error-catalog impact (which ERR_* codes each variant needs)
+- Migration impact (if any schema changes differ between variants)
+- Tradeoff Matrix row (Simplicity / Performance / Flex / Cost / Risk / Fit)
+
+Render with the numbered table from the shared module. **HALT and await user selection**. Only after selection does Step 3 (writing the spec) proceed.
+
+### Step 3: Write the Specification (using chosen structural variant)
 
 <HARD-GATE>
 SPECS MUST BE CONCRETE ENOUGH THAT ANOTHER DEVELOPER COULD IMPLEMENT FROM THEM WITHOUT ASKING CLARIFYING QUESTIONS. If a section is vague ("handle errors appropriately"), it is not done. Specify WHAT errors, HOW to handle them, WHAT the user sees.
@@ -449,6 +471,9 @@ Next steps:
 - API endpoint has no request/response schema -- add OpenAPI/JSON Schema with types
 - "TBD" or "TODO" in the spec -- resolve it or move to Open Questions
 - No alternatives considered -- you have not explored the solution space
+- You skipped Step 2.5 and presented one structure without options -- go back, generate 5 divergent structural variants, let the user pick
+- Your 5 "options" in Step 2.5 are variations of the same structure -- apply the Divergence Rule, regenerate from different architectural stances
+- Section 16 "Alternatives Considered" is empty or missing -- document the rejected options from Step 2.5 there; every rejected option gets a one-line "why not" with its tradeoff-matrix row
 - Spec references no external sources -- go back to research
 - Requirement has no Given/When/Then -- add acceptance criteria before moving on
 - NFR uses vague language ("fast", "scalable", "secure") without numeric targets -- add specific measurable targets

@@ -12,9 +12,10 @@ HEALER_VERSION=$(python3 -c "import json; print(json.load(open('$SCRIPT_DIR/plug
 
 echo "═══════════════════════════════════════════════════"
 echo "  Healer v${HEALER_VERSION} — Universal Development Lifecycle Engine"
-echo "  with Karpathy Enforcement + Postfix \`?\` Help"
-echo "  44 commands | 27 flow presets | layer-scoped imitate + Style DNA"
-echo "  161 palettes | 57 fonts | 99 UX guidelines"
+echo "  with Karpathy Enforcement + Deep-Research & Options-First"
+echo "  44 commands | 27 flow presets | 8-category research matrix"
+echo "  max-choice options (brainstorm:7 / design-UI:10 / spec:5 / plan:4)"
+echo "  HTML option galleries for UI | 161 palettes | 57 fonts | 99 UX"
 echo "═══════════════════════════════════════════════════"
 echo ""
 

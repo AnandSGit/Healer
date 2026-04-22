@@ -7,6 +7,90 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [9.1.0] — 2026-04-21
+
+### Added — Deep-Research + Options-First Protocol
+
+A new shared module (`shared/_research_and_options.md`) defines an 8-category
+research matrix and a mandatory Options-First selection gate for every
+command that produces ideas, designs, specs, or plans. Commands no longer
+silently pick one approach — they present a curated menu and wait for the
+user's selection.
+
+- **`shared/_research_and_options.md`** — new shared protocol with:
+  - **8-category research matrix**: best-practice state, competitor teardown
+    (≥3), reference implementations (top-starred GitHub), anti-patterns /
+    postmortems (non-negotiable), authoritative specs (RFCs / W3C / ADRs),
+    **visual inspiration galleries** (Mobbin, Dribbble, Awwwards, Behance,
+    Land-book, godly.website, SaaS landing galleries), Context7 library docs,
+    contradiction & consensus scan
+  - **Source credibility scoring** (★★★★★ to ★) with ≥3 distinct-organization
+    diversity requirement
+  - **Minimum candidate counts** per command+domain (brainstorm: 7,
+    design-UI: 10, design-API: 7, design-UX: 5, spec: 5, plan: 4,
+    architect: 5, strategy: 4, refactor: 5, optimize: 5, catchup: 3)
+  - **Candidate Divergence Rule** — options must come from different
+    architectures / aesthetic families / strategies, not parameter tuning
+  - **Visual Direction Starter Catalog** — 20 distinct aesthetic families
+    (editorial, swiss-grid, brutalist, neo-brutalist, glassmorphism,
+    neumorphic, bento, terminal-CLI, skeuomorphic-modern, Memphis,
+    liquid-glass, data-dense, pastel, zine, maximalist-animated,
+    command-palette-first, etc.) to draw UI options from
+  - **Numbered pros/cons template** + **Tradeoff Matrix** for all commands
+  - **HTML option gallery** spec for UI picks —
+    `docs/design-previews/options/{date}-{slug}/index.html` with iframe
+    tiles of all N variants, self-contained (no CDN), responsive 3-col grid
+- **HARD-GATE: Options-First Protocol** — new gate in `_enforcement.md`
+  binding all commands to the shared module
+- **HARD-GATE: Deep-Research Protocol upgrade** — existing research gate now
+  requires all 8 categories, not just "≥1 WebSearch"
+
+### Changed — Commands upgraded to use the new protocol
+
+- **`/healer:brainstorm`** — Step 3 (Research) now mandates all 8 categories
+  with ≥3 distinct organizations and ≥2 anti-pattern findings. Step 4
+  (Options) now requires **7 genuinely distinct approaches** (was "2-3") with
+  Divergence-Rule enforcement. Example 7-option set included inline.
+- **`/healer:design`** — Step 2 (Research) upgraded to 8-category protocol
+  with mandatory visual-gallery research (≥5 references described in prose).
+  New **Step 3 (Options Phase)** presents **10 UI visual directions / 7 API
+  options / 5 UX flow variants** with numbered pros/cons AND a self-contained
+  HTML option gallery at `docs/design-previews/options/`. Old steps
+  renumbered (old Step 3 → Step 4, old Step 4 → Step 5, old 4b → 5b, etc).
+  New red flags for missing options / variation-only options / missing HTML
+  gallery.
+- **`/healer:spec`** — Step 2 (Research) upgraded to 8-category protocol
+  with emphasis on Category 5 (authoritative specs — RFCs/W3C/ADRs fetched,
+  not paraphrased). New **Step 2.5 (Options Phase)** presents **5 structural
+  variants** (e.g., REST+webhooks vs WebSocket push vs SSE vs GraphQL-subs
+  vs queue-backed-pull) with acceptance-criteria / error-catalog /
+  migration impact per variant. Section 16 "Alternatives Considered" now
+  captures the outcome.
+- **`/healer:plan`** — Step 2 (Research) upgraded to 8-category protocol.
+  New **Step 2.5 (Options Phase)** presents **4 execution-order strategies**
+  (vertical-slice-first / horizontal-layer-first / risk-first /
+  happy-path-first / TDD-outer-loop / parallelization-optimized) with phase
+  shape, checkpoint density, rollback-ease, and parallelizability tradeoffs.
+- **`/healer:catchup`** — New **Step 5.5 (Fix-Strategy Research)** runs
+  focused research per gap cluster before fixing, producing a
+  Fix-Strategy Brief (current best practice + known anti-pattern to avoid +
+  library API check). New **Step 5.6 (Fix-Strategy Options)** presents 3
+  strategies per cluster that has ≥3 gaps and multiple valid fixes
+  (trivial clusters proceed directly). Iteration-caching note prevents
+  re-research on every convergence loop pass.
+
+### Why this release
+
+User feedback: "I was never asked any question to select the design with
+giving me options. (Enough number of best options to select one). Same
+applicable for any implementation or analysis or design or plan." Prior
+versions had research built in but no options-selection gate, so commands
+silently picked approaches instead of curating the design space for the
+user. This release treats "curate the menu" as the command's job and
+"pick one" as the user's job — non-negotiable.
+
+---
+
 ## [9.0.0] — 2026-04-15
 
 ### Breaking — Karpathy Enforcement Integration

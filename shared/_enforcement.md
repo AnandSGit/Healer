@@ -111,6 +111,21 @@ NO CODE CHANGES WITHOUT COMPLETING THE RESEARCH PHASE FIRST.
 If the skill has a "Research Phase" step, you MUST execute it using the actual tools listed below BEFORE writing or modifying any code. Thinking about what you know is NOT research. You must USE THE TOOLS.
 </HARD-GATE>
 
+<HARD-GATE>
+FOR COMMANDS THAT PRODUCE IDEAS, DESIGNS, SPECS, OR PLANS:
+The Research Phase MUST follow the Deep-Research Protocol in
+`${CLAUDE_PLUGIN_ROOT}/shared/_research_and_options.md` — covering all 8
+research categories (best-practice state, competitor teardown, reference
+implementations, anti-patterns/postmortems, authoritative specs, visual
+galleries if UI, library docs via Context7, contradiction scan). Producing
+a Research Brief without these categories is insufficient.
+</HARD-GATE>
+
+<HARD-GATE>
+OPTIONS-FIRST PROTOCOL — PICK-ONE IS THE USER'S JOB.
+When a command produces an idea, design, spec, plan, or strategy and multiple valid approaches exist, you MUST present N distinct candidates per the Options-First Protocol in `${CLAUDE_PLUGIN_ROOT}/shared/_research_and_options.md` (see the minimum-candidates table for the applicable count — e.g. brainstorm: 7 approaches, design-UI: 10 visual directions, design-API: 7, spec-structure: 5, plan-order: 4). Candidates MUST be genuinely divergent (different aesthetic families / architectures / strategies — not parameter tuning). For UI outputs, render the HTML gallery in `docs/design-previews/options/` in addition to the numbered pros/cons table. HALT for user selection. Silently picking one is equivalent to making an unapproved decision on the user's behalf.
+</HARD-GATE>
+
 ### Karpathy P1 — Surface Tradeoffs Before Implementing
 
 Before implementing any solution:

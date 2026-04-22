@@ -43,26 +43,49 @@ If no arguments, ask: "What do you want to plan?"
    ```
    Every requirement gets a unique ID. These IDs are referenced throughout the plan for traceability.
 
-### Step 2: Research Phase (THE DIFFERENTIATOR)
+### Step 2: Deep Research Phase (THE DIFFERENTIATOR)
 
-Execute these tool calls (mandatory):
+Execute the **Deep-Research Protocol** in `${CLAUDE_PLUGIN_ROOT}/shared/_research_and_options.md` — all 8 categories with planning-specific emphasis:
 
-1. **Context7 for current best practices** — before anything else, fetch docs for the main frameworks and libraries in the detected stack:
-   - `mcp__claude_ai_Context7__resolve-library-id` to find each major library
-   - `mcp__claude_ai_Context7__query-docs` to fetch current documentation, focusing on implementation patterns relevant to the planned feature
-   - This ensures the plan uses current APIs, not deprecated patterns from training data
-2. WebSearch("{feature type} implementation architecture {framework}")
-3. WebSearch("{feature type} {framework} common mistakes")
-4. WebSearch("{feature type} testing strategy {test framework}")
-5. WebFetch top 2-3 results for implementation patterns
+1. **Category 1** — Best-practice current state (how teams structure plans for this feature type in the current year)
+2. **Category 2** — Competitor teardown (≥3 similar features shipped; look at their GitHub project boards, CHANGELOG entries, post-launch writeups)
+3. **Category 3** — Reference implementations (top-starred GitHub repos — read their commit history to see actual execution order)
+4. **Category 4** — Anti-patterns / postmortems (**non-negotiable** — "{feature} implementation failure", "{pattern} rewrite postmortem")
+5. **Category 5** — Authoritative specs (if the feature references RFCs / standards that constrain execution order)
+6. **Category 6** — Visual galleries (only if the plan has UI phases; usually limited for plan-only)
+7. **Category 7** — Context7 for every library in the detected stack (non-negotiable — stale API guidance produces stale plans)
+8. **Category 8** — Contradiction & consensus scan (flag where library docs contradict popular tutorials)
 
-**PROOF REQUIREMENT**: You MUST execute at least one Context7 call AND at least one WebSearch call. If you skip either, you are violating the enforcement protocol.
+**PROOF REQUIREMENT**: Research Brief must include ≥1 Context7 call per major library, ≥3 WebSearches, ≥3 distinct organizations/authors, and ≥2 anti-pattern findings.
 
-Compile a brief **Planning Research Brief** that includes:
-- Current API patterns from Context7 (note any recent changes or deprecations)
-- Architecture patterns from web search
-- Common pitfalls to avoid
-- Testing strategies specific to this feature type
+### Step 2.5: Options Phase — Present 4 Execution-Order Strategies (NON-NEGOTIABLE)
+
+<HARD-GATE>
+HOW YOU SEQUENCE WORK IS AS IMPORTANT AS WHAT YOU BUILD. PRESENT 4 STRATEGIES.
+</HARD-GATE>
+
+Per the Options-First Protocol in `${CLAUDE_PLUGIN_ROOT}/shared/_research_and_options.md` (minimum-candidates row "plan / execution order"), generate **at least 4 genuinely divergent execution strategies** for this feature.
+
+Execution-order strategies are NOT task lists. They are philosophies about how to sequence the task list. Examples:
+
+1. **Vertical-slice-first** — end-to-end smallest thin-slice through all layers, then iterate width. Ship something demo-able on day 1. Trades: slower to fully cover any single layer; higher demo morale.
+2. **Horizontal-layer-first** — finish data model → finish API → finish UI in sequence. Trades: nothing works until the end; easier to parallelize each layer; higher risk of integration surprises.
+3. **Risk-first** — tackle the unknown / highest-complexity piece at the top (spike architecture, prove the hard integration), then trivial work. Trades: morale dip early; but surfaces fatal unknowns before sunk cost is high.
+4. **Happy-path-first** — cover only the golden path end-to-end, skip all edge cases/errors, then pass 2 adds edge cases, pass 3 adds performance. Trades: ships fast; risky if edge cases turn out to reshape architecture.
+5. **Test-first / TDD outer-loop** — acceptance test per requirement before any implementation task. Trades: slowest to first commit; tightest traceability.
+6. **Parallelization-optimized** — maximize independent-agent dispatch; serialize only when dependencies force it. Trades: best wall-clock; higher context-split overhead.
+
+Pick 4+ from above (or better variants you find in research). Each option must include:
+- Name, essence
+- Inspired by (research-brief source + URL — e.g. a postmortem that proved it works/fails)
+- Best for (team size, risk profile, time pressure)
+- Pros / Cons / Risks
+- Phase shape it produces (how it reshapes Step 6's task decomposition)
+- Checkpoint density (how many review gates — more for risk-first, fewer for happy-path-first)
+- Rollback-ease impact (some strategies leave more reversible intermediate states)
+- Tradeoff Matrix (Speed-to-demo / Risk-surfacing / Integration-safety / Parallelizability / Morale / Fit)
+
+Render with the numbered table from the shared module. **HALT and await user selection**. Steps 3+ (strategic review, design review, file map, decomposition) all adapt to the chosen strategy.
 
 ### Step 3: Strategic Review Checkpoint
 
