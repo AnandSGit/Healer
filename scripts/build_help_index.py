@@ -18,6 +18,7 @@ from __future__ import annotations
 import hashlib
 import json
 import sys
+import textwrap
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -39,6 +40,7 @@ FLOWS_YAML = DATA / "flows.yaml"
 COMMAND_SCHEMA = SCHEMA / "command.schema.json"
 FLOW_SCHEMA = SCHEMA / "flow.schema.json"
 INDEX_OUT = DATA / "help-index.json"
+PLUGIN_MANIFEST = ROOT / ".claude-plugin" / "plugin.json"
 
 INDEX_VERSION = "1.0"
 
@@ -47,13 +49,22 @@ def sha256_of(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def read_plugin_version() -> str:
+    """Read the canonical plugin version for man-page footers; tolerate absence."""
+    try:
+        with PLUGIN_MANIFEST.open(encoding="utf-8") as f:
+            return json.load(f).get("version", "dev")
+    except Exception:
+        return "dev"
+
+
 def load_yaml(path: Path) -> dict:
-    with path.open() as f:
+    with path.open(encoding="utf-8") as f:
         return yaml.safe_load(f) or {}
 
 
 def load_schema(path: Path) -> dict:
-    with path.open() as f:
+    with path.open(encoding="utf-8") as f:
         return json.load(f)
 
 
@@ -109,7 +120,7 @@ def check_bijection(commands_data: dict) -> None:
     for p in sorted(COMMANDS_DIR.glob("*.md")):
         if p.name.startswith("_"):
             continue
-        if METADATA_MARKER not in p.read_text():
+        if METADATA_MARKER not in p.read_text(encoding="utf-8"):
             missing_marker.append(p.name)
     if missing_marker:
         print(f"\nFAIL metadata marker missing", file=sys.stderr)
@@ -122,100 +133,196 @@ def check_bijection(commands_data: dict) -> None:
     print(f"  OK  metadata markers: all {len(md_files)} files OK")
 
 
-def render_command_panel(name: str, entry: dict) -> str:
-    """Render the six-section drill-down text for a command.
+# ── man-page rendering primitives ───────────────────────────────────────────
+# Healer help panels follow the Linux man-page convention (man-pages(7)):
+# a centered header/footer banner plus the standard section order
+# NAME · SYNOPSIS · DESCRIPTION · OPTIONS · EXAMPLES · EXIT STATUS · SEE ALSO.
 
-    Output is the literal text the `?` interceptor will display.
+MAN_WIDTH = 78          # classic terminal man width
+BODY_INDENT = "       "  # 7 spaces, the man-page body indent
+SUB_INDENT = "           "  # 11 spaces, for nested/option bodies
+
+
+def _banner(left: str, center: str, right: str) -> str:
+    """Center-justify a man-page header/footer line within MAN_WIDTH."""
+    # leading half: left ... center ; trailing half: center ... right
+    total = MAN_WIDTH
+    # position center so it is centered overall
+    cstart = (total - len(center)) // 2
+    line = left + " " * max(1, cstart - len(left)) + center
+    line = line + " " * max(1, total - len(right) - len(line)) + right
+    return line[:total] if len(line) > total else line
+
+
+def _wrap(text: str, indent: str = BODY_INDENT, width: int = MAN_WIDTH) -> list[str]:
+    """Wrap a paragraph (preserving explicit newlines) to the man body column."""
+    out: list[str] = []
+    for para in text.rstrip().splitlines():
+        if not para.strip():
+            out.append("")
+            continue
+        wrapped = textwrap.wrap(para.strip(), width=width - len(indent)) or [""]
+        out.extend(indent + w for w in wrapped)
+    return out
+
+
+def _tagline(purpose: str, cap: int = 62) -> str:
+    """A concise one-line summary for the NAME section / apropos listing.
+
+    Prefers the text before the first em-dash separator, else the first
+    sentence, capped to `cap` characters.
     """
-    lines: list[str] = []
-    lines.append("═" * 60)
-    lines.append(f"HEALER — /healer:{name}")
-    lines.append("═" * 60)
-    lines.append("")
+    first = purpose.strip().splitlines()[0].strip()
+    for sep in (" — ", " – ", " - "):
+        if sep in first:
+            cand = first.split(sep, 1)[0].strip()
+            if len(cand) >= 8:
+                first = cand
+                break
+    else:
+        for end in (". ", "? ", "! "):
+            if end in first:
+                first = first.split(end, 1)[0].strip()
+                break
+    if len(first) > cap:
+        first = first[: cap - 1].rstrip() + "…"
+    return first
 
-    lines.append("1. PURPOSE")
-    for ln in entry["purpose"].rstrip().splitlines():
-        lines.append(f"   {ln}")
-    lines.append("")
 
-    lines.append("2. WHAT IT DOES")
-    for ln in entry["what_it_does"].rstrip().splitlines():
-        lines.append(f"   {ln}")
-    lines.append("")
+def _man_id(name: str, *, flow: bool = False) -> str:
+    base = f"flow:{name}" if flow else name
+    return f"HEALER:{base.upper()}(1)"
 
-    lines.append("3. INPUT / EXPECTED TEXT")
-    inp = entry["input"]
-    lines.append(f"   Syntax: {inp['syntax']}")
-    if inp.get("args"):
+
+def _options_section(inp: dict) -> list[str]:
+    """Render the OPTIONS / ARGUMENTS section from input.args."""
+    args = inp.get("args") or []
+    if not args:
+        return []
+    lines = ["OPTIONS"]
+    for arg in args:
+        req = "required" if arg.get("required") else "optional"
+        lines.append(f"{BODY_INDENT}{arg['name']}  ({req})")
+        lines.extend(_wrap(arg["desc"], indent=SUB_INDENT))
         lines.append("")
-        lines.append("   Arguments:")
-        for arg in inp["args"]:
-            req = "required" if arg.get("required") else "optional"
-            lines.append(f"     {arg['name']:<14} ({req}) — {arg['desc']}")
-    if inp.get("valid"):
+    if lines and lines[-1] == "":
+        lines.pop()
+    return lines
+
+
+def _examples_section(entry: dict, inp: dict) -> list[str]:
+    lines = ["EXAMPLES"]
+    ex = entry.get("example") or {}
+    if ex.get("command"):
+        lines.append(f"{BODY_INDENT}{ex['command']}")
+        if ex.get("why_this_example"):
+            lines.extend(_wrap(ex["why_this_example"], indent=SUB_INDENT))
+        if ex.get("trace"):
+            lines.append(f"{SUB_INDENT}Trace:")
+            for step in ex["trace"]:
+                lines.append(f"{SUB_INDENT}  → {step}")
         lines.append("")
-        lines.append("   Valid examples:")
-        for v in inp["valid"]:
-            lines.append(f"     • {v!r}")
+    valid = [v for v in (inp.get("valid") or []) if v != ""]
+    if valid:
+        lines.append(f"{BODY_INDENT}Valid input:    " + ", ".join(repr(v) for v in valid))
     if inp.get("invalid"):
-        lines.append("")
-        lines.append("   Invalid examples:")
         for inv in inp["invalid"]:
-            lines.append(f"     ✗ {inv['text']!r} — {inv['why']}")
-    lines.append("")
+            lines.append(f"{BODY_INDENT}Invalid input:  {inv['text']!r} — {inv['why']}")
+    if lines and lines[-1] == "":
+        lines.pop()
+    return lines
 
-    lines.append("4. CONCRETE EXAMPLE")
-    ex = entry["example"]
-    lines.append(f"   Command: {ex['command']}")
-    lines.append("")
-    lines.append("   Trace:")
-    for step in ex["trace"]:
-        lines.append(f"     → {step}")
-    lines.append("")
-    lines.append("   Why this example:")
-    for ln in ex["why_this_example"].rstrip().splitlines():
-        lines.append(f"     {ln}")
-    lines.append("")
 
-    lines.append("5. PURPOSE OF YOUR INPUT TEXT")
-    for ln in entry["input_purpose"].rstrip().splitlines():
-        lines.append(f"   {ln}")
-    lines.append("")
+def render_command_panel(name: str, entry: dict, version: str) -> str:
+    """Render a man-page-style help panel for a command."""
+    man_id = _man_id(name)
+    inp = entry["input"]
+    L: list[str] = []
+    L.append(_banner(man_id, "Healer Manual", man_id))
+    L.append("")
 
-    lines.append("6. AFTER THIS COMMAND")
-    if entry.get("next"):
-        lines.append(f"   Suggested next: {', '.join('/healer:' + n for n in entry['next'])}")
-    if entry.get("related"):
-        lines.append(f"   Related:        {', '.join('/healer:' + r for r in entry['related'])}")
+    L.append("NAME")
+    L.extend(_wrap(f"healer:{name} — {_tagline(entry['purpose'])}"))
+    L.append("")
+
+    L.append("SYNOPSIS")
+    L.append(f"{BODY_INDENT}{inp['syntax']}")
+    L.append(f"{BODY_INDENT}/healer:{name} (-h | --help | ?)")
+    L.append("")
+
+    L.append("DESCRIPTION")
+    L.extend(_wrap(entry["purpose"]))
+    if entry.get("what_it_does"):
+        L.append("")
+        L.extend(_wrap(entry["what_it_does"]))
+    if entry.get("input_purpose"):
+        L.append("")
+        L.extend(_wrap(entry["input_purpose"]))
+    L.append("")
+
+    opts = _options_section(inp)
+    if opts:
+        L.extend(opts)
+        L.append("")
+
+    L.extend(_examples_section(entry, inp))
+    L.append("")
+
     if entry.get("errors"):
-        lines.append("")
-        lines.append("   Errors / halts:")
+        L.append("EXIT STATUS")
+        L.append(f"{BODY_INDENT}The command halts (must-pass gate failure) when:")
         for err in entry["errors"]:
-            lines.append(f"     ! {err}")
+            L.append(f"{SUB_INDENT}! {err}")
+        L.append("")
 
-    lines.append("═" * 60)
-    return "\n".join(lines)
+    see = []
+    see += [f"healer:{n}" for n in entry.get("next", [])]
+    see += [f"healer:{r}" for r in entry.get("related", [])]
+    if see:
+        L.append("SEE ALSO")
+        # de-dup while preserving order
+        seen, uniq = set(), []
+        for s in see:
+            if s not in seen:
+                seen.add(s); uniq.append(s)
+        L.extend(_wrap(", ".join(uniq)))
+        L.append("")
+
+    L.append("ENFORCEMENT")
+    L.extend(_wrap("Runs under the shared enforcement protocol "
+                   "(shared/_enforcement.md): research and verification HARD-GATEs apply."))
+    L.append("")
+    L.append(_banner(f"Healer {version}", entry.get("category", "Healer"), man_id))
+    return "\n".join(L)
 
 
-def render_flow_panel(name: str, entry: dict) -> str:
-    """Render the six-section drill-down text for a flow preset."""
-    lines: list[str] = []
-    lines.append("═" * 60)
-    lines.append(f"HEALER — /healer:flow {name}")
-    lines.append("═" * 60)
-    lines.append("")
+def render_flow_panel(name: str, entry: dict, version: str) -> str:
+    """Render a man-page-style help panel for a flow preset."""
+    man_id = _man_id(name, flow=True)
+    inp = entry["input"]
+    L: list[str] = []
+    L.append(_banner(man_id, "Healer Manual", man_id))
+    L.append("")
 
-    lines.append("1. PURPOSE")
-    for ln in entry["purpose"].rstrip().splitlines():
-        lines.append(f"   {ln}")
-    lines.append("")
+    L.append("NAME")
+    L.extend(_wrap(f"healer:flow {name} — {_tagline(entry['purpose'])}"))
+    L.append("")
 
-    lines.append("2. WHAT IT DOES (sub-commands, in order)")
-    for ln in entry["what_it_does"].rstrip().splitlines():
-        lines.append(f"   {ln}")
-    lines.append("")
-    lines.append("   STEP  COMMAND               GATE          PRODUCES")
-    lines.append("   ────  ────────────────────  ────────────  ──────────────────────────")
+    L.append("SYNOPSIS")
+    L.append(f"{BODY_INDENT}{inp['syntax']}")
+    L.append(f"{BODY_INDENT}/healer:flow {name} (-h | --help | ?)")
+    L.append("")
+
+    L.append("DESCRIPTION")
+    L.extend(_wrap(entry["purpose"]))
+    if entry.get("what_it_does"):
+        L.append("")
+        L.extend(_wrap(entry["what_it_does"]))
+    L.append("")
+
+    L.append("PIPELINE")
+    L.append(f"{BODY_INDENT}STEP  COMMAND               GATE            PRODUCES")
+    L.append(f"{BODY_INDENT}────  ────────────────────  ──────────────  ─────────────────────")
     gate_sym = {"auto": "→  auto", "interactive": "?→ interactive", "must-pass": "!→ must-pass"}
     for i, st in enumerate(entry["steps"], 1):
         cmd = f"/healer:{st['command']}"
@@ -223,93 +330,77 @@ def render_flow_panel(name: str, entry: dict) -> str:
             cmd += f" {st['args']}"
         gate = gate_sym.get(st["gate"], st["gate"])
         produces = st.get("produces", "—")
-        lines.append(f"   {i:<4}  {cmd:<20}  {gate:<12}  {produces}")
-    lines.append("")
+        L.append(f"{BODY_INDENT}{i:<4}  {cmd:<20}  {gate:<14}  {produces}")
+    L.append("")
+    L.append(f"{BODY_INDENT}Gate operators:  →  auto      ?→ interactive (pause)      "
+             "!→ must-pass (halt on failure)")
+    L.append("")
 
-    lines.append("3. INPUT / EXPECTED TEXT")
-    inp = entry["input"]
-    lines.append(f"   Syntax: {inp['syntax']}")
-    if inp.get("args"):
-        lines.append("")
-        lines.append("   Arguments:")
-        for arg in inp["args"]:
-            req = "required" if arg.get("required") else "optional"
-            lines.append(f"     {arg['name']:<14} ({req}) — {arg['desc']}")
-    if inp.get("valid"):
-        lines.append("")
-        lines.append("   Valid examples:")
-        for v in inp["valid"]:
-            lines.append(f"     • {v!r}")
-    if inp.get("invalid"):
-        lines.append("")
-        lines.append("   Invalid examples:")
-        for inv in inp["invalid"]:
-            lines.append(f"     ✗ {inv['text']!r} — {inv['why']}")
-    lines.append("")
+    opts = _options_section(inp)
+    if opts:
+        L.extend(opts)
+        L.append("")
 
-    lines.append("4. CONCRETE EXAMPLE")
-    ex = entry["example"]
-    lines.append(f"   Command: {ex['command']}")
-    lines.append("")
-    lines.append("   Trace:")
-    for step in ex["trace"]:
-        lines.append(f"     → {step}")
-    lines.append("")
-    lines.append("   Why this example:")
-    for ln in ex["why_this_example"].rstrip().splitlines():
-        lines.append(f"     {ln}")
-    lines.append("")
+    L.extend(_examples_section(entry, inp))
+    L.append("")
 
-    lines.append("5. PURPOSE OF YOUR INPUT TEXT")
-    for ln in entry["input_purpose"].rstrip().splitlines():
-        lines.append(f"   {ln}")
-    lines.append("")
-
-    lines.append("6. AFTER THIS FLOW")
     aft = entry.get("after", {})
-    if aft.get("next"):
-        lines.append(f"   Suggested next:   {', '.join('/healer:' + n for n in aft['next'])}")
-    if aft.get("sister_presets"):
-        lines.append(f"   Sister presets:   {', '.join('/healer:flow ' + p for p in aft['sister_presets'])}")
     if aft.get("on_failure"):
-        lines.append(f"   On failure:       {aft['on_failure']}")
+        L.append("EXIT STATUS")
+        L.extend(_wrap(f"On failure: {aft['on_failure']}"))
+        L.append("")
 
-    lines.append("═" * 60)
-    return "\n".join(lines)
+    see = [f"healer:{n}" for n in aft.get("next", [])]
+    see += [f"healer:flow {p}" for p in aft.get("sister_presets", [])]
+    if see:
+        L.append("SEE ALSO")
+        L.extend(_wrap(", ".join(see)))
+        L.append("")
+
+    L.append(_banner(f"Healer {version}", "flow preset", man_id))
+    return "\n".join(L)
 
 
-def render_flow_overview(flows: dict) -> str:
-    """Render the flat overview shown for `/healer:flow ?` (no preset specified)."""
-    lines: list[str] = []
-    lines.append("═" * 60)
-    lines.append("HEALER — /healer:flow")
-    lines.append("═" * 60)
-    lines.append("")
-    lines.append("Flow orchestrator — chains healer sub-commands into pipelines.")
-    lines.append("Use a preset, a custom recipe, or an inline chain.")
-    lines.append("")
-    lines.append("USAGE")
-    lines.append("  /healer:flow <preset>            # built-in preset")
-    lines.append("  /healer:flow <recipe>            # custom recipe from ~/.healer/recipes.yaml")
-    lines.append("  /healer:flow a → b ?→ c !→ d     # inline chain")
-    lines.append("  /healer:flow <preset> ?          # drill-down help for a specific preset")
-    lines.append("")
-    lines.append(f"BUILT-IN PRESETS ({len(flows)})")
-    name_w = max(len(n) for n in flows.keys()) if flows else 12
+def render_flow_overview(flows: dict, version: str) -> str:
+    """Render the man-page intro shown for `/healer:flow ?` (no preset specified)."""
+    man_id = "HEALER:FLOW(1)"
+    L: list[str] = []
+    L.append(_banner(man_id, "Healer Manual", man_id))
+    L.append("")
+    L.append("NAME")
+    L.extend(_wrap("healer:flow — orchestrate healer sub-commands into gated pipelines"))
+    L.append("")
+    L.append("SYNOPSIS")
+    L.append(f"{BODY_INDENT}/healer:flow <preset>")
+    L.append(f"{BODY_INDENT}/healer:flow <recipe>")
+    L.append(f"{BODY_INDENT}/healer:flow <cmd> → <cmd> ?→ <cmd> !→ <cmd>")
+    L.append(f"{BODY_INDENT}/healer:flow <preset> (-h | --help | ?)")
+    L.append("")
+    L.append("DESCRIPTION")
+    L.extend(_wrap("Chains healer sub-commands into a pipeline. Run a built-in preset, "
+                   "a custom recipe from ~/.healer/recipes.yaml, or an inline chain. Each "
+                   "step runs its complete procedure, including research and verification "
+                   "gates; gate operators control how one step hands off to the next."))
+    L.append("")
+    L.append("GATE OPERATORS")
+    L.append(f"{BODY_INDENT}→   auto         continue automatically")
+    L.append(f"{BODY_INDENT}?→  interactive  pause for user approval")
+    L.append(f"{BODY_INDENT}!→  must-pass    halt the flow if the step fails (no override)")
+    L.append("")
+    L.append(f"PRESETS ({len(flows)})")
+    name_w = max((len(n) for n in flows.keys()), default=12)
     for name in sorted(flows.keys()):
         purpose = flows[name]["purpose"].strip().splitlines()[0]
-        if len(purpose) > 80:
-            purpose = purpose[:77] + "..."
-        lines.append(f"  {name:<{name_w}}  {purpose}")
-    lines.append("")
-    lines.append("GATE OPERATORS")
-    lines.append("  →   AUTO         continue automatically")
-    lines.append("  ?→  INTERACTIVE  pause for user approval")
-    lines.append("  !→  MUST-PASS    halt if step fails (no override)")
-    lines.append("")
-    lines.append("Tip: append `?` to any preset for full drill-down (e.g., /healer:flow feature ?)")
-    lines.append("═" * 60)
-    return "\n".join(lines)
+        avail = MAN_WIDTH - len(BODY_INDENT) - name_w - 2
+        if len(purpose) > avail:
+            purpose = purpose[: avail - 3] + "..."
+        L.append(f"{BODY_INDENT}{name:<{name_w}}  {purpose}")
+    L.append("")
+    L.append("SEE ALSO")
+    L.extend(_wrap("healer:help, healer:help flows, healer:flow <preset> ?"))
+    L.append("")
+    L.append(_banner(f"Healer {version}", "flow orchestrator", man_id))
+    return "\n".join(L)
 
 
 def main() -> int:
@@ -336,15 +427,18 @@ def main() -> int:
     check_bijection(cmd_data)
     print()
 
+    version = read_plugin_version()
+    print(f"  plugin version: {version}")
+
     print("Rendering panels...")
     commands_index: dict[str, dict] = {}
     for name in sorted(cmd_data.keys()):
         entry = cmd_data[name]
         commands_index[name] = {
             "category": entry["category"],
-            "purpose_short": entry["purpose"].strip().splitlines()[0],
+            "purpose_short": _tagline(entry["purpose"], cap=72),
             "next": entry.get("next", []),
-            "panel": render_command_panel(name, entry),
+            "panel": render_command_panel(name, entry, version),
         }
     print(f"  rendered {len(commands_index)} command panels")
 
@@ -352,12 +446,12 @@ def main() -> int:
     for name in sorted(flow_data.keys()):
         entry = flow_data[name]
         flows_index[name] = {
-            "purpose_short": entry["purpose"].strip().splitlines()[0],
+            "purpose_short": _tagline(entry["purpose"], cap=72),
             "step_count": len(entry["steps"]),
-            "panel": render_flow_panel(name, entry),
+            "panel": render_flow_panel(name, entry, version),
         }
     print(f"  rendered {len(flows_index)} flow panels")
-    flows_overview_panel = render_flow_overview(flow_data)
+    flows_overview_panel = render_flow_overview(flow_data, version)
     print(f"  rendered flow overview panel")
     print()
 
@@ -384,7 +478,8 @@ def main() -> int:
 
     print(f"Writing {INDEX_OUT}...")
     INDEX_OUT.write_text(
-        json.dumps(index, indent=2, sort_keys=True, ensure_ascii=False) + "\n"
+        json.dumps(index, indent=2, sort_keys=True, ensure_ascii=False) + "\n",
+        encoding="utf-8",
     )
     size_kb = INDEX_OUT.stat().st_size / 1024
     print(f"  wrote {size_kb:.1f} KB")

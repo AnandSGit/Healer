@@ -4,34 +4,34 @@
 
 ---
 
-## HARD-GATE: Postfix `?` / `--help` Interceptor
+## HARD-GATE: Help Flag Interceptor (`?` / `-h` / `--help`)
 
 <HARD-GATE>
 THIS CHECK RUNS BEFORE ANY OTHER PROTOCOL IN THIS FILE.
-If the user typed `?` or `--help` as the command argument, render help
-from `data/help-index.json` and HALT — do not execute the command's
-procedure, do not run research, do not do anything else.
+If the user typed `?`, `-h`, or `--help` as the command argument, render the
+man-style help page from `data/help-index.json` and HALT — do not execute the
+command's procedure, do not run research, do not do anything else.
+These are the standard help flags (`-h`/`--help` per the GNU/POSIX convention,
+plus `?` as a Healer shorthand); they behave like `command --help` in a shell.
 </HARD-GATE>
 
 ### When to Trigger
 
-`$ARGUMENTS` triggers the help interceptor if it matches ANY of:
+`$ARGUMENTS` triggers the help interceptor if it matches ANY of (where the
+help token is one of `?`, `-h`, `--help`):
 
 ```
-^\s*\?\s*$              # exactly "?"
-^--help\s*$             # exactly "--help"
-^\s*\?\s+\S             # "? <rest>" — drill-down for command
-^--help\s+\S            # "--help <rest>" — same
-\S+\s+\?\s*$            # "<token> ?" — drill-down for that token
-\S+\s+--help\s*$        # "<token> --help" — same
+^\s*(\?|-h|--help)\s*$        # exactly the help flag, e.g. "?" / "-h" / "--help"
+^\s*(\?|-h|--help)\s+\S       # "<flag> <rest>" — drill-down for the target
+\S+\s+(\?|-h|--help)\s*$      # "<token> <flag>" — drill-down for that token
 ```
 
-It DOES NOT trigger if `?` appears mid-string (e.g., `/healer:debug "why is this ?"` — the question mark is part of the topic, not a help request).
+It DOES NOT trigger if the token appears mid-string (e.g., `/healer:debug "why is this ?"` — the `?` is part of the topic, not a help request).
 
 ### Dispatch
 
 1. Identify the current command from the file path (e.g., `commands/flow.md` → `flow`).
-2. Strip the `?` or `--help` token from `$ARGUMENTS`. The remainder, if any, is the **drill-down target**.
+2. Strip the help token (`?`, `-h`, or `--help`) from `$ARGUMENTS`. The remainder, if any, is the **drill-down target**.
 3. Read `${CLAUDE_PLUGIN_ROOT}/data/help-index.json` (single file read, ~50ms).
 4. Lookup table:
 
@@ -40,7 +40,7 @@ It DOES NOT trigger if `?` appears mid-string (e.g., `/healer:debug "why is this
    | any `<cmd>` | empty | `commands.<cmd>.panel` from index |
    | `flow` | empty | `flow_overview` from index |
    | `flow` | `<preset>` matching a built-in flow | `flows.<preset>.panel` from index |
-   | `flow` | `<recipe>` matching `~/.healer/recipes.yaml` | runtime-render using six-section format from `_help_renderer.md` |
+   | `flow` | `<recipe>` matching `~/.healer/recipes.yaml` | runtime-render using the man-page format from `_help_renderer.md` |
    | `help` | `<command-name>` | equivalent to `commands.<name>.panel` |
    | any | unrecognized target | render "Unknown" panel with Levenshtein-suggested alternatives |
 
@@ -61,14 +61,14 @@ If `data/help-index.json` is missing or unreadable:
 ```
 ARGS = $ARGUMENTS (raw)
 
-if ARGS matches "^\s*(\?|--help)\s*$":
+if ARGS matches "^\s*(\?|-h|--help)\s*$":
     target = None
-elif ARGS matches "^\s*(\?|--help)\s+(\S+.*)$":
+elif ARGS matches "^\s*(\?|-h|--help)\s+(\S+.*)$":
     target = capture group 2
-elif ARGS matches "^(\S+.*)\s+(\?|--help)\s*$":
+elif ARGS matches "^(\S+.*)\s+(\?|-h|--help)\s*$":
     target = capture group 1
 else:
-    # `?` mid-string or no `?` at all → pass through to command procedure
+    # help flag mid-string or absent → pass through to command procedure
     PROCEED to research protocol below
 
 # Help mode active — load index

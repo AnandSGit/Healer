@@ -74,7 +74,7 @@ flow:
   category: core
   purpose: |
     Flow orchestrator — chains multiple healer sub-commands into pipelines
-    with gate controls, 26 built-in presets, custom YAML recipes, and
+    with gate controls, 27 built-in presets, custom YAML recipes, and
     smart next-step suggestions. The conductor of the healer orchestra.
   what_it_does: |
     Parses the user's flow expression (preset name, inline chain, or recipe),
@@ -177,10 +177,10 @@ help:
       data-backed catalog — O(1) lookup vs grep across 14k lines.
   input_purpose: |
     The argument selects which help mode renders. With no args, the user
-    sees the welcome overview. With a known command name, they get
-    detail mode (six-section drill-down — same as `/healer:<cmd> ?`).
-    With anything else, the system attempts search before falling back
-    to a not-found panel.
+    sees the man-style overview. With a known command name, they get its
+    full man page (same as `/healer:<cmd> --help`). With `-k <term>` they
+    get apropos-style search; with anything else, the system attempts a
+    search before falling back to a not-found page.
   next: []
   related:
     - flow
@@ -194,7 +194,7 @@ healer:
     Full autonomous codebase engine — discover, understand, assess,
     research, plan, execute, and verify any project in any language on
     any platform. The umbrella command that orchestrates the full healer
-    suite (41 sub-commands, 26 flow presets, design intelligence,
+    suite (44 sub-commands, 27 flow presets, design intelligence,
     10x imitate & flow testing).
   what_it_does: |
     Detects project stack, runs assessment, identifies issues, researches

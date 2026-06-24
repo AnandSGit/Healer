@@ -118,8 +118,8 @@ def main() -> int:
         print(f"ERROR: missing YAML source(s)", file=sys.stderr)
         return 3
 
-    commands = yaml.safe_load(COMMANDS_YAML.read_text()) or {}
-    flows = yaml.safe_load(FLOWS_YAML.read_text()) or {}
+    commands = yaml.safe_load(COMMANDS_YAML.read_text(encoding="utf-8")) or {}
+    flows = yaml.safe_load(FLOWS_YAML.read_text(encoding="utf-8")) or {}
 
     commands_table = render_commands_table(commands)
     flows_table = render_flows_table(flows)
@@ -128,7 +128,7 @@ def main() -> int:
 
     # Update README.md
     if README.exists():
-        text = README.read_text()
+        text = README.read_text(encoding="utf-8")
         text, did_cmd = replace_marker_section(
             text,
             "<!-- HEALER:COMMANDS:START -->",
@@ -142,14 +142,14 @@ def main() -> int:
             flows_table,
         )
         if did_cmd or did_flow:
-            README.write_text(text)
+            README.write_text(text, encoding="utf-8")
             updated_files.append(f"README.md (commands={did_cmd}, flows={did_flow})")
         else:
             print(f"  WARN README.md has no marker sections; skipped", file=sys.stderr)
 
     # Update healer-user-guide.html (HTML markers use same syntax)
     if USER_GUIDE.exists():
-        text = USER_GUIDE.read_text()
+        text = USER_GUIDE.read_text(encoding="utf-8")
         text, did_cmd_html = replace_marker_section(
             text,
             "<!-- HEALER:COMMANDS:START -->",
@@ -163,7 +163,7 @@ def main() -> int:
             flows_table,
         )
         if did_cmd_html or did_flow_html:
-            USER_GUIDE.write_text(text)
+            USER_GUIDE.write_text(text, encoding="utf-8")
             updated_files.append(f"healer-user-guide.html (commands={did_cmd_html}, flows={did_flow_html})")
 
     if updated_files:

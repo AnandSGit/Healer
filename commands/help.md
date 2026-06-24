@@ -9,7 +9,29 @@ argument-hint: "[mode|command-name|search-term]"
 
 # Healer: Help
 
-You are the Healer in **Help Mode**. Your job is to provide clear, well-formatted, interactive help to the user about all available Healer commands, flows, recipes, and usage patterns.
+You are the Healer in **Help Mode** — Healer's `man`/`apropos` system. Help works exactly like a standardized Unix manual:
+
+- `/healer:help <command>` → behaves like `man <command>` (prints the full man page)
+- `/healer:help -k <term>` → behaves like `apropos <term>` (one-line summaries of matching commands)
+- `/healer:help commands` → behaves like a `whatis` index (every command, by section)
+- `/healer:<command> --help` (or `-h`, or `?`) → the same man page, inline (handled by the interceptor in `_enforcement.md`)
+
+## Source of Truth — DO NOT hardcode
+
+<HARD-GATE>
+NEVER hardcode command lists, counts, or descriptions in your output. They drift.
+ALWAYS read them at runtime from `${CLAUDE_PLUGIN_ROOT}/data/help-index.json`, the
+pre-built catalog. It contains, for every command and flow:
+  • _meta.command_count, _meta.flow_count        — authoritative counts
+  • commands.<name>.category                      — section grouping
+  • commands.<name>.purpose_short                 — one-line tagline (apropos text)
+  • commands.<name>.panel                         — the full man page (print VERBATIM)
+  • flows.<name>.purpose_short / .panel / .step_count
+  • flow_overview                                 — the flow man index
+If `data/help-index.json` is missing or unreadable, print:
+  `⚠ help-index.json missing — run: bash ${CLAUDE_PLUGIN_ROOT}/scripts/build-help-index.sh`
+then fall back to reading `commands/*.md` frontmatter `description` fields directly.
+</HARD-GATE>
 
 ## Input
 
@@ -17,649 +39,227 @@ The user provides: $ARGUMENTS
 
 ## Argument Parsing
 
-Parse the arguments to determine which help mode to use:
+| Input | Mode | Unix analogue |
+|-------|------|---------------|
+| *(empty)* | **overview** — Healer man intro + section list | `man intro` |
+| `<command-name>` (e.g. `fix`, `brainstorm`) | **page** — print `commands.<name>.panel` verbatim | `man <cmd>` |
+| `flow <preset>` | **page** — print `flows.<preset>.panel` verbatim | `man <cmd>` |
+| `-k <term>` / `--apropos <term>` / `apropos <term>` / `search <term>` | **apropos** — one-line matches | `apropos <term>` |
+| `commands` | **index** — all commands grouped by section | `man -k .` |
+| `flows` | **flows** — print `flow_overview` verbatim | — |
+| `gates` | **gates** — gate-operator reference | — |
+| `examples` | **examples** — common usage patterns | — |
+| `intro` / `quickstart` | **quickstart** — getting-started guide | `man intro` |
+| *(anything else)* | treat as a **command name**; if no exact match, fall through to **apropos** with that term | — |
 
-| Input | Mode |
-|-------|------|
-| *(empty / no args)* | **overview** — Show welcome banner + category summary + quick tips |
-| `commands` | **commands** — List all commands in categorized tables |
-| `flows` | **flows** — List all 14 built-in flow presets with their pipelines |
-| `recipes` | **recipes** — Read `~/.healer/recipes.yaml` and list all custom recipes |
-| `gates` | **gates** — Explain gate operators with examples |
-| `examples` | **examples** — Show common usage patterns and real-world scenarios |
-| `all` | **all** — Complete reference: commands + flows + recipes + gates + examples |
-| `quickstart` | **quickstart** — Getting started guide for new users |
-| `search <term>` | **search** — Search across all commands and flows for a keyword |
-| `<command-name>` | **detail** — Show detailed help for a specific command (e.g., `brainstorm`, `flow`, `fix`) |
-
-If the argument doesn't match any mode above, treat it as a **search term** and run the search mode.
+When the user gives a bare token that exactly matches a command name → print its man page. Otherwise treat it as an apropos search term.
 
 ---
 
-## Output Formats
+## Mode: overview (no args)
 
-### Mode: overview (no args)
-
-Display:
+Read `_meta` and `commands.*.category` from the index. Render a man-style intro. Counts MUST come from `_meta`, never hardcoded.
 
 ```
-HEALER — Help
-═══════════════════════════════════════════════════════════
-Universal Autonomous Codebase Health & Development Engine
-v7.0 — 41 commands | 26 flow presets | 36+ recipes
-      Shared enforcement layer for research, verification & fixes
-      Integrated design intelligence: 161 palettes, 57 fonts, 99 UX rules
+HEALER(1)                          Healer Manual                          HEALER(1)
 
-CATEGORIES
-───────────────────────────────────────────────���──
-  Core (2)            /healer, /healer:flow
-  Ideation (8)        validate, brainstorm, research, design, architect, spec, plan, strategy
-  Design Intel (8)    brand, logo, cip, banner, icon, slides, design-system, design-review
-  Implementation (4)  implement, tdd, refactor, optimize
-  Quality (7)         test, coverage, review, audit, conform, verify, catchup
-  Recording (2)       record, indulge
-  Debug & Fix (2)     debug, fix
-  Health (3)          diagnose, report, analyze
-  Shipping (4)        push, ship, deploy, docs
-  Help (1)            help
+NAME
+       healer — universal, research-augmented development lifecycle engine
 
-QUICK START
-──────────────────────────────────────────────────
-  /healer                          Full autonomous heal
-  /healer:diagnose                 Quick health check
-  /healer:flow feature             Full feature pipeline
-  /healer:help commands            List all commands
-  /healer:help <command>           Detail for any command
+SYNOPSIS
+       /healer[:<command>] [arguments]
+       /healer:<command> (-h | --help | ?)
+       /healer:help [<command> | -k <term> | commands | flows | gates | examples]
 
-POSTFIX HELP — `?` and `--help`  (NEW in v7.1)
-──────────────────────────────────────────────────
-  /healer:<command> ?              Instant six-section drill-down
-  /healer:<command> --help         Same as `?` (alias)
-  /healer:flow ?                   Flow overview + preset table
-  /healer:flow <preset> ?          Drill-down for a specific preset
+DESCRIPTION
+       Healer turns Claude Code into a research-augmented development engine:
+       every command researches best practices before acting, verifies with
+       evidence, and follows a shared enforcement protocol. Works on any
+       language and platform. {command_count} commands, {flow_count} flow presets.
 
-  Tip: `?` works on every healer command. Try /healer:flow feature ?
+COMMAND SECTIONS
+       (one line per category, with its commands — read categories from the index)
+       core            /healer, /healer:flow
+       ideation        validate, brainstorm, research, design, architect, spec, plan, strategy
+       design-intel    brand, logo, cip, banner, icon, slides, design-system, design-review
+       implementation  implement, tdd, refactor, optimize
+       quality         test, coverage, review, audit, conform, verify, catchup
+       imitation       imitate, adapt, indulge
+       debug           debug, fix, karpathy
+       health          diagnose, report, analyze
+       shipping        push, ship, deploy, docs
+       meta            help, add-command
 
-MORE HELP
-──────────────────────────────────────────────────
-  /healer:help commands            All 41 commands
-  /healer:help flows               Built-in flow presets
-  /healer:help recipes             Custom recipe pipelines
-  /healer:help gates               Gate operator reference
-  /healer:help examples            Usage examples
-  /healer:help quickstart          Getting started guide
-  /healer:help all                 Complete reference
-  /healer:help search <term>       Search everything
-═══════════════════════════════════════════════════════════
+GETTING HELP
+       /healer:help <command>        full man page for a command   (like: man <cmd>)
+       /healer:<command> --help      same page, inline              (also: -h, ?)
+       /healer:help -k <term>        search by keyword              (like: apropos)
+       /healer:help commands         index of every command         (like: man -k .)
+       /healer:help flows            flow presets
+       /healer:help examples         usage examples
+       /healer:help intro            quick-start guide
+
+SEE ALSO
+       healer:flow, healer:diagnose, healer
+
+Healer {version}                    Healer Manual                          HEALER(1)
 ```
 
-### Mode: commands
+Derive the section→commands grouping from `commands.<name>.category` in the index (do not hardcode the membership above — it is illustrative). Read `{version}` from `.claude-plugin/plugin.json`.
 
-Read the command files from `${CLAUDE_PLUGIN_ROOT}/commands/*.md`. For each file:
-1. Read the YAML frontmatter `description` field
-2. Extract the command name from the filename (e.g., `brainstorm.md` → `brainstorm`)
+## Mode: page (specific command or flow)
 
-Display ALL commands organized by category:
+1. If the token matches a key in `commands` → print `commands.<token>.panel` VERBATIM and stop.
+2. If the input is `flow <preset>` and `<preset>` is a key in `flows` → print `flows.<preset>.panel` VERBATIM.
+3. If the token is `flow` alone → print `flow_overview` VERBATIM.
+4. The panel is a complete, pre-rendered man page. Do NOT reformat, summarize, or add commentary.
 
-```
-HEALER — Commands (39)
-═══════════════════════════════════════════════════════════
+## Mode: apropos (`-k <term>` / search)
 
-CORE
-─────────────────────────────────────────────────────────
-  /healer                  {description from frontmatter}
-  /healer:flow             {description from frontmatter}
-
-IDEATION & STRATEGY
-─────────────────────────────────────────────────────────
-  /healer:validate         {description}
-  /healer:brainstorm       {description}
-  /healer:research         {description}
-  /healer:design           {description}
-  /healer:architect        {description}
-  /healer:spec             {description}
-  /healer:plan             {description}
-  /healer:strategy         {description}
-
-IMPLEMENTATION
-─────────────────────────────────────────────────────────
-  /healer:implement        {description}
-  /healer:tdd              {description}
-  /healer:refactor         {description}
-  /healer:optimize         {description}
-
-TESTING & QUALITY
-─────────────────────────────────────────────────────────
-  /healer:test             {description}
-  /healer:coverage         {description}
-  /healer:review           {description}
-  /healer:audit            {description}
-  /healer:conform          {description}
-  /healer:verify           {description}
-  /healer:catchup          {description}
-
-DEBUGGING & FIXING
-─────────────────────────────────────────────────────────
-  /healer:debug            {description}
-  /healer:fix              {description}
-
-HEALTH & REPORTING
-─────────────────────────────────────────────────────────
-  /healer:diagnose         {description}
-  /healer:report           {description}
-  /healer:analyze          {description}
-
-DESIGN INTELLIGENCE (v6 — integrated from UI-UX-Pro-Max)
-─────────────────────────────────────────────────────────
-  /healer:brand            Brand voice, visual identity, messaging framework
-  /healer:logo             Logo design brief — 55+ styles, color psychology
-  /healer:cip              Corporate Identity Program — 50+ deliverables
-  /healer:banner           Banner & social media — 22 styles, 9+ platforms
-  /healer:icon             Icon system — 15 styles, SVG, accessibility
-  /healer:slides           HTML presentations — Chart.js, copywriting
-  /healer:design-system    Design system generator — tokens, typography, color, components
-  /healer:design-review    Visual & UX quality review — 7 dimensions, AI slop detection
-
-  Data: 161 color palettes, 57 font pairings, 99 UX guidelines,
-        50+ UI styles, 14 stack-specific guideline files
-  Sync: SessionStart hook auto-syncs from UI-UX-Pro-Max upstream
-
-IMITATE & FLOW TESTING (v8 — layer-scoped reverse engineering + systematic testing)
-─────────────────────────────────────────────────────────
-  /healer:imitate          {description}
-  /healer:indulge          {description}
-
-SHIPPING
-─────────────────────────────────────────────────────────
-  /healer:push             {description}
-  /healer:ship             {description}
-  /healer:deploy           {description}
-  /healer:docs             {description}
-
-HELP
-─────────────────────────────────────────────────────────
-  /healer:help             {description}
-
-All commands follow the shared enforcement protocol (`${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md`):
-  research is mandatory, verification is evidence-based, fixes are verified immediately.
-
-Tip: /healer:help <command> for detailed help on any command
-═══════════════════════════════════════════════════════════
-```
-
-**Category assignments** (hardcoded mapping):
-
-```yaml
-core: [healer, flow]
-ideation: [validate, brainstorm, research, design, architect, spec, plan, strategy]
-design-intel: [brand, logo, cip, banner, icon, slides, design-system, design-review]
-implementation: [implement, tdd, refactor, optimize]
-quality: [test, coverage, review, audit, conform, verify, catchup]
-recording: [record, indulge]
-debug: [debug, fix]
-health: [diagnose, report, analyze]
-shipping: [push, ship, deploy, docs]
-help: [help]
-```
-
-### Mode: flows
-
-Display all 8 built-in flow presets:
+Behaves like `apropos`: scan `commands.<name>.purpose_short`, command names, and `flows.<name>.purpose_short` (case-insensitive substring). Print one line per match:
 
 ```
-HEALER — Flow Presets (14)
-═══════════════════════════════════════════════════════════
-
-  PRESET          PIPELINE
-  ──────────────  ──────────────────────────────────────────
-  feature         brainstorm ?→ plan ?→ implement → test !→ review ?→ ship !→
-  fix             diagnose → debug → fix → test !→ push ?→
-  deploy          diagnose !→ review ?→ ship !→
-  audit           analyze → audit → coverage → report
-  morning         diagnose → report
-  refactor        analyze → plan ?→ refactor → test !→ review ?→ push ?→
-  tdd             plan ?→ tdd → coverage → review ?→ push ?→
-  research        research → brainstorm ?→ design ?→ spec
-  ideate          validate ?→ brainstorm ?→ research → design ?→ strategy ?→ spec ?→ plan ?→
-  visual          brand ?→ design-system ?→ design ?→ design-review
-  identity        brand ?→ logo ?→ cip ?→ design-system ?→
-  conform         conform !→ implement → conform !→ test !→ push ?→
-  brand-to-prod   brand ?→ design-system ?→ design ?→ implement → test !→ review ?→ ship !→
-
-GATE OPERATORS
-  →   AUTO          Continue automatically
-  ?→  INTERACTIVE   Pause for user approval
-  !→  MUST-PASS     Halt if step fails (enforced — no override, no "continue anyway?")
-
-ENFORCEMENT
-  Each sub-command in a flow runs its COMPLETE procedure including
-  all enforcement protocols (research, verification, fix-verify cycles).
-  Flows do not shortcut sub-commands.
-
-USAGE
-  /healer:flow feature                    Run a preset
-  /healer:flow brainstorm → plan → test   Inline custom chain
-  /healer:flow my-recipe                  Run a custom recipe
-
-Tip: /healer:help recipes for custom recipes
-     /healer:help gates for gate operator details
-═══════════════════════════════════════════════════════════
-```
-
-### Mode: recipes
-
-Read `~/.healer/recipes.yaml` and display all custom recipes:
-
-```
-HEALER — Custom Recipes
-═══════════════════════════════════════════════════════════
-Source: ~/.healer/recipes.yaml
-
-  RECIPE              DESCRIPTION                              STEPS
-  ──────────────────  ───────────────────────────────────────  ─────
-  {recipe-name}       {description from YAML}                  {N}
+HEALER — apropos: "{term}"
+─────────────────────────────────────────────────────────────
+COMMANDS
+  healer:{name} ({category})  — {purpose_short}
+  ...
+FLOWS
+  flow {name}  — {purpose_short}
   ...
 
-  (For each recipe, list the name, description, and step count)
-
-USAGE
-  /healer:flow <recipe-name>
-
-Tip: Edit ~/.healer/recipes.yaml to add your own recipes
-═══════════════════════════════════════════════════════════
+{N} match(es). Use `/healer:help <name>` for the full page.
 ```
 
-For each recipe found in the YAML, also show its pipeline on a second line if the user might benefit from seeing the step sequence:
+If zero matches: `No manual entry matching "{term}". Try /healer:help commands to browse all.`
+
+## Mode: index (`commands`)
+
+Like `man -k .` — every command, grouped by section. Read names, categories, and `purpose_short` from the index. Counts from `_meta`.
 
 ```
-  full-feature        Complete feature from idea to production       10
-                      brainstorm ?→ research → design ?→ spec ?→ plan ?→ tdd → coverage → review ?→ docs → ship !→
+HEALER — Commands ({command_count})
+─────────────────────────────────────────────────────────────
+{CATEGORY, uppercased}
+  healer:{name}        {purpose_short}
+  ...
+
+Tip: /healer:help <command> for the full man page · /healer:help -k <term> to search
 ```
 
-### Mode: gates
+## Mode: flows
+
+Print `flow_overview` from the index VERBATIM (it is the pre-rendered flow man index). If the user wants a specific preset, direct them to `/healer:help flow <preset>` or `/healer:flow <preset> --help`.
+
+## Mode: gates
 
 ```
 HEALER — Gate Operators
-═══════════════════════════════════════════════════════════
-
+─────────────────────────────────────────────────────────────
 Gates control how flow steps chain together:
 
-  SYMBOL   NAME          ON SUCCESS              ON FAILURE
-  ──────   ────────────  ──────────────────────  ──────────────────────────
-  →        AUTO          Continue to next step   Log warning, continue
-  ?→       INTERACTIVE   Ask user to continue    Ask user: continue anyway?
-  !→       MUST-PASS     Continue to next step   HALT — stop the flow
+  SYMBOL  NAME         ON SUCCESS             ON FAILURE
+  ──────  ───────────  ─────────────────────  ──────────────────────
+  →       auto         continue to next step  log warning, continue
+  ?→      interactive  ask user to continue   ask user: continue anyway?
+  !→      must-pass    continue to next step  HALT — stop the flow (no override)
 
-ENFORCEMENT (v6)
-  !→ (must-pass) gates are absolute. When a step fails at a must-pass
-  gate, the flow HALTS immediately. There is no "continue anyway?" prompt.
-  The user must explicitly fix the issue and restart.
-
-  Gate checks are based on ACTUAL verification output from the sub-command,
-  not on guesses or assumptions. Each sub-command must complete its full
-  verification protocol before the gate evaluates its result.
+!→ (must-pass) is absolute: a failure halts the flow immediately, with no
+"continue anyway?" prompt. Gate checks read each sub-command's ACTUAL
+verification output, never a guess.
 
 EXAMPLES
+  /healer:flow diagnose → analyze → report          all auto
+  /healer:flow brainstorm ?→ plan ?→ implement      interactive checkpoints
+  /healer:flow implement → test !→ deploy           must-pass before deploy
 
-  # All auto — fast, hands-off
-  /healer:flow diagnose → analyze → report
-
-  # Interactive checkpoints — review before proceeding
-  /healer:flow brainstorm ?→ plan ?→ implement → test
-
-  # Must-pass gates — stop if tests fail
-  /healer:flow implement → test !→ deploy
-
-  # Mixed gates
-  /healer:flow diagnose !→ review ?→ ship !→
-
-INLINE CUSTOM CHAINS
-  You can build any pipeline inline:
-  /healer:flow step1 → step2 ?→ step3 !→ step4
-
-BUILT-IN PRESET GATES
-  Presets have pre-configured gates.
-  Run /healer:help flows to see the gate assignments for each preset.
-═══════════════════════════════════════════════════════════
+SEE ALSO
+  /healer:help flows · /healer:flow <preset> --help
 ```
 
-### Mode: examples
+## Mode: examples
+
+Show concrete, realistic invocations across the lifecycle. Keep it scannable. Pull command names from the index so you never reference a removed command.
 
 ```
 HEALER — Usage Examples
-═══════════════════════════════════════════════════════════
-
-EVERYDAY COMMANDS
+─────────────────────────────────────────────────────────────
+EVERYDAY
   /healer                                 Full autonomous heal
   /healer:diagnose                        Quick health check
   /healer:report                          Formal health report
 
-FEATURE DEVELOPMENT
-  /healer:brainstorm user authentication  Explore auth approaches
+FEATURE WORK
+  /healer:brainstorm payments             Explore approaches
   /healer:plan OAuth2 login               Plan implementation
-  /healer:implement payment processing    Build with research
-  /healer:tdd shopping cart               Test-driven development
+  /healer:implement checkout flow         Build with research
+  /healer:flow feature                    Full feature pipeline
 
-DEBUGGING & FIXING
-  /healer:debug flaky test in auth        Systematic debugging
-  /healer:fix unit                        Fix failing unit tests
-  /healer:fix e2e                         Fix failing e2e tests
+DEBUG & FIX
+  /healer:debug flaky auth test           Systematic debugging
+  /healer:fix unit                        Fix failing unit suite
+  /healer:flow fix                        diagnose → debug → fix → test → push
 
-QUALITY & REVIEW
-  /healer:test checkout flow              Write tests with research
-  /healer:coverage                        Coverage analysis
-  /healer:review                          Code review with best practices
+QUALITY & SHIP
+  /healer:review                          Code review w/ best practices
   /healer:audit security                  Security-focused audit
-
-SHIPPING
-  /healer:push                            Commit + push
   /healer:ship                            Full PR workflow
-  /healer:deploy staging                  Deploy to staging
 
-FLOW PIPELINES
-  /healer:flow feature                    Full feature lifecycle
-  /healer:flow fix                        Diagnose → fix → test → push
-  /healer:flow morning                    Quick morning check
-  /healer:flow brainstorm → plan → tdd    Custom pipeline
+DESIGN
+  /healer:brand my-product                Brand voice + identity
+  /healer:design-system                   Design system generator
+  /healer:flow visual                     brand → design-system → review
 
-RESEARCH & DESIGN
-  /healer:validate SaaS idea             Demand validation before building
-  /healer:research WebSocket scaling      Deep research
-  /healer:architect microservices         Architecture design
-  /healer:design REST API for users       API/UX design
-  /healer:spec GraphQL subscriptions      Technical specification
-  /healer:strategy                        CEO-level plan review
+DISCOVERY
+  /healer:imitate --layer=frontend        Reverse-engineer a layer
+  /healer:indulge --full                  Exhaustive flow testing
 
-DESIGN INTELLIGENCE
-  /healer:brand my-product               Brand voice + visual identity
-  /healer:logo my-brand                  Logo design brief
-  /healer:design-system                  Full design system generator
-  /healer:design-review                  Visual & UX quality audit
-  /healer:banner launch campaign         Banner & social media design
-  /healer:slides pitch deck              HTML presentation
-  /healer:flow visual                    Brand → design system → review
-  /healer:flow identity                  Brand → logo → CIP → system
-
-IMITATE & FLOW TESTING
-  /healer:imitate                           Reverse-engineer all 5 layers into 4-in-1 doc
-  /healer:imitate --layer=frontend          Scope to one layer (frontend|backend|server|db|ai)
-  /healer:imitate --layer=backend,db        Scope to multiple layers
-  /healer:imitate --full --claude-md        Full imitation + CLAUDE.md (all 10x flags)
-  /healer:imitate --risk                    Imitate with risk scoring per flow
-  /healer:imitate --impact src/payment.ts   Show all flows affected by this file
-  /healer:imitate --diff                    Compare against previous imitate
-  /healer:imitate --user-stories            Generate user stories from flows
-  /healer:imitate --services --deps         Service map + dependency graph
-  /healer:imitate --validate                Check if existing imitate is stale
-  /healer:indulge                           Test every imitate-discovered flow (6 dimensions)
-  /healer:indulge --full --dashboard      Full testing + HTML dashboard (22 flags)
-  /healer:indulge --security --contract   Security + API contract testing
-  /healer:indulge --flake-check --trace   Flakiness detection + trace capture
-  /healer:indulge --fixtures              Generate mock fixtures alongside tests
-  /healer:indulge --auto-heal             Auto-fix failing flows
-  /healer:flow record-test                Record → indulge pipeline
-  /healer:flow record-full                Full 10x recording + testing
-  /healer:flow record-onboard             Onboard: record --full --claude-md → report
-
-ADVANCED
-  /healer --check                         Assessment only (no changes)
-  /healer --learn "React Server Components"  Research mode
-  /healer --implement onboarding flow     Feature from scratch
-  /healer --ref https://example.com       Use reference for inspiration
-  /healer:optimize database queries       Performance investigation
-
-SMART NEXT-STEP
-  /healer                                 After any command, run with
-                                          no args to get suggested next step
-═══════════════════════════════════════════════════════════
+GETTING HELP
+  /healer:<cmd> --help                    Man page for any command (also -h, ?)
+  /healer:help -k test                    Search the manual
 ```
 
-### Mode: quickstart
+## Mode: quickstart (`intro`)
 
 ```
-HEALER — Quick Start Guide
-═══════════════════════════════════════════════════════════
-
-WHAT IS HEALER?
-  A 38-command suite for Claude Code that turns your AI
-  assistant into a research-augmented development engine.
-  Every command searches for best practices BEFORE acting.
-
-  Works on: JS/TS, Python, Go, Rust, Swift, Kotlin, C#,
-  Flutter, Ruby, Java, C/C++, Elixir, and more.
-
-INSTALL
-  git clone https://github.com/AnandSGit/Healer.git
-  cd Healer && ./install.sh
+HEALER — Quick Start
+─────────────────────────────────────────────────────────────
+WHAT IT IS
+  A multi-command suite for Claude Code. Every command researches
+  before acting, verifies with evidence, and follows a shared
+  enforcement protocol. Any language, any platform.
 
 FIRST STEPS
-  1. Open any project in Claude Code
-  2. Run /healer:diagnose to check project health
-  3. Run /healer:report for a formal health grade
-  4. Try /healer:flow morning for a quick daily check
+  1. /healer:diagnose                 Check project health
+  2. /healer:report                   Formal health grade
+  3. /healer:flow morning             Quick daily check
 
 BUILD A FEATURE
-  1. /healer:brainstorm my-feature       Explore the idea
-  2. /healer:plan my-feature             Create task plan
-  3. /healer:implement my-feature        Build it
-  4. /healer:test my-feature             Write tests
-  5. /healer:review                      Review code
-  6. /healer:ship                        PR + merge + deploy
-
-  Or use the flow shortcut:
   /healer:flow feature
+    (brainstorm → plan → implement → test → review → ship)
 
 FIX A BUG
-  1. /healer:diagnose                    Find what's broken
-  2. /healer:debug the-bug               Investigate
-  3. /healer:fix unit                    Fix tests
-  4. /healer:push                        Commit + push
-
-  Or: /healer:flow fix
+  /healer:flow fix
+    (diagnose → debug → fix → test → push)
 
 KEY CONCEPTS
-  • Commands    — 38 specialized tools (run /healer:help commands)
-  • Flows       — Chain commands into pipelines (run /healer:help flows)
-  • Recipes     — Custom reusable flows in ~/.healer/recipes.yaml
-  • Gates       — Control flow progression: → ?→ !→
-  • State       — .healer/state.json tracks progress + suggests next steps
-  • Research    — Every command searches online before acting
-  • Enforcement — Shared protocol ensuring research, verification & fixes
-                  are actually executed, not skipped (see below)
+  • Commands   — specialized tools          (/healer:help commands)
+  • Flows      — gated pipelines of commands (/healer:help flows)
+  • Recipes    — custom flows in ~/.healer/recipes.yaml
+  • Gates      — → auto · ?→ interactive · !→ must-pass
+  • Help       — /healer:<cmd> --help, /healer:help -k <term>
 
-GET MORE HELP
-  /healer:help                           This overview
-  /healer:help commands                  All commands
-  /healer:help flows                     Flow presets
-  /healer:help examples                  Usage examples
-  /healer:help <command>                 Any specific command
-═══════════════════════════════════════════════════════════
-```
-
-### Enforcement Layer (New in v6)
-
-All Healer commands now follow a shared enforcement protocol (`${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md`) that ensures:
-
-- **Research is mandatory** — every command that says "search online" now requires actual WebSearch/WebFetch/Context7 tool calls
-- **Verification is evidence-based** — "tests pass" means actual test output showing zero failures, not a guess
-- **Fixes are verified immediately** — apply one fix, run tests, verify, then move on
-- **Anti-rationalization** — common excuses for skipping steps are explicitly blocked
-- **Red-flag stop conditions** — automatic halt when approaches aren't working
-
-This enforcement layer is what makes Healer v6 actually effective at fixing issues, not just reporting them.
-
-When displaying help for any command in **detail** mode, mention that the command follows the enforcement protocol and link to `/healer:help gates` for gate enforcement details.
-
-### Mode: all
-
-Run ALL modes in sequence:
-1. Display **overview** header (abbreviated)
-2. Display **commands** table
-3. Display **flows** table
-4. Display **recipes** table
-5. Display **gates** reference
-6. Display **examples**
-
-Use section dividers between each.
-
-### Mode: search <term>
-
-1. Read all command files from `${CLAUDE_PLUGIN_ROOT}/commands/*.md`
-2. Read `~/.healer/recipes.yaml`
-3. Search for `<term>` (case-insensitive) in:
-   - Command names
-   - Command descriptions (YAML frontmatter)
-   - Command file content (procedure text)
-   - Flow preset names and step lists
-   - Recipe names, descriptions, and step lists
-4. Display matches grouped by type:
-
-```
-HEALER — Search: "{term}"
-═══════════════════════════════════════════════════════════
-
-MATCHING COMMANDS
-  /healer:{name}     {description}       (match in: {name|description|content})
-  ...
-
-MATCHING FLOWS
-  {preset-name}      {pipeline}          (match in: {name|steps})
-  ...
-
-MATCHING RECIPES
-  {recipe-name}      {description}       (match in: {name|description|steps})
-  ...
-
-{N} results found for "{term}"
-═══════════════════════════════════════════════════════════
-```
-
-If no results: `No results found for "{term}". Try /healer:help commands to browse all commands.`
-
-### Mode: detail (specific command)
-
-When the user provides a command name (e.g., `brainstorm`, `flow`, `fix`):
-
-1. Find the matching file: `${CLAUDE_PLUGIN_ROOT}/commands/{name}.md` (or `healer.md` if name is "healer")
-2. Read the file
-3. Extract and display:
-   - **Name** and **description** from frontmatter
-   - **Arguments** — from the `## Arguments` or `## Input` section
-   - **Procedure summary** — list the main steps (## Step headers)
-   - **Category** — from the hardcoded mapping
-   - **Enforcement** — note that the command follows the shared enforcement protocol
-   - **Suggested next** — from the next-step graph
-   - **Related commands** — other commands in the same category
-
-```
-HEALER — /healer:{name}
-═══════════════════════════════════════════════════════════
-{description}
-
-Category: {category}
-Enforcement: Follows shared enforcement protocol (`${CLAUDE_PLUGIN_ROOT}/shared/_enforcement.md`)
-
-ARGUMENTS
-  /healer:{name}                         {default behavior}
-  /healer:{name} [args]                  {with arguments}
-
-PROCEDURE
-  1. {Step 1 title}
-  2. {Step 2 title}
-  ...
-
-ENFORCEMENT PROTOCOLS APPLIED
-  - Research: mandatory tool calls before code changes
-  - Verification: evidence-based status claims
-  - Fix-verify: immediate verification after each fix
-
-AFTER THIS COMMAND
-  Suggested next: /healer:{suggested}
-  Or try: /healer:{alt1}, /healer:{alt2}
-
-RELATED COMMANDS
-  /healer:{related1}     {description}
-  /healer:{related2}     {description}
-
-Full docs: Read ${CLAUDE_PLUGIN_ROOT}/commands/{name}.md
-═══════════════════════════════════════════════════════════
-```
-
----
-
-## Suggested Next-Step Graph
-
-Use this graph to populate the "After this command" section:
-
-```yaml
-validate: [brainstorm, research]
-brainstorm: [plan, design, architect, spec, strategy]
-research: [brainstorm, design, implement]
-design: [spec, architect, implement, design-review]
-architect: [spec, design, plan]
-spec: [plan, implement]
-strategy: [plan, spec, implement]
-plan: [implement, tdd]
-implement: [test, conform, review, push]
-tdd: [coverage, review, push]
-refactor: [test, review, push]
-optimize: [test, review, push]
-test: [coverage, fix, push]
-coverage: [test, fix]
-debug: [fix, test]
-fix: [test, diagnose, push]
-review: [fix, push, ship]
-analyze: [refactor, audit, fix]
-audit: [fix, implement]
-diagnose: [fix, report, deploy]
-report: [fix, deploy]
-push: [ship, deploy]
-ship: []
-deploy: []
-docs: [push]
-brand: [logo, design-system, cip]
-logo: [icon, cip, brand]
-cip: [design-system, banner]
-banner: [slides, push]
-icon: [implement, push]
-slides: [push, ship]
-design-system: [design, design-review, conform, implement]
-design-review: [design, implement, conform, fix]
-conform: [verify, implement, fix, push]
-record: [indulge, verify, test, report, analyze]
-indulge: [fix, test, push, report, coverage]
-flow: []
-help: []
-healer: []
-```
-
----
-
-## Category Mapping
-
-```yaml
-core: [healer, flow]
-ideation: [validate, brainstorm, research, design, architect, spec, plan, strategy]
-design-intel: [brand, logo, cip, banner, icon, slides, design-system, design-review]
-implementation: [implement, tdd, refactor, optimize]
-quality: [test, coverage, review, audit, conform, verify, catchup]
-recording: [record, indulge]
-debug: [debug, fix]
-health: [diagnose, report, analyze]
-shipping: [push, ship, deploy, docs]
-help: [help]
+SEE ALSO
+  /healer:help · /healer:help commands · /healer:help examples
 ```
 
 ---
 
 ## Rules
 
-1. **Always read files dynamically** — never hardcode descriptions; read them from the command files and recipes.yaml
-2. **Format consistently** — use the box-drawing format shown above for all output
-3. **Be scannable** — users should find what they need in seconds
-4. **Suggest next actions** — every help output ends with a "Tip:" or "See also:"
-5. **Handle typos gracefully** — if a command name doesn't match exactly, suggest the closest match
-6. **Keep it concise** — help should inform, not overwhelm
-7. **Show real examples** — use concrete, realistic arguments in examples
-8. **Update state** — write to `.healer/state.json` with `last_command: "help"` and `suggested_next: null`
-9. **Mention enforcement** — when showing detail for any command, note that it follows the shared enforcement protocol
+1. **Never hardcode** command names, counts, or descriptions — read `data/help-index.json` at runtime. This is what keeps help from drifting.
+2. **Print panels verbatim** — `commands.<name>.panel`, `flows.<name>.panel`, and `flow_overview` are pre-rendered man pages. Do not reformat or summarize them.
+3. **Counts come from `_meta`** — `command_count` and `flow_count`, never a literal.
+4. **Be a manual, not a chatbot** — match the man/apropos idioms above; users should find what they need in seconds.
+5. **Handle typos gracefully** — if a command name doesn't match exactly, fall through to apropos and suggest the closest matches.
+6. **Update state** — write `.healer/state.json` with `last_command: "help"` and `suggested_next: null`.
