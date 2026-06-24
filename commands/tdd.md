@@ -1,5 +1,6 @@
 ---
 description: "Test-driven development — write failing tests first, then implement the minimum code to pass them, then refactor. Red-Green-Refactor cycle."
+argument-hint: "[feature]"
 ---
 
 <!-- Help metadata: data/commands.yaml -->

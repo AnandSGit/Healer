@@ -1,5 +1,6 @@
 ---
 description: "Deep research on a topic, technology, market, or approach — fetches docs, repos, articles, competitor intel, and community insights. Saves artifacts for cross-session reuse. Modes: --technical, --product, --deep, --quick."
+argument-hint: "[topic] [--technical|--product|--deep|--quick]"
 ---
 
 <!-- Help metadata: data/commands.yaml -->
@@ -64,8 +65,8 @@ Parse the topic into specific research questions. Classify the research type:
 
 ```
 For each library/framework in the topic:
-  1. mcp__claude_ai_Context7__resolve-library-id -> find the library
-  2. mcp__claude_ai_Context7__query-docs -> fetch current docs for the specific topic
+  1. the Context7 MCP resolve-library-id tool -> find the library
+  2. the Context7 MCP query-docs tool -> fetch current docs for the specific topic
   3. Record findings as 5-star authoritative source
 ```
 

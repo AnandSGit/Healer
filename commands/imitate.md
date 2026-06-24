@@ -1,5 +1,6 @@
 ---
 description: "Reverse-engineer a specific layer (frontend, backend, server, db, ai) — or the whole app — into a single 4-in-1 document combining Requirements + Design + Spec + Implementation Plan, PLUS a machine-readable Style DNA YAML for deterministic replication by /healer:adapt. The FIRST healer command that reads code and PRODUCES enough information to rebuild the layer from scratch (reverse direction of spec -> implement -> verify). 9-layer discovery, flow ID system, cross-reference matrix, full visual Style DNA capture (page compositions PC-NNN, visual motifs VM-NNN, chart render configs CH-NNN, icon usage IC-NNN, branding assets BR-NNN, copy voice CV-NNN, AI response patterns AR-NNN, motion literals MD-NNN), and 10x features (Mermaid diagrams, risk scoring, git timeline, impact analysis, dead code detection, imitate diff, CLAUDE.md generation, OpenAPI generation, optional rendered evidence via headless browser)."
+argument-hint: "[--layer=<list>] [--style-dna | --no-style-dna] [--pages=exhaustive|sample] [--rendered] [--deep-style] [--full | --risk | --impact <file> | --diff | --claude-md | ...]"
 ---
 
 <!-- Help metadata: data/commands.yaml -->

@@ -1,5 +1,6 @@
 ---
 description: "Karpathy-lens code review — checks recent changes against the four Karpathy principles (Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution) with research-augmented validation."
+argument-hint: "[target]"
 ---
 
 <!-- Help metadata: data/commands.yaml -->

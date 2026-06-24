@@ -1,5 +1,6 @@
 ---
 description: "Demand validation diagnostic — challenges whether the idea is worth building using YC-style forcing questions, The Mom Test principles, lean startup validation, and anti-sycophancy rules. Use BEFORE brainstorming."
+argument-hint: "[idea]"
 ---
 
 <!-- Help metadata: data/commands.yaml -->

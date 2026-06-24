@@ -1,5 +1,6 @@
 ---
 description: "Write detailed technical specifications — with acceptance tests, API contracts, error catalogs, traceability matrices, and non-functional requirements. Cross-referenced with public RFCs, ADRs, prior healer artifacts, and current library docs via Context7."
+argument-hint: "[feature]"
 ---
 
 <!-- Help metadata: data/commands.yaml -->

@@ -1,5 +1,6 @@
 ---
 description: "Research-augmented documentation generation — auto-generates README, API docs, architecture docs, component docs, and setup guides by analyzing code and comparing against best-in-class open source documentation."
+argument-hint: "[target]"
 ---
 
 <!-- Help metadata: data/commands.yaml -->
@@ -54,8 +55,8 @@ Execute these tool calls (mandatory):
 3. WebSearch("{framework} API documentation generation")
 4. WebFetch top results for documentation structure inspiration
 5. Context7 MCP for library-specific documentation patterns:
-   → mcp__claude_ai_Context7__resolve-library-id to find the library
-   → mcp__claude_ai_Context7__query-docs for current documentation patterns
+   → the Context7 MCP resolve-library-id tool to find the library
+   → the Context7 MCP query-docs tool for current documentation patterns
 ```
 
 Synthesize findings into:

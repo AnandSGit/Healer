@@ -1,5 +1,6 @@
 ---
 description: "Flow orchestrator — chains multiple healer sub-commands into pipelines with gate controls, 26 built-in presets, custom YAML recipes, and smart next-step suggestions. The conductor of the healer orchestra."
+argument-hint: "<preset|recipe|inline-chain> [topic]"
 ---
 
 <!-- Help metadata: data/commands.yaml -->
@@ -106,7 +107,9 @@ Ready to start? [Y/n]
 For each step in the flow:
 
 1. **Announce**: `▶ Step {N}/{total}: /healer:{command}`
-2. **Execute**: Run the healer sub-command by following its full procedure
+2. **Execute**: Invoke the sub-command through the **`SlashCommand` tool** (e.g. `/healer:{command} {args}`) so each step runs as a real, self-contained command rather than an inlined paraphrase. This preserves the sub-command's own frontmatter, enforcement protocols, and verification gates.
+   - If the `SlashCommand` tool is unavailable in the current environment, fall back to executing the sub-command by following its full procedure verbatim from `${CLAUDE_PLUGIN_ROOT}/commands/{command}.md`.
+   - Either way, the sub-command's COMPLETE procedure (including its research and verification HARD-GATEs) MUST run — a flow never grants permission to shortcut a step.
 3. **Capture result**: SUCCESS / FAILURE / PARTIAL
 4. **Write state** to `.healer/state.json`:
    ```json

@@ -140,10 +140,15 @@ When a skill says "search online" or "research", you MUST use these actual tools
 ```
 RESEARCH PROTOCOL — Execute in this order:
 
-1. CONTEXT7 FIRST (if available):
-   → Use mcp__claude_ai_Context7__resolve-library-id to find the library
-   → Use mcp__claude_ai_Context7__query-docs to fetch current documentation
+1. CONTEXT7 FIRST (if a Context7 MCP server is connected):
+   → Use the Context7 MCP resolve-library-id tool to find the library
+   → Use the Context7 MCP query-docs tool to fetch current documentation
    → This gets you AUTHORITATIVE, UP-TO-DATE docs — not training data
+   → NOTE: the exact tool id depends on how Context7 is connected
+     (e.g. mcp__context7__* for a locally-installed server,
+     mcp__claude_ai_Context7__* for the claude.ai integration).
+     Use whichever Context7 tools are available. If NO Context7 server
+     is connected, skip this step and rely on WebSearch + WebFetch below.
 
 2. WEB SEARCH for broader context:
    → Use WebSearch with specific queries:
@@ -420,22 +425,28 @@ DETECT STACK (run once per session, cache results):
 
 ## Subagent Dispatch Protocol
 
-For complex tasks, dispatch focused subagents instead of doing everything in one context:
+For complex tasks, dispatch focused subagents (via the **`Agent` tool**) instead of doing everything in one context. Healer ships three purpose-built agents in `agents/` — prefer them over ad-hoc generic agents:
+
+| Agent (`subagent_type`) | Role | Tools |
+|-------------------------|------|-------|
+| `researcher` | Read-only Research Protocol → returns a Research Brief | read + WebSearch/WebFetch |
+| `implementer` | Build ONE scoped task, Fix-Verify after each change | read + Edit/Write/Bash |
+| `spec-reviewer` | Read-only review (correctness/security/perf/conformance) | read + Bash + WebSearch/WebFetch |
 
 ```
 WHEN TO DISPATCH SUBAGENTS:
 
-  - When implementing 3+ independent files → dispatch parallel implementer agents
-  - When fixing requires both research AND implementation → research agent first, then fix agent
-  - When reviewing → separate spec-compliance agent and code-quality agent
+  - When implementing 3+ independent files → dispatch parallel `implementer` agents (one per file)
+  - When fixing requires both research AND implementation → `researcher` first, hand its brief to `implementer`
+  - When reviewing → dispatch `spec-reviewer` (independent from whoever wrote the code)
 
-HOW TO DISPATCH:
+HOW TO DISPATCH (via the Agent tool):
 
-  1. Extract the FULL task description (not a reference)
-  2. Include relevant context: stack info, file paths, conventions
-  3. Include the enforcement protocol reference
-  4. Set clear success criteria
-  5. Review the subagent's output — don't blindly trust it
+  1. Choose the agent type (`researcher` / `implementer` / `spec-reviewer`)
+  2. Extract the FULL task description (not a reference) into the prompt
+  3. Include relevant context: detected stack, file paths, conventions, success criteria
+  4. Reference this enforcement protocol so the subagent inherits the HARD-GATEs
+  5. Review the subagent's structured output — don't blindly trust it
 ```
 
 ---

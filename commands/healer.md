@@ -1,5 +1,6 @@
 ---
 description: "Full autonomous codebase engine — discover, understand, assess, research, plan, execute, and verify any project in any language on any platform. 41 sub-commands, 26 flow presets, design intelligence, 10x recording & flow testing."
+argument-hint: "[--check | --learn <topic> | --implement <feature> | --ref <url>]"
 ---
 
 <!-- Help metadata: data/commands.yaml -->
@@ -325,7 +326,7 @@ FOR EACH identified gap, failure, or implementation task:
 
   2. READ authoritative sources using explicit tool calls:
      → Use WebFetch tool to read: Official documentation pages (Apple Developer, Android Developers, MDN, etc.)
-     → Use mcp__claude_ai_Context7__resolve-library-id and mcp__claude_ai_Context7__query-docs for library docs
+     → Use the Context7 MCP resolve-library-id tool and the Context7 MCP query-docs tool for library docs
      → Use WebFetch tool to read: Highly-rated Stack Overflow answers
      → Use WebFetch tool to read: Blog posts from recognized experts
      → Use WebFetch tool to read: GitHub repos with high stars implementing similar features

@@ -1,5 +1,6 @@
 ---
 description: "Research-augmented feature design — APIs, data models, UX flows, visual design systems, and HTML previews inspired by public design systems, pattern libraries, and real-world examples."
+argument-hint: "[feature]"
 ---
 
 <!-- Help metadata: data/commands.yaml -->

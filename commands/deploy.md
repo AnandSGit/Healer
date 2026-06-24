@@ -1,5 +1,6 @@
 ---
 description: "Research-augmented production deployment — runs all test suites as a gate check, deploys to the detected platform, and runs post-deploy smoke tests."
+argument-hint: "[environment]"
 ---
 
 <!-- Help metadata: data/commands.yaml -->

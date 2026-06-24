@@ -1,5 +1,6 @@
 ---
 description: "Banner and social media design — 22 banner styles, 9+ social platforms, size specifications, style recommendations, and HTML/CSS banner generation for web and social media campaigns."
+argument-hint: "[campaign]"
 ---
 
 <!-- Help metadata: data/commands.yaml -->

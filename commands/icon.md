@@ -1,5 +1,6 @@
 ---
 description: "Icon system design — 15 icon styles, SVG generation guidance, icon library selection, accessibility requirements, and consistent icon system specifications for applications."
+argument-hint: "[project]"
 ---
 
 <!-- Help metadata: data/commands.yaml -->

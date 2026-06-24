@@ -1,5 +1,6 @@
 ---
 description: "Interactive help system — list commands, flows, recipes, gates, examples, and get detailed help for any healer sub-command"
+argument-hint: "[mode|command-name|search-term]"
 ---
 
 <!-- Help metadata: data/commands.yaml -->

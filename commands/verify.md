@@ -1,5 +1,6 @@
 ---
 description: "Requirement-driven autonomous verification engine — reads all specs, designs, and requirements, traces each through code across 9 behavioral dimensions, fixes all gaps via sub-command dispatch, and loops until every requirement is demonstrably working. The behavioral counterpart to /healer:conform."
+argument-hint: "[scope]"
 ---
 
 <!-- Help metadata: data/commands.yaml -->

@@ -1,5 +1,6 @@
 ---
 description: "Comprehensive status report generator — runs all test suites and produces a formal health report with pass/fail counts, error summaries, and overall grade."
+argument-hint: "[format]"
 ---
 
 <!-- Help metadata: data/commands.yaml -->

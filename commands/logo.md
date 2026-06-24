@@ -1,5 +1,6 @@
 ---
 description: "Logo design guidance — 55+ logo styles, color psychology, industry conventions, AI generation prompts, and do/don't rules. Produces a logo brief, not the logo itself."
+argument-hint: "[brand]"
 ---
 
 <!-- Help metadata: data/commands.yaml -->

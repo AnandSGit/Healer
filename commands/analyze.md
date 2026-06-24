@@ -1,5 +1,6 @@
 ---
 description: "Analyze codebase health — patterns, tech debt, dependencies, and quality compared against industry best practices from online sources."
+argument-hint: "[scope]"
 ---
 
 <!-- Help metadata: data/commands.yaml -->

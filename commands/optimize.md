@@ -1,5 +1,6 @@
 ---
 description: "Research-augmented performance investigation — 10-phase structured workflow with baselines, profiling, hypothesis testing, controlled experiments, and evidence-backed optimization. Stores baseline artifacts for tracking over time."
+argument-hint: "[target]"
 ---
 
 <!-- Help metadata: data/commands.yaml -->

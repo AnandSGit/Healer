@@ -1,5 +1,6 @@
 ---
 description: "Complete PR workflow — branch, commit, push, create PR, wait for auto-reviewers, resolve all comments in a loop, merge, deploy with rollback. End-to-end from code to production."
+argument-hint: "[pr-title]"
 ---
 
 <!-- Help metadata: data/commands.yaml -->

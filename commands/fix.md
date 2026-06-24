@@ -1,5 +1,6 @@
 ---
 description: "Research-augmented targeted fix — runs a specific test suite, analyzes failures, searches online for error messages and known issues, then fixes root causes with max 5 iterations."
+argument-hint: "<suite>"
 ---
 
 <!-- Help metadata: data/commands.yaml -->
@@ -45,7 +46,7 @@ Execute these tool calls (not optional):
 1. WebSearch("{exact error message stripped of file paths}")
 2. WebSearch("{error type} {framework} known issue {year}")
 3. WebFetch on the top 2-3 relevant URLs from search results
-4. If a library is involved: mcp__claude_ai_Context7__resolve-library-id → mcp__claude_ai_Context7__query-docs
+4. If a library is involved: the Context7 MCP resolve-library-id tool → the Context7 MCP query-docs tool
 
 Compile a brief **Fix Research Brief** per error:
 ```

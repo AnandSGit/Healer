@@ -1,5 +1,6 @@
 ---
 description: "Design system generator — creates complete visual identity from scratch: color palettes, typography scales, spacing systems, component patterns, and interactive HTML previews. Produces DESIGN.md as the project's design source of truth."
+argument-hint: "[project]"
 ---
 
 <!-- Help metadata: data/commands.yaml -->
@@ -183,8 +184,8 @@ Execute these tool calls:
 8. WebFetch on the top 3-5 URLs from the above searches
 
 **Framework-specific research (if CSS framework detected):**
-9. Context7: `mcp__claude_ai_Context7__resolve-library-id` for the detected CSS framework
-10. Context7: `mcp__claude_ai_Context7__query-docs` for theme configuration and customization
+9. Context7: `the Context7 MCP resolve-library-id tool` for the detected CSS framework
+10. Context7: `the Context7 MCP query-docs tool` for theme configuration and customization
 
 **PROOF REQUIREMENT**: Your response MUST include at least 3 WebSearch calls and at least 1 WebFetch call. If you skip this, you are violating the enforcement protocol.
 

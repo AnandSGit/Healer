@@ -1,5 +1,6 @@
 ---
 description: "Atomic scaffolder for new healer commands — interactively prompts for all metadata, writes commands/<name>.md AND data/commands.yaml entry in one operation, runs validation, rebuilds index. Eliminates drift risk from manual two-place updates."
+argument-hint: "<name>"
 ---
 
 <!-- Help metadata: data/commands.yaml -->

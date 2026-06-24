@@ -1,5 +1,6 @@
 ---
 description: "Research-augmented system architecture — service boundaries, infrastructure, scalability patterns, cost estimation, failure mode analysis, and security architecture informed by public postmortems, tech blogs, and current documentation."
+argument-hint: "[system]"
 ---
 
 <!-- Help metadata: data/commands.yaml -->
@@ -65,7 +66,7 @@ Execute these tool calls (mandatory):
 4. **WebSearch** — `"{system type} ADR architecture decision record"`
 5. **WebSearch** — `"{system type} infrastructure cost estimation {cloud provider}"`
 6. **WebFetch** — top 3 results (especially postmortems — failures teach more than successes)
-7. For every framework/infrastructure technology mentioned: **mcp__claude_ai_Context7__resolve-library-id** then **mcp__claude_ai_Context7__query-docs** — fetch current documentation to ensure architecture decisions use current APIs, features, and best practices. Do not rely on training data for framework capabilities.
+7. For every framework/infrastructure technology mentioned: **the Context7 MCP resolve-library-id tool** then **the Context7 MCP query-docs tool** — fetch current documentation to ensure architecture decisions use current APIs, features, and best practices. Do not rely on training data for framework capabilities.
 
 **PROOF REQUIREMENT**: Your response MUST include at least 2 WebSearch tool calls, 1 WebFetch call, and Context7 lookups for each major technology in the stack. If you skip this, you are violating the enforcement protocol.
 

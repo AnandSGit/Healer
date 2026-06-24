@@ -1,5 +1,6 @@
 ---
 description: "Research-augmented test writing — searches for testing patterns, edge case strategies, and framework-specific test examples from GitHub and articles before writing comprehensive tests."
+argument-hint: "[target]"
 ---
 
 <!-- Help metadata: data/commands.yaml -->
@@ -38,7 +39,7 @@ Execute these tool calls (mandatory):
 1. `WebSearch("{framework} testing {feature type} best practices")`
 2. `WebSearch("{test framework} {component type} test examples github")`
 3. `WebSearch("{feature type} edge cases testing gotchas")`
-4. If using a library: `mcp__claude_ai_Context7__resolve-library-id` → `mcp__claude_ai_Context7__query-docs` for testing docs
+4. If using a library: `the Context7 MCP resolve-library-id tool` → `the Context7 MCP query-docs tool` for testing docs
 5. `WebFetch` the most relevant results
 
 Compile a brief **Test Research Brief** with:

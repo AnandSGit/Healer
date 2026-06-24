@@ -1,5 +1,6 @@
 ---
 description: "Test coverage analysis — identifies untested critical paths, measures coverage gaps, and prioritizes what to test next based on risk and impact."
+argument-hint: "[target]"
 ---
 
 <!-- Help metadata: data/commands.yaml -->

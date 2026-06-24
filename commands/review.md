@@ -1,5 +1,6 @@
 ---
 description: "Research-augmented code review — reviews recent changes for bugs, security, performance, and adherence to project conventions with online best practice validation."
+argument-hint: "[target]"
 ---
 
 <!-- Help metadata: data/commands.yaml -->
@@ -43,8 +44,8 @@ Execute these tool calls for each concern found:
 2. WebSearch("{framework} {pattern} best practice {year}")
 3. WebSearch("{API/library being used} known issues pitfalls")
 4. If a library: Context7 MCP for current docs
-   - `mcp__claude_ai_Context7__resolve-library-id` to find the library
-   - `mcp__claude_ai_Context7__query-docs` to fetch current documentation
+   - `the Context7 MCP resolve-library-id tool` to find the library
+   - `the Context7 MCP query-docs tool` to fetch current documentation
 
 **PROOF REQUIREMENT**: You MUST execute at least one WebSearch or Context7 call. If you skip this, you are violating the enforcement protocol.
 

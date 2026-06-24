@@ -1,5 +1,6 @@
 ---
 description: "CEO-level strategic review -- evaluates plans and designs for scope fitness, dangerous assumptions, 10x thinking, competitor landscape, and vitamin-vs-painkiller analysis. Use after brainstorming, before implementation."
+argument-hint: "[plan-or-design]"
 ---
 
 <!-- Help metadata: data/commands.yaml -->

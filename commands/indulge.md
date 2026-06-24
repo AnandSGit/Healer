@@ -1,5 +1,6 @@
 ---
 description: "Imitate-driven exhaustive flow testing engine — parses /healer:imitate output, systematically tests EVERY discovered flow across 6 dimensions (happy path, negative input, boundary cases, permission/auth, state violations, data integrity), generates repeatable test files, and produces detailed reports. Optional 10x features: visual regression, accessibility, security, performance, regression analysis, CI generation, auto-heal, HTML dashboard, and contract testing."
+argument-hint: "[--full | --security | --visual | --auto-heal | ...]"
 ---
 
 <!-- Help metadata: data/commands.yaml -->

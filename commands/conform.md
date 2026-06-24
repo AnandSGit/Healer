@@ -1,5 +1,6 @@
 ---
 description: "Design conformance gate — reads approved design docs before and after implementation, enforces pixel-perfect spec compliance, prevents drift between design artifacts and code. Run before /healer:push to catch visual regressions."
+argument-hint: "[target]"
 ---
 
 <!-- Help metadata: data/commands.yaml -->

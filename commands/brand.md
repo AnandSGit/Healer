@@ -1,5 +1,6 @@
 ---
 description: "Brand framework generator — creates brand voice, visual identity direction, messaging architecture, and asset guidelines. Produces brand-guidelines.md as the project's brand source of truth."
+argument-hint: "[product-or-company]"
 ---
 
 <!-- Help metadata: data/commands.yaml -->

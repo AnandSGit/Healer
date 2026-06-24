@@ -1,5 +1,6 @@
 ---
 description: "Visual and UX quality review — rates 7 design dimensions (0-10), detects AI slop patterns, checks design system alignment, responsive behavior, and accessibility compliance. Use after design or before shipping UI features."
+argument-hint: "[target]"
 ---
 
 <!-- Help metadata: data/commands.yaml -->
@@ -98,8 +99,8 @@ Execute these tool calls (mandatory):
 2. **WebSearch** — `"WCAG AA checklist interactive components {year}"` for accessibility baseline
 3. **WebSearch** — `"{framework} {component type} accessibility requirements"` for framework-specific a11y guidance
 4. **Context7 MCP** — If a UI framework is detected:
-   - `mcp__claude_ai_Context7__resolve-library-id` to find the component library
-   - `mcp__claude_ai_Context7__query-docs` for component API, accessibility props, and recommended patterns
+   - `the Context7 MCP resolve-library-id tool` to find the component library
+   - `the Context7 MCP query-docs tool` for component API, accessibility props, and recommended patterns
 
 **PROOF REQUIREMENT**: Your response MUST include at least one WebSearch or Context7 tool call. If you skip this, you are violating the enforcement protocol. Research informs your scoring baseline — without it, your scores are opinion, not assessment.
 

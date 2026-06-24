@@ -75,8 +75,8 @@ For every command that invokes this protocol, execute queries from these categor
 - For top 3-5 references: `WebFetch` the page URL and describe the visual treatment in prose (layout grid, typography choices, color relationships, motion, density).
 
 **Category 7 — Library / API current docs** (if any library is involved):
-- `mcp__claude_ai_Context7__resolve-library-id` for each library
-- `mcp__claude_ai_Context7__query-docs` for each resolved library
+- `the Context7 MCP resolve-library-id tool` for each library
+- `the Context7 MCP query-docs tool` for each resolved library
 - Cross-check method signatures, config keys, and types against your training-data assumptions. Context7 wins every conflict.
 
 **Category 8 — Contradiction & consensus scan** (synthesis):

@@ -1,5 +1,6 @@
 ---
 description: "Style DNA consumer and replicator — takes a StyleDNA YAML produced by /healer:imitate and applies it to a TARGET codebase. Reads the target's existing tokens/primitives/pages, computes a mapping plan (what tokens to write, which primitives to scaffold, which page compositions to echo), and optionally applies the plan. Three write modes: --plan-only (safe; produces ADAPTATION_PLAN.md and stops), --write-components (DEFAULT; writes tokens + primitives + compositions but does NOT clobber existing pages), --full (also rewrites target pages to echo source page compositions). Deterministic: same StyleDNA + same target SHA → same plan."
+argument-hint: "<path/to/StyleDNA.yaml> [--plan-only | --write-components | --full] [--only=<sections>] [--exclude=<sections>] [--copy-voice] [--branding] [--no-page-wipe] [--dry-run] [--report] [--target-root <path>]"
 ---
 
 <!-- Help metadata: data/commands.yaml -->

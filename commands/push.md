@@ -1,5 +1,6 @@
 ---
 description: "Research-augmented commit and push — stages changes, generates a conventional commit message with emoji prefix, and pushes to the current branch."
+argument-hint: "[message-hint]"
 ---
 
 <!-- Help metadata: data/commands.yaml -->

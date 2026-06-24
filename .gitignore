@@ -4,3 +4,5 @@
 *~
 .healer/state.json
 .healer/perf/
+__pycache__/
+*.pyc

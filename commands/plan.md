@@ -1,5 +1,6 @@
 ---
 description: "Research-augmented implementation planning — creates bite-sized task lists with dependency tracking, file mapping, requirement traceability, effort estimation, review checkpoints, verification protocol, and native task integration. Produces a reusable plan document with persistent memory."
+argument-hint: "[feature]"
 ---
 
 <!-- Help metadata: data/commands.yaml -->

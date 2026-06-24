@@ -1,5 +1,6 @@
 ---
 description: "Presentation design — HTML slide decks with Chart.js data visualization, copywriting formulas, slide strategies, layout patterns, and self-contained single-file presentations viewable in any browser."
+argument-hint: "[presentation]"
 ---
 
 <!-- Help metadata: data/commands.yaml -->

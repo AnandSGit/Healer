@@ -1,5 +1,6 @@
 ---
 description: "Research-augmented security and quality audit — scans for OWASP top 10 vulnerabilities, accessibility issues, dependency vulnerabilities, and license conflicts using CVE databases and public advisories."
+argument-hint: "[scope]"
 ---
 
 <!-- Help metadata: data/commands.yaml -->

@@ -1,5 +1,6 @@
 ---
 description: "Systematic debugging — structured troubleshooting with reproducible steps, hypothesis testing, and root cause isolation. Never guesses — always verifies."
+argument-hint: "[issue]"
 ---
 
 <!-- Help metadata: data/commands.yaml -->
@@ -49,7 +50,7 @@ Execute these tool calls (not optional):
 1. WebSearch("{exact error message stripped of file paths}")
 2. WebSearch("{error type} {framework} known issue {year}")
 3. WebFetch on the top 2-3 relevant URLs from search results
-4. If a library is involved: mcp__claude_ai_Context7__resolve-library-id → mcp__claude_ai_Context7__query-docs
+4. If a library is involved: the Context7 MCP resolve-library-id tool → the Context7 MCP query-docs tool
 
 <HARD-GATE>NO CODE CHANGES UNTIL RESEARCH PHASE IS COMPLETE WITH AT LEAST ONE WebSearch OR Context7 TOOL CALL.</HARD-GATE>
 

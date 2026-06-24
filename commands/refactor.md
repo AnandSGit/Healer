@@ -1,5 +1,6 @@
 ---
 description: "Research-augmented refactoring — improves code structure, readability, and maintainability using clean code patterns and examples from top open source projects."
+argument-hint: "[target]"
 ---
 
 <!-- Help metadata: data/commands.yaml -->

@@ -1,5 +1,6 @@
 ---
 description: "Research-augmented implementation — builds features by searching GitHub/GitLab for reference implementations, idiomatic patterns, and library best practices before writing code."
+argument-hint: "[feature]"
 ---
 
 <!-- Help metadata: data/commands.yaml -->
@@ -96,7 +97,7 @@ python3 ${CLAUDE_PLUGIN_ROOT}/scripts/search.py "<style_name>" --domain style
 Execute these tool calls (mandatory):
 1. `WebSearch("{feature type} {framework} implementation example github")`
 2. `WebSearch("{feature type} {framework} best practices {year}")`
-3. If using a library: `mcp__claude_ai_Context7__resolve-library-id` → `mcp__claude_ai_Context7__query-docs`
+3. If using a library: `the Context7 MCP resolve-library-id tool` → `the Context7 MCP query-docs tool`
 4. `WebFetch` on the top 2-3 relevant URLs
 5. `WebSearch("{feature type} {framework} common pitfalls anti-patterns")`
 

@@ -1,5 +1,6 @@
 ---
 description: "Corporate Identity Program — 50+ deliverables checklist, mockup generation guidance, style guide creation, and brand consistency enforcement across all touchpoints."
+argument-hint: "[brand]"
 ---
 
 <!-- Help metadata: data/commands.yaml -->
