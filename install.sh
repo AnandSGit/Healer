@@ -8,7 +8,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CLAUDE_SETTINGS="$HOME/.claude/settings.json"
 CLAUDE_COMMANDS="$HOME/.claude/commands"
 HEALER_CONFIG="$HOME/.healer"
-HEALER_VERSION=$(python3 -c "import json; print(json.load(open('$SCRIPT_DIR/plugin.json'))['version'])")
+HEALER_VERSION=$(HEALER_ROOT="$SCRIPT_DIR" python3 -c 'import json,os; d=os.environ["HEALER_ROOT"]; p=os.path.join(d,".claude-plugin","plugin.json"); p=p if os.path.exists(p) else os.path.join(d,"plugin.json"); print(json.load(open(p))["version"])')
 
 echo "═══════════════════════════════════════════════════"
 echo "  Healer v${HEALER_VERSION} — Universal Development Lifecycle Engine"
@@ -44,13 +44,15 @@ fi
 # ─── Step 2: Register Healer as a local marketplace ───
 echo "Registering Healer plugin..."
 
-# Use python3 to safely modify settings.json and installed_plugins.json
-python3 << PYEOF
+# Use python3 to safely modify settings.json and installed_plugins.json.
+# Paths are passed via the environment (not interpolated into the source) so
+# they survive repo paths containing quotes/backslashes.
+CLAUDE_SETTINGS="$CLAUDE_SETTINGS" SCRIPT_DIR="$SCRIPT_DIR" python3 << 'PYEOF'
 import json, sys, os
 from datetime import datetime, timezone
 
-settings_path = "$CLAUDE_SETTINGS"
-healer_path = "$SCRIPT_DIR"
+settings_path = os.environ["CLAUDE_SETTINGS"]
+healer_path = os.environ["SCRIPT_DIR"]
 installed_path = os.path.join(os.path.dirname(settings_path), "plugins", "installed_plugins.json")
 
 # --- Update settings.json ---
@@ -90,7 +92,10 @@ else:
 
 plugins = installed.setdefault('plugins', {})
 now = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%S.000Z')
-with open(os.path.join(healer_path, "plugin.json")) as f:
+manifest_path = os.path.join(healer_path, ".claude-plugin", "plugin.json")
+if not os.path.exists(manifest_path):
+    manifest_path = os.path.join(healer_path, "plugin.json")
+with open(manifest_path) as f:
     plugin_manifest = json.load(f)
 healer_version = plugin_manifest["version"]
 
@@ -139,7 +144,7 @@ if python3 -c "import yaml, jsonschema" 2>/dev/null; then
 else
   pip3 install --quiet --user pyyaml jsonschema 2>&1 | tail -3 || {
     echo "  ⚠️  Failed to install help catalog dependencies."
-    echo "      The `?` postfix help system requires PyYAML and jsonschema."
+    echo "      The \`?\` postfix help system requires PyYAML and jsonschema."
     echo "      Install manually: pip3 install --user pyyaml jsonschema"
   }
   if python3 -c "import yaml, jsonschema" 2>/dev/null; then
@@ -157,7 +162,7 @@ if bash "$SCRIPT_DIR/scripts/build-help-index.sh" >/dev/null 2>&1; then
     echo "  ✨ Try: /healer:flow ?  (or any /healer:<command> ?)"
   fi
 else
-  echo "  ⚠️  Help index build failed — `?` postfix help may be slow."
+  echo "  ⚠️  Help index build failed — \`?\` postfix help may be slow."
   echo "      Run manually: bash $SCRIPT_DIR/scripts/build-help-index.sh"
 fi
 
@@ -208,4 +213,8 @@ echo "    /healer:flow identity  # Brand → logo → CIP → system"
 echo ""
 echo "  Open user guide:"
 echo "    open $HEALER_CONFIG/healer-user-guide.html"
+echo ""
+echo "  To uninstall:"
+echo "    ./uninstall.sh           # unregister plugin (keeps your ~/.healer data)"
+echo "    ./uninstall.sh --purge   # also remove ~/.healer + synced design data"
 echo "═══════════════════════════════════════════════════"
